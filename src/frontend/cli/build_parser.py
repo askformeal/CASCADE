@@ -133,7 +133,7 @@ def build_parser():
     meta_parser = lib_sub.add_parser('meta', help='Manage metadata of songs in library', epilog=meta_epilog)
     meta_sub = meta_parser.add_subparsers(dest='meta_action', required=True)
 
-    meta_set_parser = meta_sub.add_parser('set', help='Set the value of metadata of a song in library. Using empty string (\"\") to clear a metadata')
+    meta_set_parser = meta_sub.add_parser('set', help='Set the value of metadata of a song in library')
     meta_set_parser.add_argument('song', type=str, help='Song to set metadata')
     meta_set_parser.add_argument('--name', type=str, default=None, help='Name of the song')
     meta_set_parser.add_argument('--artist', type=str, default=None, help='Artist of the song')
