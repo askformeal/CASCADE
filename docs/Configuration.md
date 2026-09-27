@@ -1,0 +1,45 @@
+# Configuration
+
+## Options
+
+| Option                                | TOML Section   | Default                       | Description                                                                                 |
+| ------------------------------------- | -------------- | ----------------------------- | ------------------------------------------------------------------------------------------- |
+| `username`                          | *(root)*     | `J. Doe`                    | Name shown in the welcome message. Just for fun                                             |
+| `backend_token`                     | `network`    | *(empty)*                   | Token the backend verifies requests with. Empty disables auth                               |
+| `frontend_token`                    | `network`    | *(empty)*                   | Token frontends send with requests                                                          |
+| `backend_host` / `backend_port`   | `network`    | `127.0.0.1` / `17891`     | Address the backend listens on                                                              |
+| `frontend_host` / `frontend_port` | `network`    | `127.0.0.1` / `17891`     | Address frontends sends requests to                                                         |
+| `connection_timeout`                | `network`    | `3`                         | Timeout of frontends waiting for the backend's acknowledge (seconds)                        |
+| `execution_timeout`                 | `network`    | `30`                        | Timeout of frontends waiting for the backend's response (seconds)                           |
+| `proxy`                             | `network`    | *(empty)*                   | Proxy used when fetching lyrics online; empty uses the system default                       |
+| `netease_skip_proxy`                | `network`    | `false`                     | Connect to the NetEase lyric source without using proxy                                     |
+| `hotkey`                            | `service`    | `true`                      | Enable media key service                                                                    |
+| `tray`                              | `service`    | `true`                      | Enable tray icon service                                                                    |
+| `lyric`                             | `service`    | `true`                      | Enable lyric board service                                                                  |
+| `engine`                            | `playback`   | `miniaudio`                 | Audio engine (`vlc` / `miniaudio`)                                                      |
+| `default_volume`                    | `playback`   | `100`                       | Volume on start (0~100)                                                                     |
+| `default_shuffle`                   | `playback`   | `false`                     | Shuffle mode on start                                                                       |
+| `default_online_lyric`              | `playback`   | `false`                     | Use the online lyric source on start                                                        |
+| `pos_memorize_interval`             | `playback`   | `5`                         | Interval of memorizing progress of the playing song (seconds)                               |
+| `player_timeout`                    | `playback`   | `1`                         | Timeout of backend waiting for a player action to take effect (seconds)                     |
+| `dash_volume_step`                  | `dash`       | `5`                         | Volume increase/decrease step on the dashboard                                              |
+| `dash_pos_step`                     | `dash`       | `5`                         | Position forward/backward step on the dashboard                                             |
+| `escape_char`                       | `appearance` | `true`                      | Use ANSI escape codes in the CLI and dashboard output                                       |
+| `cli_box_style`                     | `appearance` | `rounded`                   | Box style of the CLI                                                                        |
+| `dash_box_style`                    | `appearance` | `rounded`                   | Box style of the dashboard                                                                  |
+| `dash_poster_width`                 | `appearance` | `80`                        | Width of the album cover in the dashboard's poster mode (columns)                           |
+| `dash_poster_height`                | `appearance` | `64`                        | Height of the album cover in poster mode (pixels, 2 per terminal row)                       |
+| `dash_screen_buffer`                | `appearance` | `true`                      | Use the terminal alt-screen buffer for the dashboard                                        |
+| `auto_dash_height`                  | `appearance` | `true`                      | Auto resize dashboard height from terminal height                                           |
+| `pause_hide_lyric`                  | `lyric`      | `true`                      | Hide the lyric board when playback is paused                                                |
+| `lyric_trans_bg`                    | `appearance` | `false`                     | Use transparent background on lyric board                                                   |
+| `lyric_hover_solid`                 | `appearance` | `true`                      | Turn lyric board background solid when hovered                                              |
+| `lyric_height`                      | `appearance` | `70`                        | Height of the lyric board (pixels)                                                          |
+| `lyric_x_offset`                    | `appearance` | `0`                         | Horizontal offset of the lyric board from screen center (negative = left, positive = right) |
+| `lyric_font_family`                 | `appearance` | *(empty → system default)* | Font family of the lyric board                                                              |
+| `lyric_font_size`                   | `appearance` | `20`                        | Font size of the lyric board                                                                |
+| `lyric_font_bold`                   | `appearance` | `false`                     | Use a bold font on the lyric board                                                          |
+| `lyric_font_color`                  | `appearance` | `#797979`                   | Font color of the lyric board (hex)                                                         |
+| `lyric_bg_color`                    | `appearance` | `#111111`                   | Background color of the lyric board (hex)                                                   |
+| `lyric_opacity`                     | `appearance` | `40`                        | Lyric board opacity when not hovered (0~100, 100 = fully opaque)                            |
+| `config_default_remote`             | `config_gui` | `true`                      | Start the configure GUI in remote mode                                                      |

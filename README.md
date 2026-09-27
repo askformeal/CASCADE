@@ -2,7 +2,7 @@
 
 **C**ommand-Line **A**udio **S**tream **C**apture **A**nd **D**ecoding **E**ngine
 
-![CASCADE logo](res/musical.png)
+![CASCADE logo](docs/images/logo.png)
 
 Retrieves collections of mechanically-represented wave data from persistent storage, decompartmentalizes their format-specific encapsulation, reconstitutes the original waveform through algorithmic reconstruction, and transmits the resulting signal to a computer-connected mechanical wave generator. Controlled via a teletype-like interactive interface. Supports automatic transition to the next data set or the beginning of the current data set upon completion, based on a configured mode.
 
@@ -16,8 +16,6 @@ The original name of this project was CADENCE, which stands for **C**ommand-line
 
 I'm not a professional programmer, and programming is more of a hobby to me. Don't hold back on any kind of feedback!
 
-Wiki coming soon.
-
 P.S. I'm not from an English-speaking country, so feel free to give feedback on my English too.
 
 ---
@@ -25,9 +23,11 @@ P.S. I'm not from an English-speaking country, so feel free to give feedback on 
 ## Highlights
 
 - Daemon backend running in the background - control your playback across terminals
-- Automatic online lyric 
+- Automatic online lyrics
 - Remote control
 - Choose from TWO audio engines: VLC / miniaudio
+
+[Full features](./docs/Features.md)
 
 ## Dependencies
 
@@ -50,6 +50,10 @@ bash build.sh          # on Windows: from git-bash
 ```
 
 **I never spent much effort on the building script, so I recommend pip.**
+
+---
+
+**For more information, check out [the document](docs/Index.md).**
 
 ## Screenshots
 
@@ -80,15 +84,19 @@ bash build.sh          # on Windows: from git-bash
 ╰──────────────────────────────────────┴────────────────────────────────────────────────────────┴─────────────────────────────────────────────────────────────────────────╯
 ```
 
-(Yep, that's Sabaton you are seeing there)
+*Yep, that's Sabaton right there*
 
 ### Floating lyric
 
-![Floating lyric board](res/lyric_board_screenshot.png)
+![Floating lyric board](docs/images/lyric_board.png)
+
+### System tray
+
+![System tray](docs/images/tray.png)
 
 ### Configure GUI
 
-![Configure GUI](res/config_gui_screenshot.png)
+![Configure GUI](docs/images/config_gui.png)
 
 ## TODO
 
