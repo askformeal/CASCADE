@@ -20,9 +20,10 @@ COLOR_WHITE_ICON_PATH = get_res('color_white.png')
 dirs = PlatformDirs('cascade', ensure_exists=True)
 
 DATA_DIR = Path(dirs.user_data_dir)
+CONFIG_DIR = Path(dirs.user_config_dir)
 
 PID_PATH = DATA_DIR / 'PID.json'
-CONFIG_PATH = DATA_DIR / 'config.toml'
+CONFIG_PATH = CONFIG_DIR / 'config.toml'
 
 LOG_DIR = Path(dirs.user_log_dir)
 BACKEND_LOG_PATH = LOG_DIR / 'cascade.log'
