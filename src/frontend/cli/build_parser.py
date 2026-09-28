@@ -32,6 +32,8 @@ def build_parser():
     reboot_parser.add_argument('-c', '--continue', action='store_true', help='Continue playing last song')
 
     dash_parser = command_sub.add_parser('dash', help='Open Dashboard')
+    
+    gui_parser = command_sub.add_parser('gui', help='Open GUI')
 
     status_parser = command_sub.add_parser('status', help='Show CASCADE status')
 

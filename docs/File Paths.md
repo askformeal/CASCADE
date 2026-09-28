@@ -20,14 +20,15 @@
 
 ### Filename
 
-| Module           | Filename               |
-| ---------------- | ---------------------- |
+| Module           | Filename                   |
+| ---------------- | -------------------------- |
 | Backend          | `cascade.log`            |
 | IPC              | `cascade-socket.log`     |
 | Media Key Daemon | `cascade-hotkey.log`     |
 | System Tray      | `cascade-tray.log`       |
 | Lyric Board      | `cascade-lyric.log`      |
 | Dashboard        | `cascade-dash.log`       |
+| GUI              | `cascade-gui.log`        |
 | Config GUI       | `cascade-config-gui.log` |
 | Configure        | `cascade-config.log`     |
 | PID Management   | `cascade-pid.log`        |
@@ -45,9 +46,8 @@
 
 ## PID
 
-| Platform | Path                                                 |
-| -------- | ---------------------------------------------------- |
+| Platform | Path                                               |
+| -------- | -------------------------------------------------- |
 | Windows  | `%LOCALAPPDATA%\cascade\cascade\PID.json`        |
 | Linux    | `~/.local/share/cascade/PID.json`                |
 | macOS    | `~/Library/Application Support/cascade/PID.json` |
-

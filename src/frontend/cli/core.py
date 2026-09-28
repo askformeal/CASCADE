@@ -73,6 +73,10 @@ def main():
     elif args['action'] == 'dash':
         from src.frontend.dash.core import Dash
         Dash().run()
+    
+    elif args['action'] == 'gui':
+        from src.frontend.gui.core import GUI
+        GUI().run()
 
     elif args['action'] == 'config.gui':
         from src.frontend.config_gui.core import ConfigGUI

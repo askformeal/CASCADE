@@ -11,6 +11,7 @@ SOURCES = {
     SENTINELS.SOURCE_NOT_PROVIDED: '[source not provided]',
     'cli': 'teletypewriter interface (non-interactive)',
     'dash': 'teletypewriter interface (dashboard)',
+    'gui': 'graphic user interface',
     'backend': 'backend inter-process communication from backend',
     'player': 'backend inter-process communication from player',
     'hotkey': 'Hotkey control service',
@@ -41,7 +42,8 @@ ACTION_KEYS = {
         'on_end': (bool, False, False)
     },
     'seek': {
-        'time': (str, True)
+        'time': (str, True),
+        'ms': (bool, False, False)
     },
     'jump': {
         'progress': (int, True)

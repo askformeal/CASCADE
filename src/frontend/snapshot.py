@@ -5,9 +5,9 @@ class Snapshot:
         self.request = requester
         self.empty=empty
         self.snapshot = {}
-        self._reset()
+        self.reset()
 
-    def _reset(self):
+    def reset(self):
         self.lib_id = self.empty
         self.display_name = self.empty
         self.meta_name = self.empty
@@ -49,7 +49,7 @@ class Snapshot:
         self.cover_hash = self.empty
 
     def poll(self):
-        self._reset()
+        self.reset()
         self.snapshot = self.request('poll', silent=True)
         if self.snapshot is not None:            
             self.lib_id = self.get('id')

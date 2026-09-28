@@ -64,8 +64,8 @@
 - [X] Dual audio engine: miniaudio + VLC
 - [X] GUI configure editor
 - [X] Add ~~a wiki~~ full document
-- [ ] HTTP frontend
 - [ ] GUI frontend
+- [ ] HTTP frontend
 - [ ] Audio visualization
 - [ ] PyInstaller packaging
 - [ ] mpv engine

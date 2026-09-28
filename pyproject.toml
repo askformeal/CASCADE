@@ -31,7 +31,7 @@ cascade = "src.frontend.cli.core:main"
 include = ["src*", "res*"]
 
 [tool.setuptools.package-data]
-res = ["*.ico", "*.png", "*.txt"]
+res = ["*.ico", "*.png", "*.txt", "*/*.png"]
 
 [tool.bumpversion]
 current_version = "0.54.0"

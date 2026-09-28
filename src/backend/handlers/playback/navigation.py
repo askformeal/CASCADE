@@ -9,8 +9,16 @@ logger = setup_logger(__name__, BACKEND_LOG_PATH)
 
 def seek(ctx, request):
     raw_time = request['time']
+    is_ms = request['ms']
+
     if raw_time.startswith(('+', '-')):
-        step = parse_time(raw_time[1:])
+        if is_ms:
+            try:
+                step = int(raw_time[1:])
+            except ValueError:
+                step = SENTINELS.INVALID_TIME
+        else:
+            step = parse_time(raw_time[1:])
         if step is SENTINELS.INVALID_TIME:
             return gen_response.Failed(f'invalid forward/backward time: {raw_time}')
         else:
@@ -26,8 +34,14 @@ def seek(ctx, request):
                 pos = min(pos, length)
             pos = max(pos, 0)
             return jump_to_pos(ctx, pos)
-    else:   
-        pos = parse_time(raw_time)
+    else:
+        if is_ms:
+            try:
+                pos = int(raw_time)
+            except ValueError:
+                pos = SENTINELS.INVALID_TIME
+        else:
+            pos = parse_time(raw_time)
         if pos is SENTINELS.INVALID_TIME:
             return gen_response.Failed(f'invalid time: {raw_time}')
         else:

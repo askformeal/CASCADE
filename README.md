@@ -98,6 +98,10 @@ bash build.sh          # on Windows: from git-bash
 
 ![Configure GUI](docs/images/config_gui.png)
 
+## Known issues
+
+When open a playlist from tray icon and there's a song of the same name in the library, the song will be opened instead.
+
 ## TODO
 
 See [TODO.md](TODO.md) for planned features.

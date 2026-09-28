@@ -9,13 +9,31 @@ ICON_PATH = get_res('icon.ico')
 ERROR_ICON_PATH = get_res('icon_error.ico')
 LYRIC_ICON_PATH = get_res('lyric_icon.ico')
 NO_COVER_PATH = get_res('no_cover.txt')
-REMOTE_ICON_PATH = get_res('remote.png')
-REFRESH_ICON_PATH = get_res('refresh.png')
-EDIT_ICON_PATH = get_res('edit.png')
-OPEN_FILE_ICON_PATH = get_res('open_file.png')
-COPY_PATH_ICON_PATH = get_res('copy.png')
-COLOR_BLACK_ICON_PATH = get_res('color_black.png')
-COLOR_WHITE_ICON_PATH = get_res('color_white.png')
+REMOTE_ICON_PATH = get_res('config_gui/remote.png')
+REFRESH_ICON_PATH = get_res('config_gui/refresh.png')
+EDIT_ICON_PATH = get_res('config_gui/edit.png')
+OPEN_FILE_ICON_PATH = get_res('config_gui/open_file.png')
+COPY_PATH_ICON_PATH = get_res('config_gui/copy.png')
+COLOR_BLACK_ICON_PATH = get_res('config_gui/color_black.png')
+COLOR_WHITE_ICON_PATH = get_res('config_gui/color_white.png')
+
+NEXT_SONG_ICON_PATH = get_res('gui/next.png')
+PREV_SONG_ICON_PATH = get_res('gui/previous.png')
+PLAY_ICON_PATH = get_res('gui/play.png')
+PAUSE_ICON_PATH = get_res('gui/pause.png')
+
+UNMUTE_ICON_PATH = get_res('gui/unmute.png')
+MUTE_ICON_PATH = get_res('gui/mute.png')
+
+ONLINE_ICON_PATH = get_res('gui/online.png')
+OFFLINE_ICON_PATH = get_res('gui/offline.png')
+
+SHUFFLE_ICON_PATH = get_res('gui/shuffle.png')
+LOOP_ICON_PATH = get_res('gui/loop.png')
+DICE_ICON_PATH = get_res('gui/dice.png')
+
+ONLINE_LYRIC_ICON_PATH = get_res('gui/online_lyric.png')
+LOCAL_LYRIC_ICON_PATH = get_res('gui/local_lyric.png')
 
 dirs = PlatformDirs('cascade', ensure_exists=True)
 
@@ -32,6 +50,7 @@ HOTKEY_LOG_PATH = LOG_DIR / 'cascade-hotkey.log'
 TRAY_LOG_PATH = LOG_DIR / 'cascade-tray.log'
 LYRIC_LOG_PATH = LOG_DIR / 'cascade-lyric.log'
 DASH_LOG_PATH = LOG_DIR / 'cascade-dash.log'
+GUI_LOG_PATH = LOG_DIR / 'cascade-gui.log'
 CONFIG_GUI_LOG_PATH = LOG_DIR / 'cascade-config-gui.log'
 CONFIG_LOG_PATH = LOG_DIR / 'cascade-config.log'
 PID_LOG_PATH = LOG_DIR / 'cascade-pid.log'
