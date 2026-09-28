@@ -15,7 +15,7 @@ from src.constants.paths import (
 from src.constants.gui import FONT_SIZE
 
 class PlaybackMixin:
-    def build_playback(self):
+    def build_playback(self, playback_frame):
         self.unmute_icon = self.get_icon(UNMUTE_ICON_PATH, 20)
         self.mute_icon = self.get_icon(MUTE_ICON_PATH, 20)
 
@@ -27,16 +27,14 @@ class PlaybackMixin:
         self.loop_icon = self.get_icon(LOOP_ICON_PATH)
         self.shuffle_icon = self.get_icon(SHUFFLE_ICON_PATH)
         self.dice_icon = self.get_icon(DICE_ICON_PATH)
-        
-        self.playback_frame = tk.Frame(self)
 
-        self.name_label = tk.Label(self.playback_frame, font=tkfont.Font(size=FONT_SIZE+4, weight='bold'))
+        self.name_label = tk.Label(playback_frame, font=tkfont.Font(size=FONT_SIZE+4, weight='bold'))
         self.name_label.pack(pady=(0,20))
 
-        self.artist_label = tk.Label(self.playback_frame, font=self.font)
-        self.artist_label.pack(pady=(0,50))
+        self.artist_label = tk.Label(playback_frame, font=self.font)
+        self.artist_label.pack(pady=(0,70))
 
-        scale_frame = tk.Frame(self.playback_frame)
+        scale_frame = tk.Frame(playback_frame)
 
         self.progress_scale = tk.Scale(
             scale_frame, 
@@ -65,7 +63,7 @@ class PlaybackMixin:
         self.volume_scale.bind('<ButtonPress-1>', lambda *_: setattr(self, 'volume_dragging', True))
         self.volume_scale.bind('<ButtonRelease-1>', self._set_volume)
         
-        bottom_bar = tk.Frame(self.playback_frame)
+        bottom_bar = tk.Frame(playback_frame)
         self._build_bottom_bar(bottom_bar)
         
         bottom_bar.pack(side='bottom', fill='x')

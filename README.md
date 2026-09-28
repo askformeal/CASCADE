@@ -114,6 +114,8 @@ Lyric icon: [Lyrics icons created by Aranagraphics - Flaticon](https://www.flati
 
 Cover placeholder: [Image-placeholder icons created by Graphics Plazza - Flaticon](https://www.flaticon.com/free-icon/image_9261181)
 
+Enter icon: [Enter icons created by Cap Cool - Flaticon](https://www.flaticon.com/free-icon/enter_12460814)
+
 Uicons by [Flaticon](https://www.flaticon.com/uicons)
 
 ## License

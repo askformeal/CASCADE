@@ -20,17 +20,21 @@ from src.constants.gui import (
     )
 from src.frontend.client import send_request, test_heartbeat
 from src.frontend.snapshot import Snapshot
+from src.utils.misc import get_song_display_name
 from src.utils.time_ import format_time
 from .empty import GUI_EMPTY as EMPTY
 from .build_playback import PlaybackMixin
+from .build_playlist import PlaylistMixin
 
-class GUI(tk.Tk, PlaybackMixin):
+class GUI(tk.Tk, PlaybackMixin, PlaylistMixin):
     def __init__(self):
         self.running = True
         self.backend_online = True
         self.window_ready = False
 
         self.snapshot = Snapshot(self.poll_request, empty=EMPTY)
+        self.old_playlist = []
+        self.song_numbers = []
 
         self.progress_dragging = False
         self.volume_dragging = False
@@ -54,7 +58,6 @@ class GUI(tk.Tk, PlaybackMixin):
         self.online_icon = self.get_icon(ONLINE_ICON_PATH, 32)
         self.offline_icon = self.get_icon(OFFLINE_ICON_PATH, 32)
 
-        self.config(padx=10)
         menubar = tk.Menu(self)
         self.config(menu=menubar)
 
@@ -63,11 +66,33 @@ class GUI(tk.Tk, PlaybackMixin):
 
         menubar.add_cascade(label='File', menu=file_menu, underline=0)
 
-        self.build_playback()
+        main_frame = tk.Frame(self)
+        main_frame.pack(
+            fill='both', 
+            expand=True, 
+            padx=10, 
+            pady=(5, 10)
+            )
+
+        playback_frame = tk.Frame(main_frame)
+        self.build_playback(playback_frame)
+        playback_frame.pack(
+            side='left', 
+            fill='y', 
+            expand=True,
+            padx=(0, 10)
+            )
+
+        playlist_frame = tk.Frame(main_frame)
+        self.build_playlist(playlist_frame)
+        playlist_frame.pack(
+            side='left',
+            fill='y',
+            expand=True
+        )
         
-        self.playback_frame.pack(pady=(5, 10), fill='y', expand=True)
         self.online_label = tk.Label(self)
-        self.online_label.pack(anchor='e')
+        self.online_label.pack(anchor='e', padx=(0,5))
 
     def get_icon(self, path, size=None):
         if size is None:
@@ -94,49 +119,8 @@ class GUI(tk.Tk, PlaybackMixin):
                 time.sleep(UPDATE_INTERVAL)
 
     def _update_window(self):
-        self.name_label.config(text=self.snapshot.display_name)
-        self.artist_label.config(text=self.snapshot.artist)
-
-        if (
-            EMPTY not in (self.snapshot.time, self.snapshot.length) 
-            and self.snapshot.time >= 0
-            and self.snapshot.length >= 0
-            ):
-            if not self.progress_dragging:
-                self.progress_scale.config(to=self.snapshot.length)
-                self.progress_scale.set(self.snapshot.time)
-
-            time_ = format_time(self.snapshot.time)
-            length = format_time(self.snapshot.length)
-            self.progress_label.config(text=f'{time_} / {length}')
-            
-        else:
-            self.progress_scale.config(to=0)
-            self.progress_scale.set(0)
-            self.progress_label.config(text='--:--:-- / --:--:--')
-
-        if self.snapshot.volume is not EMPTY and not self.volume_dragging:
-            self.volume_scale.set(self.snapshot.volume)
-
-        if self.snapshot.mute and self.snapshot.mute is not EMPTY:
-            self.mute_button.config(image=self.mute_icon)
-        else:
-            self.mute_button.config(image=self.unmute_icon)
-
-        if self.snapshot.player_status == 'playing':
-            self.play_button.config(image=self.pause_icon)
-        else:
-            self.play_button.config(image=self.play_icon)
-
-        if self.snapshot.loop and self.snapshot.loop is not EMPTY:
-            self.loop_button.config(relief='sunken')
-        else:
-            self.loop_button.config(relief='raised')
-        
-        if self.snapshot.shuffle and self.snapshot.shuffle is not EMPTY:
-            self.shuffle_button.config(relief='sunken')
-        else:
-            self.shuffle_button.config(relief='raised')
+        self._update_playback()
+        self._update_playlist()
 
         if self.backend_online:
             self.online_label.config(image=self.online_icon)
@@ -150,6 +134,74 @@ class GUI(tk.Tk, PlaybackMixin):
 
             self.deiconify()
             self.window_ready = True
+
+    def _update_playback(self):
+        self.name_label.config(text=self.snapshot.display_name)
+        self.artist_label.config(text=self.snapshot.artist)
+        
+        if (
+            EMPTY not in (self.snapshot.time, self.snapshot.length) 
+            and self.snapshot.time >= 0
+            and self.snapshot.length >= 0
+            ):
+            if not self.progress_dragging:
+                self.progress_scale.config(to=self.snapshot.length)
+                self.progress_scale.set(self.snapshot.time)
+        
+            time_ = format_time(self.snapshot.time)
+            length = format_time(self.snapshot.length)
+            self.progress_label.config(text=f'{time_} / {length}')
+        
+        else:
+            self.progress_scale.config(to=0)
+            self.progress_scale.set(0)
+            self.progress_label.config(text='--:--:-- / --:--:--')
+        
+        if self.snapshot.volume is not EMPTY and not self.volume_dragging:
+            self.volume_scale.set(self.snapshot.volume)
+        
+        if self.snapshot.mute and self.snapshot.mute is not EMPTY:
+            self.mute_button.config(image=self.mute_icon)
+        else:
+            self.mute_button.config(image=self.unmute_icon)
+        
+        if self.snapshot.player_status == 'playing':
+            self.play_button.config(image=self.pause_icon)
+        else:
+            self.play_button.config(image=self.play_icon)
+        
+        if self.snapshot.loop and self.snapshot.loop is not EMPTY:
+            self.loop_button.config(relief='sunken')
+        else:
+            self.loop_button.config(relief='raised')
+        
+        if self.snapshot.shuffle and self.snapshot.shuffle is not EMPTY:
+            self.shuffle_button.config(relief='sunken')
+        else:
+            self.shuffle_button.config(relief='raised')
+
+    def _update_playlist(self):
+        playlist = []
+        self.song_numbers = []
+        if self.snapshot.current_songs is not EMPTY:
+            for i, song in enumerate(self.snapshot.current_songs):
+                name = get_song_display_name(song)
+                playlist.append(name)
+                self.song_numbers.append(i)
+
+        if playlist != self.old_playlist:
+            self.old_playlist = playlist
+
+            self.playlist_box.delete(0, tk.END)
+            for name in playlist:
+                self.playlist_box.insert(tk.END, name)
+
+    def _select_current(self):
+        if self.snapshot.current_num is not EMPTY:
+            index = self.song_numbers[self.snapshot.current_num]
+            self.playlist_box.select_clear(0, tk.END)
+            self.playlist_box.select_set(index)
+            self.playlist_box.see(index)
 
     def _sent_gui_request(self, action, **kwargs):
         silent = kwargs.get('silent', False)
