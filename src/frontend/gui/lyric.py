@@ -1,5 +1,6 @@
 import tkinter as tk
 
+from src.constants.gui import LYRIC_CURRENT_BG, LYRIC_CURRENT_FG
 from src.sentinels import SENTINELS
 from src.utils.lyric import get_lyric_line
 from .empty import GUI_EMPTY as EMPTY
@@ -9,7 +10,14 @@ class LyricMixin:
         self.old_lyric = []
 
     def build_lyric(self, lyric_frame):
-        self.lyric_box = tk.Listbox(lyric_frame, justify='center', width=40)
+        self.lyric_box = tk.Listbox(lyric_frame, 
+                                    justify='center', 
+                                    font=self.font,
+                                    width=40,
+                                    selectbackground=LYRIC_CURRENT_BG,
+                                    selectforeground=LYRIC_CURRENT_FG,
+                                    activestyle='none'
+                                    )
         self.lyric_box.pack(fill='both', expand=True)
 
     def update_lyric(self):
@@ -45,5 +53,10 @@ class LyricMixin:
 
         self.lyric_box.select_clear(0, tk.END)
         self.lyric_box.select_set(index)
-        self.lyric_box.see(index)
-                    
+        if self.snapshot.player_status == 'playing':
+            bbox = self.lyric_box.bbox(self.lyric_box.index('@0,0'))
+            if bbox is not None:
+                item_height = bbox[3]
+                visible_lines = self.lyric_box.winfo_height() // item_height
+                self.lyric_box.yview(max(0, index - (visible_lines // 2)))
+        
