@@ -12,9 +12,15 @@ from src.constants.paths import (
     SHUFFLE_ICON_PATH,
     DICE_ICON_PATH
 )
+from src.utils.time_ import format_time
 from src.constants.gui import FONT_SIZE
+from .empty import GUI_EMPTY as EMPTY
 
 class PlaybackMixin:
+    def __init__(self):
+        self.progress_dragging = False
+        self.volume_dragging = False
+        
     def build_playback(self, playback_frame):
         self.unmute_icon = self.get_icon(UNMUTE_ICON_PATH, 20)
         self.mute_icon = self.get_icon(MUTE_ICON_PATH, 20)
@@ -129,4 +135,49 @@ class PlaybackMixin:
     def _set_volume(self, *_):
         self.volume_dragging = False
         self.send_command('volume', volume=str(self.volume_scale.get()))
-        
+
+    def update_playback(self):
+        self.name_label.config(text=self.snapshot.display_name)
+        self.artist_label.config(text=self.snapshot.artist)
+
+        if (
+            EMPTY not in (self.snapshot.time, self.snapshot.length) 
+            and self.snapshot.time >= 0
+            and self.snapshot.length >= 0
+            ):
+            if not self.progress_dragging:
+                self.progress_scale.config(to=self.snapshot.length)
+                self.progress_scale.set(self.snapshot.time)
+
+            time_ = format_time(self.snapshot.time)
+            length = format_time(self.snapshot.length)
+            self.progress_label.config(text=f'{time_} / {length}')
+
+        else:
+            self.progress_scale.config(to=0)
+            self.progress_scale.set(0)
+            self.progress_label.config(text='--:--:-- / --:--:--')
+
+        if self.snapshot.volume is not EMPTY and not self.volume_dragging:
+            self.volume_scale.set(self.snapshot.volume)
+
+        if self.snapshot.mute and self.snapshot.mute is not EMPTY:
+            self.mute_button.config(image=self.mute_icon)
+        else:
+            self.mute_button.config(image=self.unmute_icon)
+
+        if self.snapshot.player_status == 'playing':
+            self.play_button.config(image=self.pause_icon)
+        else:
+            self.play_button.config(image=self.play_icon)
+
+        if self.snapshot.loop and self.snapshot.loop is not EMPTY:
+            self.loop_button.config(relief='sunken')
+        else:
+            self.loop_button.config(relief='raised')
+
+        if self.snapshot.shuffle and self.snapshot.shuffle is not EMPTY:
+            self.shuffle_button.config(relief='sunken')
+        else:
+            self.shuffle_button.config(relief='raised')
+    

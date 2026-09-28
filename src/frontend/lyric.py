@@ -152,7 +152,8 @@ class Lyric(tk.Tk):
                                         ) and len(self.snapshot.lyric) > 0:
                         index = get_lyric_line(self.snapshot.lyric, 
                                                self.snapshot.time,
-                                               self.snapshot.lyric_offset + self.snapshot.offset_overlay)
+                                               self.snapshot.lyric_offset + self.snapshot.offset_overlay
+                                               )
                         
                         if index is SENTINELS.BEFORE_FIRST_LYRIC:
                             current_line = '...'
