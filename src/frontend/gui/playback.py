@@ -1,7 +1,12 @@
 import tkinter as tk
 import tkinter.font as tkfont
+from io import BytesIO
 
+from PIL import Image, ImageTk
+
+from .logger import logger
 from src.constants.paths import (
+    GUI_NO_COVER_PATH,
     PREV_SONG_ICON_PATH,
     NEXT_SONG_ICON_PATH,
     PLAY_ICON_PATH,
@@ -12,12 +17,26 @@ from src.constants.paths import (
     SHUFFLE_ICON_PATH,
     DICE_ICON_PATH
 )
+from src.constants.gui import FONT_SIZE, COVER_SIZE
 from src.utils.time_ import format_time
-from src.constants.gui import FONT_SIZE
+from src.sentinels import SENTINELS
+from src.frontend.cover import Cover
 from .empty import GUI_EMPTY as EMPTY
 
 class PlaybackMixin:
     def __init__(self):
+        image = Image.open(GUI_NO_COVER_PATH)
+        buffer = BytesIO()
+        image.save(buffer, format='PNG')
+        self.no_cover = buffer.getvalue()
+        self.old_cover_hash = None
+
+        self.cover = Cover(
+            self.poll_request,
+            self.no_cover,
+            logger
+        )
+
         self.progress_dragging = False
         self.volume_dragging = False
         
@@ -35,11 +54,15 @@ class PlaybackMixin:
         
     def build_playback(self, playback_frame):
 
-        self.name_label = tk.Label(playback_frame, font=tkfont.Font(size=FONT_SIZE+4, weight='bold'))
-        self.name_label.pack(pady=(0,20))
+        self.name_label = tk.Label(playback_frame, font=tkfont.Font(size=FONT_SIZE+6, weight='bold'))
+        self.name_label.pack(pady=(0,15))
 
-        self.artist_label = tk.Label(playback_frame, font=self.font)
-        self.artist_label.pack(pady=(0,70))
+        self.artist_label = tk.Label(playback_frame, font=tkfont.Font(size=FONT_SIZE+2, weight='bold'))
+        self.artist_label.pack(pady=(0,25))
+
+        self.cover_label = tk.Label(playback_frame)
+
+        self.cover_label.pack(fill='both', expand=True, pady=(0, 50))
 
         scale_frame = tk.Frame(playback_frame)
 
@@ -141,6 +164,20 @@ class PlaybackMixin:
     def update_playback(self):
         self.name_label.config(text=self.snapshot.display_name)
         self.artist_label.config(text=self.snapshot.artist)
+
+        if self.snapshot.cover_hash is not EMPTY:
+            cover = self.cover.get_cover(self.snapshot.cover_hash)
+            cover_hash = self.snapshot.cover_hash
+        else:
+            cover = self.no_cover
+            cover_hash = SENTINELS.NO_COVER
+
+        if cover_hash != self.old_cover_hash:
+            self.cover_image = Image.open(BytesIO(cover))
+            self.cover_image = self.cover_image.resize(COVER_SIZE, Image.Resampling.LANCZOS)
+            self.cover_image = ImageTk.PhotoImage(self.cover_image)
+            self.cover_label.config(image=self.cover_image)
+            self.old_cover_hash = cover_hash
 
         if (
             EMPTY not in (self.snapshot.time, self.snapshot.length) 

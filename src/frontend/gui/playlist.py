@@ -10,6 +10,7 @@ class PlaylistMixin:
         self.old_playlist = []
         self.old_current = None
         self.song_numbers = []
+        self.playlist_empty = False
         
         self.select_current_icon = self.get_icon(SELECT_CURRENT_ICON_PATH, 20)
         self.switch_selected_icon = self.get_icon(SWITCH_SELECTED_ICON_PATH, 20)
@@ -61,20 +62,28 @@ class PlaylistMixin:
             self.playlist_box.see(index)
 
     def _on_switch(self, *_):
-        selected = self.playlist_box.curselection()
-        if len(selected) > 0:
-            index = selected[0]
-            index = self.song_numbers[index]
-            self.send_command('switch', number=index + 1)
+        if not self.playlist_empty:
+            selected = self.playlist_box.curselection()
+            if len(selected) > 0:
+                index = selected[0]
+                index = self.song_numbers[index]
+                self.send_command('switch', number=index + 1)
 
     def update_playlist(self):
-        playlist = []
-        self.song_numbers = []
-        if self.snapshot.current_songs is not EMPTY:
+        if (self.snapshot.current_songs is not EMPTY 
+            and len(self.snapshot.current_songs) > 0
+            ):
+            self.playlist_empty = False
+            playlist = []
+            self.song_numbers = []
             for i, song in enumerate(self.snapshot.current_songs):
                 name = get_song_display_name(song)
                 playlist.append(f' {name} ')
                 self.song_numbers.append(i)
+        else:
+            self.playlist_empty = True
+            playlist = [' - No songs playing - ']
+            self.song_numbers = []
 
         if playlist != self.old_playlist:
             self.old_playlist = playlist

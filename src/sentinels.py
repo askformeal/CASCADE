@@ -94,5 +94,6 @@ class Sentinels:
         self.EMPTY_LYRIC = Sentinel('Lyric is Empty')
         self.LYRIC_NOT_FOUND = Sentinel('Lyric Not Found')
         self.LYRIC_LOADING = Sentinel('Lyric is loading')
+        self.NO_COVER = Sentinel('No Cover')
 
 SENTINELS = Sentinels()

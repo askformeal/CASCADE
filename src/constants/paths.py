@@ -17,6 +17,8 @@ COPY_PATH_ICON_PATH = get_res('config_gui/copy.png')
 COLOR_BLACK_ICON_PATH = get_res('config_gui/color_black.png')
 COLOR_WHITE_ICON_PATH = get_res('config_gui/color_white.png')
 
+GUI_NO_COVER_PATH = get_res('gui/no_cover.png')
+
 NEXT_SONG_ICON_PATH = get_res('gui/next.png')
 PREV_SONG_ICON_PATH = get_res('gui/previous.png')
 PLAY_ICON_PATH = get_res('gui/play.png')

@@ -3,6 +3,8 @@ FONT_SIZE = 12
 
 ICON_SIZE = (22, 22)
 
+COVER_SIZE = (350, 350)
+
 CURRENT_SONG_BG = 'cyan'
 
 LYRIC_BG = 'snow'
