@@ -32,7 +32,7 @@ class PlaylistMixin:
         box_frame = tk.Frame(playlist_frame)
         box_frame.pack(fill='both', expand=True)
 
-        self.playlist_box = tk.Listbox(box_frame, font=self.font, width=25)
+        self.playlist_box = tk.Listbox(box_frame, font=self.font, width=0)
         self.playlist_box.pack(side='left', fill='both', expand=True)
 
         scroll_bar_y = tk.Scrollbar(box_frame, orient='vertical')
@@ -71,7 +71,7 @@ class PlaylistMixin:
         if self.snapshot.current_songs is not EMPTY:
             for i, song in enumerate(self.snapshot.current_songs):
                 name = get_song_display_name(song)
-                playlist.append(name)
+                playlist.append(f' {name} ')
                 self.song_numbers.append(i)
 
         if playlist != self.old_playlist:

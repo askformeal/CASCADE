@@ -136,6 +136,7 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
             self.online_label.config(image=self.offline_icon)
 
         if not self.window_ready:
+            self.update_idletasks()
             x = (self.winfo_screenwidth() - self.winfo_reqwidth()) // 2
             y = (self.winfo_screenheight() - self.winfo_reqheight()) // 2
             self.geometry(f'+{x}+{y}')
