@@ -21,9 +21,8 @@ class PlaybackMixin:
         self.progress_dragging = False
         self.volume_dragging = False
         
-    def build_playback(self, playback_frame):
-        self.unmute_icon = self.get_icon(UNMUTE_ICON_PATH, 20)
-        self.mute_icon = self.get_icon(MUTE_ICON_PATH, 20)
+        self.unmute_icon = self.get_icon(UNMUTE_ICON_PATH, 18)
+        self.mute_icon = self.get_icon(MUTE_ICON_PATH, 18)
 
         self.prev_icon = self.get_icon(PREV_SONG_ICON_PATH)
         self.next_icon = self.get_icon(NEXT_SONG_ICON_PATH)
@@ -33,6 +32,8 @@ class PlaybackMixin:
         self.loop_icon = self.get_icon(LOOP_ICON_PATH)
         self.shuffle_icon = self.get_icon(SHUFFLE_ICON_PATH)
         self.dice_icon = self.get_icon(DICE_ICON_PATH)
+        
+    def build_playback(self, playback_frame):
 
         self.name_label = tk.Label(playback_frame, font=tkfont.Font(size=FONT_SIZE+4, weight='bold'))
         self.name_label.pack(pady=(0,20))
@@ -46,11 +47,11 @@ class PlaybackMixin:
             scale_frame, 
             from_=0, 
             orient='horizontal', 
+            sliderlength=20,
             showvalue=False,
-            length=400,
-            width=24
+            width=22
             )
-        self.progress_scale.pack(side='left', padx=(0, 30))
+        self.progress_scale.pack(side='left', padx=(0, 30), fill='x', expand=True)
         self.progress_scale.bind('<ButtonPress-1>', lambda *_: setattr(self, 'progress_dragging', True))
         self.progress_scale.bind('<ButtonRelease-1>', self._set_time)
 
@@ -61,9 +62,10 @@ class PlaybackMixin:
                                      from_=0,
                                      to=100,
                                      orient='horizontal',
+                                    sliderlength=20,
                                      showvalue=False,
                                      length=100,
-                                     width=24,
+                                     width=22
                                      )
         self.volume_scale.pack(side='left')
         self.volume_scale.bind('<ButtonPress-1>', lambda *_: setattr(self, 'volume_dragging', True))
@@ -126,7 +128,7 @@ class PlaybackMixin:
             padx=5,
             pady=5
             )
-        self.progress_label.pack(side='right')
+        self.progress_label.pack(side='right', padx=(20, 0))
     
     def _set_time(self, *_):
         self.progress_dragging = False

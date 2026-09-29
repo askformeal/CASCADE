@@ -1,11 +1,17 @@
 import tkinter as tk
 
+from src.constants.paths import (
+    ONLINE_LYRIC_ICON_PATH,
+    LOCAL_LYRIC_ICON_PATH,
+    RESET_OFFSET_ICON_PATH
+)
 from src.constants.gui import (
     LYRIC_BG,
     LYRIC_FG,
     LYRIC_CURRENT_BG, 
     LYRIC_CURRENT_FG, 
-    SCROLL_EVENTS
+    SCROLL_EVENTS,
+    MAX_OFFSET
     )
 from src.sentinels import SENTINELS
 from src.utils.lyric import get_lyric_line
@@ -17,6 +23,12 @@ class LyricMixin:
         self.old_index = None
         self.scroll_on = True
         self.bound_scroll = {}
+
+        self.offset_dragging = False
+
+        self.online_lyric_icon = self.get_icon(ONLINE_LYRIC_ICON_PATH)
+        self.local_lyric_icon = self.get_icon(LOCAL_LYRIC_ICON_PATH)
+        self.reset_offset_icon = self.get_icon(RESET_OFFSET_ICON_PATH)
 
     def build_lyric(self, lyric_frame):
         self.lyric_box = tk.Listbox(lyric_frame, 
@@ -31,18 +43,58 @@ class LyricMixin:
                                     )
         self.lyric_box.pack(fill='both', expand=True)
 
+        bottom_bar = tk.Frame(lyric_frame)
+        bottom_bar.pack(side='bottom', fill='x', padx=10, pady=(10, 0))
+
+        self.online_lyric_button = tk.Button(bottom_bar, command=lambda: self.send_command('lyric'))
+        self.online_lyric_button.pack(side='right', padx=(10, 0))
+
+        self.offset_scale = tk.Scale(bottom_bar, 
+                                     font=self.font,
+                                     from_=-MAX_OFFSET, 
+                                     to=MAX_OFFSET,
+                                     orient='horizontal'
+                                     )
+        self.offset_scale.pack(side='right', fill='x', expand=True, pady=(0,10))
+        self.offset_scale.bind('<ButtonPress-1>', lambda *_: setattr(self, 'offset_dragging', True))
+        self.offset_scale.bind('<ButtonRelease-1>', self._set_offset)
+        
+        offset_reset_button = tk.Button(bottom_bar,
+                                        image=self.reset_offset_icon, 
+                                        command=self._reset_offset
+                                        )
+        offset_reset_button.pack(side='left', padx=(0, 10))
+
+    def _reset_offset(self, *_):
+        self.send_command('set_offset_overlay', offset=0)
+
+    def _set_offset(self, *_):
+        self.offset_dragging = False
+        self.send_command('set_offset_overlay', offset=self.offset_scale.get())
+
     def update_lyric(self):
+        self._update_lyric_box()
+
+        if self.snapshot.online_lyric is not EMPTY and self.snapshot.online_lyric:
+            self.online_lyric_button.config(image=self.online_lyric_icon)
+        else:
+            self.online_lyric_button.config(image=self.local_lyric_icon)
+
+        if self.snapshot.offset_overlay is not EMPTY and not self.offset_dragging:
+            self.offset_scale.set(self.snapshot.offset_overlay)
+
+    def _update_lyric_box(self):
         if self.snapshot.lyric_loading is not EMPTY and self.snapshot.lyric_loading:
-            lyric = ['Loading ...']
+            lyric = [' - Loading ... - ']
             index = 0
         else:
-            lyric = []
             index = 0
             if EMPTY not in (self.snapshot.time, 
                         self.snapshot.lyric,
                         self.snapshot.lyric_offset, 
                         self.snapshot.offset_overlay
                         ):
+                lyric = []
                 for line in self.snapshot.lyric:
                     lyric.append(f' {line[1].strip()} ')
 
@@ -53,8 +105,10 @@ class LyricMixin:
                 if index is SENTINELS.BEFORE_FIRST_LYRIC:
                     index = 0
                 elif index is SENTINELS.EMPTY_LYRIC:
-                    lyric = ['- No Lyric -']
+                    lyric = [' - Empty Lyric - ']
                     index = 0
+            else:
+                lyric = [' - No Lyric - ']
 
         if lyric != self.old_lyric:
             self.old_lyric = lyric

@@ -1,7 +1,9 @@
 UPDATE_INTERVAL = 0.1
 FONT_SIZE = 12
 
-ICON_SIZE = (32, 32)
+ICON_SIZE = (22, 22)
+
+CURRENT_SONG_BG = 'cyan'
 
 LYRIC_BG = 'snow'
 LYRIC_FG = 'black'
@@ -20,3 +22,5 @@ SCROLL_EVENTS = (
     '<Home>',
     '<End>'
 )
+
+MAX_OFFSET = 5000

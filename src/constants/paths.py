@@ -38,6 +38,8 @@ SWITCH_SELECTED_ICON_PATH = get_res('gui/switch_selected.png')
 ONLINE_LYRIC_ICON_PATH = get_res('gui/online_lyric.png')
 LOCAL_LYRIC_ICON_PATH = get_res('gui/local_lyric.png')
 
+RESET_OFFSET_ICON_PATH = get_res('gui/reset_offset.png')
+
 dirs = PlatformDirs('cascade', ensure_exists=True)
 
 DATA_DIR = Path(dirs.user_data_dir)
