@@ -48,6 +48,9 @@ class Snapshot:
 
         self.cover_hash = self.empty
 
+        self.run_time = self.empty
+        self.dev = self.empty
+
     def poll(self):
         self.reset()
         self.snapshot = self.request('poll', silent=True)
@@ -92,6 +95,9 @@ class Snapshot:
             self.playlists = self.get('playlists')
 
             self.cover_hash = self.get('cover_hash')
+
+            self.run_time = self.get('run_time')
+            self.dev = self.get('dev')
 
     def get(self, name):
         value = self.snapshot.get(name, self.empty)

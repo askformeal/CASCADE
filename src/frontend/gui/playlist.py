@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 
 from src.constants.paths import SELECT_CURRENT_ICON_PATH, SWITCH_SELECTED_ICON_PATH
 from src.constants.gui import CURRENT_SONG_BG
@@ -26,7 +27,7 @@ class PlaylistMixin:
         scroll_bar_y = tk.Scrollbar(box_frame, orient='vertical')
         scroll_bar_x = tk.Scrollbar(playlist_frame, orient='horizontal')
         scroll_bar_y.pack(side='left', fill='y')
-        scroll_bar_x.pack(fill='x')
+        scroll_bar_x.pack(fill='x', pady=(0,10))
 
         self.playlist_box.config(
             xscrollcommand=scroll_bar_x.set, 
@@ -38,6 +39,8 @@ class PlaylistMixin:
 
         self.playlist_box.bind('<Return>', self._on_switch)
         self.playlist_box.bind('<Double-Button-1>', self._on_switch)
+
+        ttk.Separator(playlist_frame, orient='horizontal').pack(fill='x')
 
         bottom_bar = tk.Frame(playlist_frame)
         bottom_bar.pack(side='bottom', fill='x', padx=5, pady=(10, 0))

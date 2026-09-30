@@ -10,6 +10,8 @@ CURRENT_SONG_BG = 'cyan'
 LYRIC_BG = 'snow'
 LYRIC_FG = 'black'
 
+DEV_COLOR = 'blue'
+
 LYRIC_CURRENT_BG = 'cyan'
 LYRIC_CURRENT_FG = 'black'
 

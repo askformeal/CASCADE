@@ -16,10 +16,12 @@ from src.constants.frontend import HEARTBEAT_POLL_INTERVAL
 from src.constants.gui import (
     UPDATE_INTERVAL,
     FONT_SIZE,
-    ICON_SIZE
+    ICON_SIZE,
+    DEV_COLOR
     )
 from src.frontend.client import send_request, test_heartbeat
 from src.frontend.snapshot import Snapshot
+from src.utils.time_ import format_time
 from .empty import GUI_EMPTY as EMPTY
 from .playback import PlaybackMixin
 from .playlist import PlaylistMixin
@@ -30,6 +32,7 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
         self.running = True
         self.backend_online = True
         self.window_ready = False
+        self.dev_label_shown = False
 
         self.snapshot = Snapshot(self.poll_request, empty=EMPTY)
 
@@ -53,8 +56,8 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
         logger.debug(f'{__name__} initialized')
 
     def _build_window(self):
-        self.online_icon = self.get_icon(ONLINE_ICON_PATH, 32)
-        self.offline_icon = self.get_icon(OFFLINE_ICON_PATH, 32)
+        self.online_icon = self.get_icon(ONLINE_ICON_PATH, (32, 23))
+        self.offline_icon = self.get_icon(OFFLINE_ICON_PATH, (32, 23))
 
         menubar = tk.Menu(self)
         self.config(menu=menubar)
@@ -97,9 +100,21 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
             fill='both',
             expand=True
         )
+
+        bottom_bar = tk.Frame(self)
+        bottom_bar.pack(side='bottom', fill='x', padx=10, pady=(0,10))
         
-        self.online_label = tk.Label(self)
-        self.online_label.pack(anchor='e', padx=(0,5))
+        self.online_button = tk.Button(bottom_bar, command=lambda: Thread(target=self._check_backend).start())
+        self.online_button.pack(side='right')
+
+        self.run_time_label = tk.Label(bottom_bar, font=tkfont.Font(size=FONT_SIZE, weight='bold'))
+        self.run_time_label.pack(side='left', padx=(0, 20))
+
+        self.dev_label = tk.Label(bottom_bar, 
+                                  font=tkfont.Font(size=FONT_SIZE+3, weight='bold'), 
+                                  fg=DEV_COLOR,
+                                  text='DEV'
+                                  )
 
     def get_icon(self, path, size=None):
         if size is None:
@@ -131,9 +146,21 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
         self.update_lyric()
 
         if self.backend_online:
-            self.online_label.config(image=self.online_icon)
+            self.online_button.config(image=self.online_icon)
         else:
-            self.online_label.config(image=self.offline_icon)
+            self.online_button.config(image=self.offline_icon)
+
+        if self.snapshot.run_time is not EMPTY:
+            self.run_time_label.config(text=format_time(self.snapshot.run_time, unit='sec'))
+        else:
+            self.run_time_label.config(text='--:--:--')
+
+        if (self.snapshot.dev is not EMPTY 
+            and self.snapshot.dev
+            and not self.dev_label_shown
+            ):
+            self.dev_label.pack(side='left')
+            self.dev_label_shown = True
 
         if not self.window_ready:
             self.update_idletasks()
@@ -144,7 +171,7 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
             self.deiconify()
             self.window_ready = True
 
-    def _sent_gui_request(self, action, **kwargs):
+    def _send_gui_request(self, action, **kwargs):
         silent = kwargs.get('silent', False)
         request = {
             'action':action, 
@@ -163,13 +190,13 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
         return response
 
     def poll_request(self, action, **kwargs):
-        response = self._sent_gui_request(action=action, **kwargs)
+        response = self._send_gui_request(action=action, **kwargs)
         return response.get('attachment', None)
 
     def send_command(self, action, **kwargs):
         if self.backend_online:
             logger.info(f'Send command: {action}')
-            response = self._sent_gui_request(action=action, **kwargs)
+            response = self._send_gui_request(action=action, **kwargs)
             if response['code'] != 0:
                 msg = response['msg']
                 messagebox.showerror('Error', msg)
@@ -183,6 +210,16 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
                 self.backend_online = True
             else:
                 self.backend_online = False
+
+    def _check_backend(self):
+        response = self._send_gui_request(action='test_alive')
+        code = response['code']
+        msg = f'Received response with code {code}'
+        detail = response['msg']
+        if code == 0:
+            self.after(0, messagebox.showinfo, title='Backend online', message=msg, detail=detail)
+        else:
+            self.after(0, messagebox.showerror, title='Connection failed', message=msg, detail=detail)
 
     def _exit(self):
         logger.info('Exit GUI')

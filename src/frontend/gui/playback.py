@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 import tkinter.font as tkfont
 from io import BytesIO
 
@@ -62,7 +63,8 @@ class PlaybackMixin:
 
         self.cover_label = tk.Label(playback_frame)
 
-        self.cover_label.pack(fill='both', expand=True, pady=(0, 50))
+        # self.cover_label.pack(fill='both', expand=True, pady=(0, 50))
+        self.cover_label.pack(pady=(0, 50))
 
         scale_frame = tk.Frame(playback_frame)
 
@@ -74,7 +76,7 @@ class PlaybackMixin:
             showvalue=False,
             width=22
             )
-        self.progress_scale.pack(side='left', padx=(0, 30), fill='x', expand=True)
+        self.progress_scale.pack(side='left', padx=(0,30), fill='x', expand=True)
         self.progress_scale.bind('<ButtonPress-1>', lambda *_: setattr(self, 'progress_dragging', True))
         self.progress_scale.bind('<ButtonRelease-1>', self._set_time)
 
@@ -93,12 +95,15 @@ class PlaybackMixin:
         self.volume_scale.pack(side='left')
         self.volume_scale.bind('<ButtonPress-1>', lambda *_: setattr(self, 'volume_dragging', True))
         self.volume_scale.bind('<ButtonRelease-1>', self._set_volume)
+
         
         bottom_bar = tk.Frame(playback_frame)
         self._build_bottom_bar(bottom_bar)
         
-        bottom_bar.pack(side='bottom', fill='x')
+        bottom_bar.pack(side='bottom', fill='x', pady=(10, 0))
+        ttk.Separator(playback_frame, orient='horizontal').pack(side='bottom', fill='x')
         scale_frame.pack(side='bottom', fill='x', pady=(0,20))
+        
 
     def _build_bottom_bar(self, bottom_bar):
         
