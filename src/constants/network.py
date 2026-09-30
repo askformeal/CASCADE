@@ -1,4 +1,4 @@
-from src.types import IterType
+from src.types import IterType, StrChoiceList
 from src.sentinels import SENTINELS
 
 SERVER_TIMEOUT = 0.5
@@ -30,7 +30,8 @@ ACK = {
 # literal type: (IterType(element_type), is_required). every element needs to match
 ACTION_KEYS = {
     'open': {
-        'song': (str, True)
+        'song': (str, True),
+        'type': (StrChoiceList(['song', 'playlist', 'file', 'auto']), False, 'auto')
     },
     'switch': {
         'number': (int, True)

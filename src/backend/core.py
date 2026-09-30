@@ -33,7 +33,6 @@ from src.backend.database.core import Database
 from src.backend.playback.core import Playback
 from src.backend.context import Context
 from src.backend.handlers import ROUTER
-from src.types import IterType, get_type_name
 from src.pid import add_pid, remove_pid
 
 logger = setup_logger(__name__, BACKEND_LOG_PATH)
@@ -228,11 +227,10 @@ class Backend:
                     if len(unexpected_keys) > 0:
                         logger.warning(f'Unexpected key(s) received: {unexpected_keys}')
 
-
                     for key, info in keys.items():
                         key_type, is_required = info[:2]
                         value = request.get(key, SENTINELS.KEY_NOT_PROVIDED)
-                        if value is SENTINELS.KEY_NOT_PROVIDED:
+                        if value in (SENTINELS.KEY_NOT_PROVIDED, None):
                             if is_required:
                                 return gen_response.MissingKey(action, key)
                             else:
@@ -243,19 +241,13 @@ class Backend:
                                 else:
                                     request[key] = default_value
                         else:
-                            if isinstance(key_type, IterType): # (iter_type, element_type)
-                                # verify iterable type
-                                element_type = key_type.element_type
-                                if isinstance(value, (list, tuple)):
-                                    for element in value:
-                                        if not isinstance(element, element_type):
-                                            return gen_response.InvalidElementType(action, key, get_type_name(element_type), type(element).__name__)
-                                elif not (value is None and not is_required):
-                                    return gen_response.InvalidKeyType(action, key, get_type_name(key_type), type(value).__name__)
+                            try:
+                                value = key_type(value)
+                            except ValueError as e: 
+                                return gen_response.InvalidKeyType(action, key, value, str(e))
+                            else:
+                                request[key] = value
                                 
-                            elif not isinstance(value, key_type) and not (value is None and not is_required): # None type acceptable for non-required keys even if not stated in ACTION_KEYS
-                                return gen_response.InvalidKeyType(action, key, get_type_name(key_type), type(value).__name__)
-
                     return request
 
     def _memorize_pos(self):

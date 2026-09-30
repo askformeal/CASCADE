@@ -41,6 +41,8 @@ class Sentinels:
 
         self.PLAY_ALL = Sentinel('Play All Song in Library')
 
+        self.INVALID_OPEN = Sentinel('Failed to parse open command')
+
         # Database
 
         self.SONG_NOT_FOUND = Sentinel('Song Not Found')

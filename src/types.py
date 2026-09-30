@@ -3,6 +3,26 @@ class IterType:
     def __init__(self, element_type):
         self.element_type = element_type
 
+    def __call__(self, obj):
+        if isinstance(obj, (str, bytes)):
+            # a bare string iterates per character; that is never a list of elements
+            raise ValueError('not a list or tuple')
+
+        result = []
+        try:
+            for element in obj:
+                try:
+                    element = self.element_type(element)
+                except ValueError:
+                    raise
+                else:
+                    result.append(element)
+        except TypeError:
+            raise ValueError('not iterable')
+        
+        else:
+            return result
+
 class StrChoiceList:
     def __init__(self, choices):
         self.choices = tuple(map(lambda x: x.lower(), choices))

@@ -226,15 +226,20 @@ def test_open_raw_path(backend, audio_file):
 def test_open_missing_file(backend):
     response = _request(backend, 'open', song='nonexistent_song.flac')
     assert response['code'] == 1
-    assert 'can not parsed as an alias, library id, file path or playlist name' in response['msg']
+    # the path resolved fine, so the failure names the resolved absolute path
+    assert 'nonexistent_song.flac' in response['msg']
+    assert 'it does not exist' in response['msg']
 
 
 def test_open_without_cwd_not_playlist(backend):
-    """Tray sends open without cwd; a song that is neither playlist nor file
-    must return a clean MissingCWD, not crash on Path(None) / song."""
+    """Auto resolution without cwd fails with the single shared parse-failure
+    message. The specific sub-reasons (song / playlist / missing cwd) are
+    deliberately not surfaced: auto is a guess, and its failure must not claim
+    to know which guess was right."""
     response = backend.dispatch({'action': 'open', 'song': 'not_a_playlist_either'})
     assert response['code'] == 1
-    assert 'cwd' in response['msg']
+    assert 'failed to parse "not_a_playlist_either"' in response['msg']
+    assert 'a song in library, a playlist or a file' in response['msg']
 
 
 def test_open_via_library_path(backend, audio_file):
@@ -280,7 +285,8 @@ def test_open_song_id_not_found_falls_back_to_path(backend, audio_file):
     database.add_song(audio_file)
     response = _request(backend, 'open', song='999')
     assert response['code'] == 1
-    assert 'can not parsed as an alias, library id, file path or playlist name' in response['msg']
+    assert '999' in response['msg']
+    assert 'it does not exist' in response['msg']
 
 
 def test_open_superscript_does_not_crash(backend, audio_file):
@@ -289,7 +295,68 @@ def test_open_superscript_does_not_crash(backend, audio_file):
     database.add_song(audio_file)
     response = _request(backend, 'open', song='²')
     assert response['code'] == 1
-    assert 'can not parsed as an alias, library id, file path or playlist name' in response['msg']
+    assert '²' in response['msg']
+
+
+def test_open_explicit_song_type_does_not_fall_through(backend, audio_file, tmp_path):
+    """type='song' must not fall back to the playlist or file branch."""
+    _open_two_song_playlist(backend, audio_file, tmp_path)
+    response = _request(backend, 'open', song='pair', type='song')
+    assert response['code'] == 1
+    assert 'failed to parse "pair" as a song' in response['msg']
+
+
+def test_open_explicit_playlist_type_wins_over_same_named_alias(backend, audio_file, tmp_path):
+    """The named case this feature exists for: a playlist shadowed by an alias.
+
+    Auto resolves the alias (song branch is tried first); an explicit
+    type='playlist' reaches the playlist that auto can never reach.
+    """
+    _open_two_song_playlist(backend, audio_file, tmp_path)
+    shadow_path = str(tmp_path / 'shadow.wav')
+    _make_wav(shadow_path)
+    database = backend.database
+    shadow_id, _ = database.add_song(shadow_path)
+    database.bind_alias(shadow_id, 'pair')
+
+    _request(backend, 'open', song='pair')
+    assert backend.playback.current_song_info[0]['id'] == shadow_id
+
+    response = _request(backend, 'open', song='pair', type='playlist')
+    assert response['code'] == 0
+    assert backend.playback.current_playlist is not None
+    status = _request(backend, 'status')
+    assert status['attachment']['playlist_len'] == 2
+
+
+def test_open_explicit_file_type_loads_out_of_library(backend, audio_file):
+    """type='file' loads the file as a raw path even when the library knows it."""
+    database = backend.database
+    database.add_song(audio_file)
+    response = _request(backend, 'open', song=audio_file, type='file')
+    assert response['code'] == 0
+    assert backend.playback.current_song_in_lib is False
+    status = _request(backend, 'status')
+    assert status['attachment']['path'] == audio_file
+
+
+def test_open_invalid_type_rejected(backend):
+    response = _request(backend, 'open', song='anything', type='banana')
+    assert response['code'] == 1
+    assert 'type' in response['msg']
+
+
+def test_open_type_defaults_to_auto(backend, audio_file):
+    """A missing key and an explicit None both fall back to the 'auto' default."""
+    song_id, _ = backend.database.add_song(audio_file)
+
+    response = backend.dispatch({'action': 'open', 'song': str(song_id), 'cwd': os.getcwd()})
+    assert response['code'] == 0
+    assert backend.playback.current_song_info[0]['id'] == song_id
+
+    response = _request(backend, 'open', song=str(song_id), type=None)
+    assert response['code'] == 0
+    assert backend.playback.current_song_info[0]['id'] == song_id
 
 
 def test_open_alias_priority_over_song_id(backend, audio_file, tmp_path):
@@ -1168,18 +1235,25 @@ def test_lib_info_missing_songs_key(backend, audio_file):
 
 def test_lib_info_songs_must_be_list(backend, audio_file):
     backend.database.add_song(audio_file)
-    # IterType(str):单字符串不是 list/tuple → InvalidKeyType
+    # IterType(str): a bare string is not a list/tuple -> InvalidKeyType
     response = _request(backend, 'lib.info', songs=audio_file)
     assert response['code'] == 1
-    assert 'must be a list or tuple' in response['msg']
+    assert 'not a list or tuple' in response['msg']
 
 
 def test_lib_info_songs_element_type(backend, audio_file):
     backend.database.add_song(audio_file)
-    # 元素类型不对 → InvalidElementType
+    # the callable-validator model coerces elements instead of type-checking them,
+    # so an int element is looked up as the string "123"
     response = _request(backend, 'lib.info', songs=[123])
     assert response['code'] == 1
-    assert 'every element' in response['msg']
+    assert '[0/1]' in response['msg']
+
+
+def test_lib_info_songs_not_iterable(backend):
+    response = _request(backend, 'lib.info', songs=123)
+    assert response['code'] == 1
+    assert 'not iterable' in response['msg']
 
 
 def test_lib_info_with_aliases(backend, audio_file):
@@ -1524,7 +1598,7 @@ def test_manual_prev_keeps_memorized_pos(backend, audio_file, tmp_path):
 def test_invalid_key_type(backend):
     response = _request(backend, 'switch', number='abc')
     assert response['code'] == 1
-    assert 'must be a integer' in response['msg']
+    assert 'invalid value "abc" of key "number"' in response['msg']
 
 
 def test_optional_key_none_accepted(backend, audio_file):
@@ -1649,8 +1723,8 @@ def test_load_last_opens_last_song(backend, audio_file):
     database = backend.database
     song_id, _ = database.add_song(audio_file)
     database.set_setting('last_is_all', '0')
-    database.set_setting('last_song', audio_file)
-    database.set_setting('last_cwd', os.getcwd())
+    database.set_setting('last_type', 'song')
+    database.set_setting('last_reference', song_id)
 
     response = _request(backend, 'load_last')
     assert response['code'] == 0
@@ -1665,10 +1739,7 @@ def test_load_last_play_all_mode(backend, audio_file, tmp_path):
     backend.database.add_song(audio_file)
     backend.database.add_song(second)
 
-    database = backend.database
-    database.set_setting('last_is_all', '1')
-    database.set_setting('last_song', audio_file)
-    database.set_setting('last_cwd', os.getcwd())
+    backend.database.set_setting('last_is_all', '1')
 
     response = _request(backend, 'load_last')
     assert response['code'] == 0
@@ -1678,15 +1749,33 @@ def test_load_last_play_all_mode(backend, audio_file, tmp_path):
 def test_load_last_ignores_num_setting(backend, audio_file):
     # 旧的全局 last_num setting 不应再影响 load_last(已被 playlist last_num 取代)
     database = backend.database
-    database.add_song(audio_file)
+    song_id, _ = database.add_song(audio_file)
     database.set_setting('last_is_all', '0')
-    database.set_setting('last_song', audio_file)
-    database.set_setting('last_cwd', os.getcwd())
+    database.set_setting('last_type', 'song')
+    database.set_setting('last_reference', song_id)
     database.set_setting('last_num', 999)  # 毒数据:若被读取会导致越界
 
     response = _request(backend, 'load_last')
     assert response['code'] == 0
     assert backend.playback.current_song_num == 0
+
+
+def test_load_last_opens_last_playlist(backend, audio_file, tmp_path):
+    """The persisted playlist reference round-trips through load_last.
+
+    last_reference comes back as a string from the settings table, so this also
+    covers open_type being handed an id that is not the int the resolver produced.
+    """
+    first, second = _open_two_song_playlist(backend, audio_file, tmp_path)
+    playlist_id = backend.database.get_playlist_via_name('pair')
+    assert backend.database.get_setting('last_type') == 'playlist'
+    assert int(backend.database.get_setting('last_reference')) == playlist_id
+
+    response = _request(backend, 'load_last')
+    assert response['code'] == 0
+    status = _request(backend, 'status')
+    assert status['attachment']['playlist_len'] == 2
+    assert status['attachment']['path'] in (first, second)
 
 
 def test_open_playlist_restores_last_num(backend, audio_file, tmp_path):

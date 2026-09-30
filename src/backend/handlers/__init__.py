@@ -9,7 +9,7 @@ ROUTER = {
     'get_notifies': misc.get_notifies,
 
     'status': play_core.status,
-    'open': play_core.open,
+    'open': play_core.open_,
     'play-all': play_core.play_all,
     'load_last': play_core.load_last,
     'stop': play_core.stop,

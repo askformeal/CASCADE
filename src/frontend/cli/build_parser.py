@@ -37,8 +37,10 @@ def build_parser():
 
     status_parser = command_sub.add_parser('status', help='Show CASCADE status')
 
-    open_parser = command_sub.add_parser('open', help='Open a song or playlist. Supports alias, file path and playlist name')
+    open_epilog = 'You can open a song in library, a playlist or a file on disk, and you can specify it with the --type option.'
+    open_parser = command_sub.add_parser('open', help='Open a song or playlist. Supports alias, file path and playlist name', epilog=open_epilog)
     open_parser.add_argument('song', type=str, help='Song to open')
+    open_parser.add_argument('-t', '--type', type=str, help='Type of the song to open')
 
     play_all_parser = command_sub.add_parser('play-all', help='Play all songs in library')
 

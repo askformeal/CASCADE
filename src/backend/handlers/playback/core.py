@@ -3,33 +3,36 @@ from src.constants.paths import BACKEND_LOG_PATH
 from src.sentinels import SENTINELS
 from src import gen_response
 from src.utils.misc import bytes2base64
-from .helpers import get_status, open_song, play_all_songs, stop_player
+from .helpers import get_status, open_song, open_type, play_all_songs, stop_player
 
 logger = setup_logger(__name__, BACKEND_LOG_PATH)
 
 def status(ctx, request):
     return gen_response.Success('status obtained', get_status(ctx))
 
-def open(ctx, request):
+def open_(ctx, request):
     song = request['song']
+    type_ = request['type']
     cwd = request.get('cwd', None)
-    return open_song(ctx, song, cwd)
+    return open_song(ctx, song, type_, cwd)
 
 def play_all(ctx, request):
     return play_all_songs(ctx)
 
 def load_last(ctx, request):
     is_all = ctx.database.get_setting('last_is_all')
-    song = ctx.database.get_setting('last_song')
-    last_cwd = ctx.database.get_setting('last_cwd')
+    last_type = ctx.database.get_setting('last_type')
+    last_reference = ctx.database.get_setting('last_reference')
 
     if is_all == '1':
         response = play_all_songs(ctx)
     else:
-        if song in (SENTINELS.SETTING_NOT_FOUND, None):
+        if (last_type in (SENTINELS.SETTING_NOT_FOUND, None)
+            or last_reference in (SENTINELS.SETTING_NOT_FOUND, None)
+            ):
             response = gen_response.Failed('No last song to open')
         else:
-            response = open_song(ctx, song, last_cwd)
+            response = open_type(ctx, last_type, last_reference)
 
     ctx.playback.update_lyric(force=True)
     logger.debug(response.msg)

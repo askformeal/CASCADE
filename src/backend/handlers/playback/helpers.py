@@ -73,80 +73,122 @@ def get_current_lyric(ctx):
 
     return lyric
 
-def open_song(ctx, song, cwd) -> gen_response.Response:
-    from ..library.helpers import get_song, get_playlist_songs
-
-    info_to_set = None
-    paths_to_load = None # MUST be a list!!!
-    playlist_id = None
-
-    id = get_song(ctx, song, cwd)
-    if id not in (SENTINELS.NOT_IN_LIB, SENTINELS.MISSING_CWD):
-        # open single song by path / alias
-        info_to_set = (ctx.database.get_song_info(id),)
-        paths_to_load = [info_to_set[0][0]['path']]
+def open_song(ctx, song, type_, cwd=None) -> gen_response.Response:
+    result = _resolve_open(ctx, song, type_, cwd)
+    if result is SENTINELS.INVALID_OPEN:
+        if type_ == 'auto':
+            type_ = 'a song in library, a playlist or a file'
+        else:
+            type_ = f'a {type_}'
+        return gen_response.Failed(f'failed to parse \"{song}\" as {type_}')
     else:
-        # try as playlist name
-        info, playlist_id = get_playlist_songs(ctx, song, return_id=True)
-        if info is SENTINELS.PLAYLIST_EMPTY:
-            playlist_id = None
-            response = gen_response.Failed(f'can not open playlist \"{song}\" because it is empty')
+        type_, reference = result
+    
+    logger.debug(f'Resolved \"{song}\" into reference \"{reference}\" of type {type_}')
+    
+    return open_type(ctx, type_, reference)
 
-        elif info is not SENTINELS.PLAYLIST_NOT_FOUND:
-            # open playlist
+def open_type(ctx, type_, reference):
+    if type_ == 'song':
+        song_info = ctx.database.get_song_info(reference)
+        info_to_set = (song_info,)
+        paths_to_load = [song_info[0]['path']]
+
+    elif type_ == 'playlist':
+        ids = ctx.database.get_playlist_songs(reference)
+        if ids is SENTINELS.PLAYLIST_EMPTY:
+            return gen_response.Failed(f'can not open playlist because it is empty')
+        else:
+            info = ctx.database.get_song_info(ids)
+            info = sort_songs(info)
             info_to_set = (info,)
             paths_to_load = list(map(lambda i: i['path'], info))
-
+    
+    elif type_ == 'file':
+        if Path(reference).is_file():
+            info_to_set = ([{'path': reference}], False)
+            paths_to_load = [reference]
         else:
-            # Not in library, try to open as path
-            playlist_id = None
-            path = None
-            if Path(song).is_absolute():
-                path = Path(song)
+            return gen_response.FileIOFailed(f'open song', reference, "it does not exist")
+        
+    if ctx.playback.current_song_info is None:
+        current_paths = []
+    else:
+        current_paths = list(map(lambda s: s['path'], ctx.playback.current_song_info))
+
+    if len(paths_to_load) == 1 and paths_to_load[0] in current_paths:
+        num = current_paths.index(paths_to_load[0])
+        ctx.playback.current_song_info[num] = info_to_set[0][0]
+        response = gen_response.Success('song in current playlist. try to switch')
+        response.append(switch_song(ctx, num), joiner='->')
+    else:
+        ctx.playback.set_current_song(*info_to_set)
+        response = _load_paths(ctx, paths_to_load)
+
+        if response.ok():
+            ctx.database.set_setting('last_is_all', '0')
+            ctx.database.set_setting('last_type', type_)
+            ctx.database.set_setting('last_reference', reference)
+
+            if type_ == 'playlist':
+                ctx.playback.current_playlist = reference
+                last_num = ctx.database.get_playlist_last_num(reference)
+                if last_num not in (None, SENTINELS.PLAYLIST_NOT_FOUND):
+                    response += gen_response.Success('last played number detected, switching')
+                    response.append(switch_song(ctx, last_num), joiner='->')
+                else:
+                    ctx.playback.set_current_num(0)
             else:
-                if cwd is None:
-                    response = gen_response.MissingCWD('open')
-                else:
-                    path = Path(cwd) / song
-
-            if path is not None:
-                if path.is_file():
-                    info_to_set = ([{'path': str(path)}], False)
-                    paths_to_load = [str(path)]
-                else:
-                    logger.warning(f'Can not open {path}')
-                    response = gen_response.Failed(f'\"{song}\" can not parsed as an alias, library id, file path or playlist name')
-
-    if paths_to_load is not None:
-        if ctx.playback.current_song_info is None:
-            current_paths = []
-        else:
-            current_paths = list(map(lambda s: s['path'], ctx.playback.current_song_info))
-
-        if len(paths_to_load) == 1 and paths_to_load[0] in current_paths:
-            num = current_paths.index(paths_to_load[0])
-            ctx.playback.current_song_info[num] = info_to_set[0][0]
-            response = gen_response.Success('song in current playlist. try to switch')
-            response.append(switch_song(ctx, num), joiner='->')
-        else:
-            ctx.playback.set_current_song(*info_to_set)
-            response = _load_paths(ctx, paths_to_load, song)
-
-            if response.ok():
-                ctx.database.set_setting('last_is_all', '0')
-                ctx.database.set_setting('last_song', song)
-                ctx.database.set_setting('last_cwd', cwd)
-
-                ctx.playback.current_playlist = playlist_id
-                if playlist_id is not None:
-                    last_num = ctx.database.get_playlist_last_num(playlist_id)
-                    if last_num not in (None, SENTINELS.PLAYLIST_NOT_FOUND):
-                        response += gen_response.Success('last played number detected, switching')
-                        response.append(switch_song(ctx, last_num), joiner='->')
-                    else:
-                        ctx.playback.set_current_num(0)
+                ctx.playback.current_playlist = None                
 
     return response
+
+def _resolve_open(ctx, song, type_, cwd):
+    if type_ in ('song', 'auto'):
+        ok, result = _resolve_song(ctx, song, cwd)
+        if ok:
+            return 'song', result
+        
+    if type_ in ('playlist', 'auto'):
+        ok, result = _resolve_playlist(ctx, song)
+        if ok:
+            return 'playlist', result
+    
+    if type_ in ('file', 'auto'):
+        ok, result = _resolve_path(song, cwd)
+        if ok: 
+            return 'file', result
+    
+    return SENTINELS.INVALID_OPEN
+
+def _resolve_song(ctx, song, cwd):
+    from ..library.helpers import get_song
+    id_ = get_song(ctx, song, cwd)
+    if id_ is SENTINELS.NOT_IN_LIB:
+        return False, gen_response.SongNotExist(f'resolve {song}')
+    elif id_ is SENTINELS.MISSING_CWD:
+        return False, gen_response.MissingCWD(f'resolve {song}')
+    else:
+        return True, id_
+
+def _resolve_playlist(ctx, playlist):
+    id_ = ctx.database.get_playlist_via_name(playlist)
+    if id_ is SENTINELS.PLAYLIST_NOT_FOUND:
+        return False, gen_response.PlaylistNotExist(f'resolve {playlist}')
+    else:
+        return True, id_
+
+def _resolve_path(path, cwd):
+    if Path(path).is_absolute():
+        path = Path(path)
+    else:
+        if cwd is None:
+            return False, gen_response.MissingCWD(f'resolve {path}')
+        else:
+            path = Path(cwd) / path
+
+    return True, str(path)
+
 
 def play_all_songs(ctx):
     info = ctx.database.get_all_song_info()
@@ -154,7 +196,7 @@ def play_all_songs(ctx):
         info = sort_songs(info)
         ctx.playback.set_current_song(info, True)
         paths = list(map(lambda x: x['path'], info))
-        response = _load_paths(ctx, paths, 'all-songs')
+        response = _load_paths(ctx, paths)
         if response.ok():
             ctx.database.set_setting('last_is_all', '1')
             ctx.playback.current_playlist = SENTINELS.PLAY_ALL
@@ -228,10 +270,10 @@ def replay_song(ctx) -> gen_response.Response:
         SENTINELS.INVALID_PLAYER_STATE: gen_response.NotPlayingPaused('jump to beginning')
     }[result]
 
-def _load_paths(ctx, paths, song, jump_to_mem=True) -> gen_response.Response:
+def _load_paths(ctx, paths, jump_to_mem=True) -> gen_response.Response:
     result = ctx.playback.load_paths(paths)
     response = {
-        SENTINELS.SUCCESS: gen_response.Success(f'opened song/playlist \"{song}\"'),
+        SENTINELS.SUCCESS: gen_response.Success(f'opened song/playlist'),
         SENTINELS.PLAYER_LOAD_EMPTY: gen_response.Failed('can not load empty list of songs'),
         SENTINELS.ENGINE_ERROR: gen_response.EngineError('load path(s)'),
         SENTINELS.PLAYER_TIMEOUT: gen_response.PlayerTimeout('load path(s)'),
@@ -277,7 +319,7 @@ def remove_from_current(ctx, path) -> gen_response.Response:
                     if num >= len(paths):
                         num = len(paths) - 1
 
-                response = _load_paths(ctx, paths, 'reload current playlist due to deleted song', jump_to_mem=False)
+                response = _load_paths(ctx, paths, jump_to_mem=False)
                 response += switch_song(ctx, num)
                 return response
             else:
