@@ -20,7 +20,7 @@ class HotkeyMixin:
                     song = self._get_input('Enter song name/library ID/file path/playlist name: ')
                     if song != '':
                         self._toast(f'Open \"{song}\"')
-                        self._send_dash_request('open', song=song)
+                        self._send_dash_request('open', song=song, type='file')
                         
                 elif key in KEY_MAP.reload:
                     self._toast('Reload')

@@ -21,8 +21,8 @@ def play_all(ctx, request):
 
 def load_last(ctx, request):
     is_all = ctx.database.get_setting('last_is_all')
-    last_type = ctx.database.get_setting('last_type')
-    last_reference = ctx.database.get_setting('last_reference')
+    last_type = int(ctx.database.get_setting('last_type'))
+    last_reference = int(ctx.database.get_setting('last_reference'))
 
     if is_all == '1':
         response = play_all_songs(ctx)

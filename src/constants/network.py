@@ -1,4 +1,4 @@
-from src.types import IterType, StrChoiceList
+from src.types import IterType, StrChoiceList, CONVERTER
 from src.sentinels import SENTINELS
 
 SERVER_TIMEOUT = 0.5
@@ -37,14 +37,14 @@ ACTION_KEYS = {
         'number': (int, True)
     },
     'prev': {
-        'on_end': (bool, False, False)
+        'on_end': (CONVERTER.boolean, False, False)
     },
     'next': {
-        'on_end': (bool, False, False)
+        'on_end': (CONVERTER.boolean, False, False)
     },
     'seek': {
         'time': (str, True),
-        'ms': (bool, False, False)
+        'ms': (CONVERTER.boolean, False, False)
     },
     'jump': {
         'progress': (int, True)
@@ -54,47 +54,47 @@ ACTION_KEYS = {
     },
     'set_offset_overlay': {
         'offset': (int, True),
-        'autoincrement': (bool, False, False)
+        'autoincrement': (CONVERTER.boolean, False, False)
     },
     'lib.info':
     {
         'songs': (IterType(str), True),
-        'show_aliases': (bool, False, False),
-        'show_playlists': (bool, False, False),
-        'force_id': (bool, False, False)
+        'show_aliases': (CONVERTER.boolean, False, False),
+        'show_playlists': (CONVERTER.boolean, False, False),
+        'force_id': (CONVERTER.boolean, False, False)
     },
     'lib.list': {
-        'show_aliases': (bool, False, False),
-        'show_playlists': (bool, False, False),
-        'show_tech': (bool, False, False)
+        'show_aliases': (CONVERTER.boolean, False, False),
+        'show_playlists': (CONVERTER.boolean, False, False),
+        'show_tech': (CONVERTER.boolean, False, False)
     },
     'lib.search': {
         'keyword': (IterType(str), True),
-        'or': (bool, False, False)
+        'or': (CONVERTER.boolean, False, False)
     },
     'lib.add': {
         'paths': (IterType(str), True),
         'aliases': (IterType(str), False, []),
-        'skip_meta': (bool, False, False),
-        'skip_alias': (bool, False, False),
-        'skip_lyric': (bool, False, False),
-        'loose_path': (bool, False, False)
+        'skip_meta': (CONVERTER.boolean, False, False),
+        'skip_alias': (CONVERTER.boolean, False, False),
+        'skip_lyric': (CONVERTER.boolean, False, False),
+        'loose_path': (CONVERTER.boolean, False, False)
     },
     'lib.del': {
         'songs': (IterType(str), True)
     },
     'lib.prune':
     {
-        'dry_run': (bool, False, False),
+        'dry_run': (CONVERTER.boolean, False, False),
     },
     'lib.scan': {
         'dir': (str, True),
         'playlist': (str, False, None),
-        'recurse': (bool, False, False),
-        'dry_run': (bool, False, False),
-        'skip_meta': (bool, False, False),
-        'skip_alias': (bool, False, False),
-        'skip_lyric': (bool, False, False),
+        'recurse': (CONVERTER.boolean, False, False),
+        'dry_run': (CONVERTER.boolean, False, False),
+        'skip_meta': (CONVERTER.boolean, False, False),
+        'skip_alias': (CONVERTER.boolean, False, False),
+        'skip_lyric': (CONVERTER.boolean, False, False),
     },
     'lib.meta.set': {
         'song': (str, True),
@@ -111,14 +111,14 @@ ACTION_KEYS = {
 
     'lib.meta.read-file': {
         'song': (str, True),
-        'name': (bool, False, False),
-        'artist': (bool, False, False),
-        'album': (bool, False, False),
-        'duration': (bool, False, False),
-        'bitrate': (bool, False, False),
-        'sample_rate': (bool, False, False),
-        'channels': (bool, False, False),
-        'all': (bool, False, False),
+        'name': (CONVERTER.boolean, False, False),
+        'artist': (CONVERTER.boolean, False, False),
+        'album': (CONVERTER.boolean, False, False),
+        'duration': (CONVERTER.boolean, False, False),
+        'bitrate': (CONVERTER.boolean, False, False),
+        'sample_rate': (CONVERTER.boolean, False, False),
+        'channels': (CONVERTER.boolean, False, False),
+        'all': (CONVERTER.boolean, False, False),
     },
 
     'lib.alias.list': {
@@ -151,9 +151,9 @@ ACTION_KEYS = {
     },
     'lib.playlist.list': {
         'playlist': (str, False, None),
-        'show_aliases': (bool, False, False),
-        'show_playlists': (bool, False, False),
-        'show_tech': (bool, False, False)
+        'show_aliases': (CONVERTER.boolean, False, False),
+        'show_playlists': (CONVERTER.boolean, False, False),
+        'show_tech': (CONVERTER.boolean, False, False)
     },
     'lib.playlist.create': {
         'name': (str, True)
@@ -175,7 +175,7 @@ ACTION_KEYS = {
     'config.set': {
         'option': (str, True),
         'value': (str, True),
-        'overwrite_corrupt': (bool, False, False)
+        'overwrite_corrupt': (CONVERTER.boolean, False, False)
     },
     'config.unset': {
         'option': (str, True)

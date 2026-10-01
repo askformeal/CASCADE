@@ -1250,10 +1250,10 @@ def test_lib_info_songs_element_type(backend, audio_file):
     assert '[0/1]' in response['msg']
 
 
-def test_lib_info_songs_not_iterable(backend):
+def test_lib_info_songs_not_a_list(backend):
     response = _request(backend, 'lib.info', songs=123)
     assert response['code'] == 1
-    assert 'not iterable' in response['msg']
+    assert 'not a list or tuple' in response['msg']
 
 
 def test_lib_info_with_aliases(backend, audio_file):

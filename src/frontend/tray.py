@@ -68,7 +68,7 @@ class Tray(Icon):
 
                 if self.snapshot.playlists is not None and len(self.snapshot.playlists) > 0:
                     for name in self.snapshot.playlists:
-                        playlists_sub_menu.append(MenuItem(name, lambda *_, x=name: self._send_tray_request('open', song=x)))
+                        playlists_sub_menu.append(MenuItem(name, lambda *_, x=name: self._send_tray_request('open', song=x, type='playlist')))
 
                 playlists_sub_menu = Menu(*playlists_sub_menu)
 
@@ -151,7 +151,7 @@ class Tray(Icon):
             filetypes=file_types,
         )
         if path != '':
-            self._send_tray_request('open', song=path)
+            self._send_tray_request('open', song=path, )
 
     def _send_tray_request(self, action, silent=False, **kwargs):
         request = {'action': action, 'source': 'tray', 'notify_support': False, 'silent': silent, **kwargs}

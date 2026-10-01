@@ -110,10 +110,6 @@ class InvalidKeyType(Failed):
     def __init__(self, action, key, value, error, attachment=None, failed=None):
         super().__init__(f'invalid value \"{value}\" of key \"{key}\" of \"{action}\": {error}', attachment, failed)
 
-class InvalidElementType(Failed):
-    def __init__(self, action, key, element_type, received_type, attachment=None, failed=None):
-        super().__init__(f'every element of the value of the key \"{key}\" of \"{action}\" action must be a {element_type} value but one with value of type \"{received_type}\" was received instead', attachment, failed)
-
 class EmptyList(Failed):
     def __init__(self, item, attachment=None, failed=None):
         super().__init__(f'received empty list of {item}', attachment, failed)

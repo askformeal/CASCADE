@@ -4,24 +4,19 @@ class IterType:
         self.element_type = element_type
 
     def __call__(self, obj):
-        if isinstance(obj, (str, bytes)):
-            # a bare string iterates per character; that is never a list of elements
-            raise ValueError('not a list or tuple')
-
-        result = []
-        try:
+        if isinstance(obj, (list, tuple)):
+            result = []
             for element in obj:
                 try:
                     element = self.element_type(element)
                 except ValueError:
                     raise
                 else:
-                    result.append(element)
-        except TypeError:
-            raise ValueError('not iterable')
-        
+                    result.append(element)            
+            else:
+                return result
         else:
-            return result
+            raise ValueError('not a list or tuple')
 
 class StrChoiceList:
     def __init__(self, choices):
@@ -32,7 +27,7 @@ class StrChoiceList:
         if value in self.choices:
             return value
         else:
-            raise ValueError
+            raise ValueError(f"element value is not one of {', '.join(self.choices)}")
 
 class Converter:
     def boolean(self, value):
