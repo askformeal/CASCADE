@@ -7,7 +7,7 @@ name = "cascade"
 version = "0.54.0"
 description = "Command-Line Audio Stream Capture And Decoding Engine"
 readme = "README.md"
-license = "MIT"
+license = {file = "LICENSE"}
 requires-python = ">=3.12"
 dependencies = [
     "platformdirs>=4.0",

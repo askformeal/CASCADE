@@ -3,11 +3,15 @@ from threading import Thread
 import tkinter as tk
 import tkinter.font as tkfont
 from tkinter import messagebox
+import webbrowser
 
 from PIL import Image, ImageTk
 
 from .logger import logger
+from src import __version__
+from src.constants.misc import ENCODING, REPO_LINK
 from src.constants.paths import (
+    LICENSE_PATH,
     ICON_PATH,
     ONLINE_ICON_PATH,
     OFFLINE_ICON_PATH
@@ -21,6 +25,7 @@ from src.constants.gui import (
     )
 from src.frontend.client import send_request, test_heartbeat
 from src.frontend.snapshot import Snapshot
+from src.process import spawn as spawn_module
 from src.utils.time_ import format_time
 from .empty import GUI_EMPTY as EMPTY
 from .playback import PlaybackMixin
@@ -74,9 +79,31 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
         self.open_playlist_menu = tk.Menu(file_menu, tearoff=False)
         file_menu.add_cascade(label='Open playlist', menu=self.open_playlist_menu, underline=5)
         file_menu.add_separator()
+        file_menu.add_command(label='Ping backend', command=self._check_backend)
+        file_menu.add_separator()
         file_menu.add_command(label='Exit', command=lambda *_: self._exit(), underline=0)
 
+        edit_menu = tk.Menu(menubar, tearoff=False)
+        edit_menu.add_command(label='Configure...', command=lambda: spawn_module('src.frontend.config_gui'))
+
+        view_menu = tk.Menu(menubar, tearoff=False)
+        view_menu.add_command(label='Minimize', command=lambda: self.iconify())
+        self.fullscreen = tk.BooleanVar(value=False)
+        view_menu.add_checkbutton(label='Fullscreen', 
+                                  variable=self.fullscreen,
+                                  command=lambda: self.attributes('-fullscreen', self.fullscreen.get())
+                                  )
+
+        help_menu = tk.Menu(menubar, tearoff=False)
+        help_menu.add_command(label='GitHub repository...', command=lambda: webbrowser.open(REPO_LINK))
+        help_menu.add_command(label='License', command=self._show_license)
+        help_menu.add_separator()
+        help_menu.add_command(label='About', command=self._show_about)
+
         menubar.add_cascade(label='File', menu=file_menu, underline=0)
+        menubar.add_cascade(label='Edit', menu=edit_menu, underline=0)
+        menubar.add_cascade(label='View', menu=view_menu, underline=0)
+        menubar.add_cascade(label='Help', menu=help_menu, underline=0)
 
         main_frame = tk.Frame(self)
         main_frame.pack(
@@ -247,7 +274,23 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
             self.after(0, messagebox.showerror, title='Connection failed', message=msg, detail=detail)
 
     def _on_open(self):
-        OpenDialogue(self)        
+        OpenDialogue(self)
+
+    def _show_license(self):
+        with open(LICENSE_PATH, 'r', encoding=ENCODING) as f:
+            license_text = f.read()
+        messagebox.showinfo('License', 'MIT License', detail=license_text)
+
+    def _show_about(self):
+        app_name = 'Command-Line Audio Stream Capture And Decoding Engine'
+        detail = (
+            f'Version: {__version__}\n'
+            f'Author: Edward\n'
+            f'GitHub repository: {REPO_LINK}\n'
+            f'E-Mail: muzhi1014@outlook.com\n'
+            f'License: MIT\n'
+        )
+        messagebox.showinfo('C.A.S.C.A.D.E', app_name, detail=detail)
 
     def _exit(self):
         logger.info('Exit GUI')

@@ -5,6 +5,8 @@ from pathlib import Path
 def get_res(filename):
     return str(files('res') / filename)
 
+LICENSE_PATH = get_res('license.txt')
+
 ICON_PATH = get_res('icon.ico')
 ERROR_ICON_PATH = get_res('icon_error.ico')
 LYRIC_ICON_PATH = get_res('lyric_icon.ico')

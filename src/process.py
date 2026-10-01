@@ -16,13 +16,13 @@ def start(**kwargs):
     if test_alive():
         return SENTINELS.BACKEND_ALREADY_RUNNING
     else:
-        _spawn('src.backend.core', **kwargs)
+        spawn('src.backend.core', **kwargs)
         if CONFIG.hotkey:
-            _spawn('src.frontend.hotkey')
+            spawn('src.frontend.hotkey')
         if CONFIG.tray:
-            _spawn('src.frontend.tray')
+            spawn('src.frontend.tray')
         if CONFIG.lyric:
-            _spawn('src.frontend.lyric')
+            spawn('src.frontend.lyric')
             
         for i in range(STARTER_RETRY):
             if test_alive():
@@ -31,7 +31,7 @@ def start(**kwargs):
 
         return SENTINELS.FAILED_START_BACKEND
 
-def _spawn(module, **env_args):
+def spawn(module, **env_args):
     for key, value in env_args.items():
         env_args[key] = str(value)
     env = {**os.environ, **env_args}
