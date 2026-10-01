@@ -12,6 +12,7 @@ from src.constants.paths import (
     NEXT_SONG_ICON_PATH,
     PLAY_ICON_PATH,
     PAUSE_ICON_PATH,
+    STOP_ICON_PATH,
     UNMUTE_ICON_PATH,
     MUTE_ICON_PATH,
     LOOP_ICON_PATH,
@@ -48,6 +49,7 @@ class PlaybackMixin:
         self.next_icon = self.get_icon(NEXT_SONG_ICON_PATH)
         self.play_icon = self.get_icon(PLAY_ICON_PATH)
         self.pause_icon = self.get_icon(PAUSE_ICON_PATH)
+        self.stop_icon = self.get_icon(STOP_ICON_PATH)
 
         self.loop_icon = self.get_icon(LOOP_ICON_PATH)
         self.shuffle_icon = self.get_icon(SHUFFLE_ICON_PATH)
@@ -63,7 +65,6 @@ class PlaybackMixin:
 
         self.cover_label = tk.Label(playback_frame)
 
-        # self.cover_label.pack(fill='both', expand=True, pady=(0, 50))
         self.cover_label.pack(pady=(0, 50))
 
         scale_frame = tk.Frame(playback_frame)
@@ -74,11 +75,12 @@ class PlaybackMixin:
             orient='horizontal', 
             sliderlength=20,
             showvalue=False,
-            width=22
+            width=22,
+            command=self._set_time
             )
         self.progress_scale.pack(side='left', padx=(0,30), fill='x', expand=True)
         self.progress_scale.bind('<ButtonPress-1>', lambda *_: setattr(self, 'progress_dragging', True))
-        self.progress_scale.bind('<ButtonRelease-1>', self._set_time)
+        self.progress_scale.bind('<ButtonRelease-1>', lambda *_: setattr(self, 'progress_dragging', False))
 
         self.mute_button = tk.Button(scale_frame, command=lambda: self.send_command('mute'))
         self.mute_button.pack(side='left', padx=(0,5))
@@ -90,11 +92,12 @@ class PlaybackMixin:
                                     sliderlength=20,
                                      showvalue=False,
                                      length=100,
-                                     width=22
+                                     width=22,
+                                     command=self._set_volume
                                      )
         self.volume_scale.pack(side='left')
         self.volume_scale.bind('<ButtonPress-1>', lambda *_: setattr(self, 'volume_dragging', True))
-        self.volume_scale.bind('<ButtonRelease-1>', self._set_volume)
+        self.volume_scale.bind('<ButtonRelease-1>', lambda *_: setattr(self, 'volume_dragging', False))
 
         
         bottom_bar = tk.Frame(playback_frame)
@@ -125,7 +128,14 @@ class PlaybackMixin:
             image=self.next_icon, 
             command=lambda: self.send_command('next')
             )
-        next_button.pack(side='left', padx=(0,30))
+        next_button.pack(side='left', padx=(0,20))
+
+        stop_button = tk.Button(
+            bottom_bar,
+            image=self.stop_icon,
+            command=lambda: self.send_command('stop')
+        )
+        stop_button.pack(side='left', padx=(0, 30))
 
         self.loop_button = tk.Button(
             bottom_bar, 
@@ -157,14 +167,14 @@ class PlaybackMixin:
             pady=5
             )
         self.progress_label.pack(side='right', padx=(20, 0))
-    
-    def _set_time(self, *_):
-        self.progress_dragging = False
-        self.send_command('seek', time=str(self.progress_scale.get()), ms=True)
 
-    def _set_volume(self, *_):
-        self.volume_dragging = False
-        self.send_command('volume', volume=str(self.volume_scale.get()))
+    def _set_time(self, time_):
+        if self.progress_dragging:
+            self.send_command('seek', time=str(time_), ms=True, silent=True)
+
+    def _set_volume(self, volume):
+        if self.volume_dragging:
+            self.send_command('volume', volume=str(volume), silent=True)
 
     def update_playback(self):
         self.name_label.config(text=self.snapshot.display_name)

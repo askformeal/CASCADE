@@ -195,7 +195,8 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
 
     def send_command(self, action, **kwargs):
         if self.backend_online:
-            logger.info(f'Send command: {action}')
+            if not kwargs.get('silent', False):
+                logger.info(f'Send command: {action}')
             response = self._send_gui_request(action=action, **kwargs)
             if response['code'] != 0:
                 msg = response['msg']

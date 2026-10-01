@@ -23,6 +23,7 @@ NEXT_SONG_ICON_PATH = get_res('gui/next.png')
 PREV_SONG_ICON_PATH = get_res('gui/previous.png')
 PLAY_ICON_PATH = get_res('gui/play.png')
 PAUSE_ICON_PATH = get_res('gui/pause.png')
+STOP_ICON_PATH = get_res('gui/stop.png')
 
 UNMUTE_ICON_PATH = get_res('gui/unmute.png')
 MUTE_ICON_PATH = get_res('gui/mute.png')
