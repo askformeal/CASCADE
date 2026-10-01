@@ -1,9 +1,11 @@
 # CHANGELOG
 
-## [Unreleased]
+## [0.55.0] - 2026-10-01
 
 ### Added
 
+- **A graphical frontend — `cascade gui`.** Album cover, song info, progress and volume bars that follow the drag in real time, a lyric panel and a playlist panel, and a menu bar for opening songs, playlists and files, starting / pinging / exiting the backend, the configure GUI, fullscreen, and a license / about box.
+- **`open` can be told what it is given** — the `type` key (`auto`, `song`, `playlist`, `file`) replaces guessing how to resolve the reference; the GUI and the tray use it.
 - **The configure GUI is a CLI command now** — `cascade config gui` opens the window that until now could only be started as `python -m src.frontend.config_gui`. It takes `-d/--direct` / `--no-direct` to pick the route it starts on: `--direct` opens it in local mode, `--no-direct` in remote mode, and passing neither keeps honouring `config_default_remote`.
 - **`-d/--direct` became a three-state switch** — `-d/--direct` / `--no-direct`, neither of which is forced to a default. The CLI used to give the flag a `false` default, so "force the backend route" and "no opinion" were the same value and the configure GUI could not tell them apart; leaving it unset is what lets `config gui` fall back to `config_default_remote`.
 
