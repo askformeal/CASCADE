@@ -26,6 +26,7 @@ from .empty import GUI_EMPTY as EMPTY
 from .playback import PlaybackMixin
 from .playlist import PlaylistMixin
 from .lyric import LyricMixin
+from .open_dialogue import OpenDialogue
 
 class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
     def __init__(self):
@@ -33,6 +34,8 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
         self.backend_online = True
         self.window_ready = False
         self.dev_label_shown = False
+
+        self.old_playlists = []
 
         self.snapshot = Snapshot(self.poll_request, empty=EMPTY)
 
@@ -63,6 +66,14 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
         self.config(menu=menubar)
 
         file_menu = tk.Menu(menubar, tearoff=False)
+        file_menu.add_command(label='Open...', command=self._on_open, underline=0)
+        file_menu.add_command(label='Open all', 
+                              command=lambda: self.send_command('play-all'),
+                              underline=5
+                              )
+        self.open_playlist_menu = tk.Menu(file_menu, tearoff=False)
+        file_menu.add_cascade(label='Open playlist', menu=self.open_playlist_menu, underline=5)
+        file_menu.add_separator()
         file_menu.add_command(label='Exit', command=lambda *_: self._exit(), underline=0)
 
         menubar.add_cascade(label='File', menu=file_menu, underline=0)
@@ -145,6 +156,19 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
         self.update_playlist()
         self.update_lyric()
 
+        if self.snapshot.playlists is EMPTY:
+            current_playlists = []
+        else:
+            current_playlists = self.snapshot.playlists
+        if current_playlists != self.old_playlists:
+            
+            self.old_playlists = current_playlists
+            self.open_playlist_menu.delete(0, tk.END)
+            for name in current_playlists:
+                open_func = lambda name=name: self.send_command('open', song=name, type='playlist')
+                self.open_playlist_menu.add_command(label=name, 
+                                                    command=open_func)
+
         if self.backend_online:
             self.online_button.config(image=self.online_icon)
         else:
@@ -221,6 +245,9 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
             self.after(0, messagebox.showinfo, title='Backend online', message=msg, detail=detail)
         else:
             self.after(0, messagebox.showerror, title='Connection failed', message=msg, detail=detail)
+
+    def _on_open(self):
+        OpenDialogue(self)        
 
     def _exit(self):
         logger.info('Exit GUI')

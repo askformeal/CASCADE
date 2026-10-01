@@ -15,6 +15,9 @@ DEV_COLOR = 'blue'
 LYRIC_CURRENT_BG = 'cyan'
 LYRIC_CURRENT_FG = 'black'
 
+OPEN_COLOR = 'light green'
+CANCEL_COLOR = 'light grey'
+
 SCROLL_EVENTS = (
     '<MouseWheel>',
     '<Button-4>',
