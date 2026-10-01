@@ -23,9 +23,10 @@ from src.constants.gui import (
     ICON_SIZE,
     DEV_COLOR
     )
+from src.sentinels import SENTINELS
 from src.frontend.client import send_request, test_heartbeat
 from src.frontend.snapshot import Snapshot
-from src.process import spawn as spawn_module
+from src.process import spawn as spawn_module, start as start_backend
 from src.utils.time_ import format_time
 from .empty import GUI_EMPTY as EMPTY
 from .playback import PlaybackMixin
@@ -79,7 +80,9 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
         self.open_playlist_menu = tk.Menu(file_menu, tearoff=False)
         file_menu.add_cascade(label='Open playlist', menu=self.open_playlist_menu, underline=5)
         file_menu.add_separator()
-        file_menu.add_command(label='Ping backend', command=self._check_backend)
+        file_menu.add_command(label='Start backend', command=Thread(target=self._start_backend).start)
+        file_menu.add_command(label='Ping backend', command=Thread(target=self._check_backend).start)
+        file_menu.add_command(label='Exit backend', command=lambda: self.send_command('exit'))
         file_menu.add_separator()
         file_menu.add_command(label='Exit', command=lambda *_: self._exit(), underline=0)
 
@@ -272,6 +275,25 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
             self.after(0, messagebox.showinfo, title='Backend online', message=msg, detail=detail)
         else:
             self.after(0, messagebox.showerror, title='Connection failed', message=msg, detail=detail)
+
+    def _start_backend(self):
+        result = start_backend()
+        if result is SENTINELS.BACKEND_STARTED:
+            self.after(0, messagebox.showinfo, 
+                       title='Backend started', 
+                       message='Backend is now up and running'
+                       )
+        elif result is SENTINELS.BACKEND_ALREADY_RUNNING:
+            self.after(0, messagebox.showinfo, 
+                       title='Backend already running', 
+                       message='Backend is already running'
+                       )
+        else:
+            self.after(0, messagebox.showinfo, 
+                       title='Error', 
+                       message='Failed to start backend',
+                       detail='Timed out waiting for backend to be alive'
+                       )
 
     def _on_open(self):
         OpenDialogue(self)
