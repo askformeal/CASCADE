@@ -45,11 +45,11 @@ def send_request(expect_reset=False, **kwargs):
         }
 
 def test_alive():
-    response = send_request(action='test_alive', source='alive', notify_support=False, expect_reset=True)
+    response = send_request(action='test_alive', source='client', notify_support=False, expect_reset=True)
     return response['code'] != 2
 
 def test_heartbeat():
-    response = send_request(action='heartbeat', source='heartbeat') # for good measure
+    response = send_request(action='heartbeat', source='client') # for good measure
     return response['code']
 
 def confirm_dead():

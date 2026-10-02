@@ -21,8 +21,8 @@ def play_all(ctx, request):
 
 def load_last(ctx, request):
     is_all = ctx.database.get_setting('last_is_all')
-    last_type = int(ctx.database.get_setting('last_type'))
-    last_reference = int(ctx.database.get_setting('last_reference'))
+    last_type = ctx.database.get_setting('last_type')
+    last_reference = ctx.database.get_setting('last_reference')
 
     if is_all == '1':
         response = play_all_songs(ctx)
@@ -32,6 +32,10 @@ def load_last(ctx, request):
             ):
             response = gen_response.Failed('No last song to open')
         else:
+            try:
+                last_reference = int(last_reference)
+            except ValueError:
+                ...
             response = open_type(ctx, last_type, last_reference)
 
     ctx.playback.update_lyric(force=True)

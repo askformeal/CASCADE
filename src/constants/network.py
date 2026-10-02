@@ -18,8 +18,8 @@ SOURCES = {
     'tray': 'Tray icon control service',
     'lyric': 'lyric board service service',
     'config_gui': 'configure GUI',
-    'alive': 'alive test',
-    'heartbeat': 'heartbeat test',
+    'process': 'process manager',
+    'client': 'client-side network manager',
 }
 
 ACK = {

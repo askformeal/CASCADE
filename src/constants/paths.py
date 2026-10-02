@@ -56,6 +56,7 @@ CONFIG_PATH = CONFIG_DIR / 'config.toml'
 LOG_DIR = Path(dirs.user_log_dir)
 BACKEND_LOG_PATH = LOG_DIR / 'cascade.log'
 SOCKET_LOG_PATH = LOG_DIR / 'cascade-socket.log'
+CLI_LOG_PATH = LOG_DIR / 'cascade-cli.log'
 HOTKEY_LOG_PATH = LOG_DIR / 'cascade-hotkey.log'
 TRAY_LOG_PATH = LOG_DIR / 'cascade-tray.log'
 LYRIC_LOG_PATH = LOG_DIR / 'cascade-lyric.log'

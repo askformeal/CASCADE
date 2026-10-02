@@ -26,7 +26,7 @@ from src.constants.gui import (
 from src.sentinels import SENTINELS
 from src.frontend.client import send_request, test_heartbeat
 from src.frontend.snapshot import Snapshot
-from src.process import spawn as spawn_module, start as start_backend
+from src.process import ProcessManager
 from src.utils.time_ import format_time
 from .empty import GUI_EMPTY as EMPTY
 from .playback import PlaybackMixin
@@ -43,6 +43,7 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
 
         self.old_playlists = []
 
+        self.process = ProcessManager(logger)
         self.snapshot = Snapshot(self.poll_request, empty=EMPTY)
 
         super().__init__()
@@ -87,7 +88,7 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
         file_menu.add_command(label='Exit', command=lambda *_: self._exit(), underline=0)
 
         edit_menu = tk.Menu(menubar, tearoff=False)
-        edit_menu.add_command(label='Configure...', command=lambda: spawn_module('src.frontend.config_gui'))
+        edit_menu.add_command(label='Configure...', command=lambda: self.process.spawn('src.frontend.config_gui'))
 
         view_menu = tk.Menu(menubar, tearoff=False)
         view_menu.add_command(label='Minimize', command=lambda: self.iconify())
@@ -277,8 +278,8 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
             self.after(0, messagebox.showerror, title='Connection failed', message=msg, detail=detail)
 
     def _start_backend(self):
-        result = start_backend()
-        if result is SENTINELS.BACKEND_STARTED:
+        result = self.process.start()
+        if result is SENTINELS.SUCCESS:
             self.after(0, messagebox.showinfo, 
                        title='Backend started', 
                        message='Backend is now up and running'

@@ -74,10 +74,11 @@ class Sentinels:
         self.INVALID_PLAYER_STATE = Sentinel('This action can not be done under current player state')
         self.POS_TOO_LATE = Sentinel('Position is Later than Total Length')
 
-        # Starter
+        # Backend life status
         self.BACKEND_ALREADY_RUNNING = Sentinel('Backend is Already Running')
-        self.BACKEND_STARTED = Sentinel('Backend Started')
+        self.BACKEND_NOT_RUNNING = Sentinel('Backend is Not Running')
         self.FAILED_START_BACKEND = Sentinel('Failed to Start Backend')
+        self.FAILED_EXIT_BACKEND = Sentinel('Failed to Exit Backend')
 
         # Process
 
