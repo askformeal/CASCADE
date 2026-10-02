@@ -134,7 +134,7 @@ CONFIG_SCHEME = {
         'type': CONVERTER.pos_int,
         'section': 'gui',
         'default': 5,
-        'description': 'Step of volume increase/decrease on dashboard'
+        'description': 'Step of volume increase/decrease on GUI'
     },
     'gui_pos_step': {
         'type': CONVERTER.pos_int,

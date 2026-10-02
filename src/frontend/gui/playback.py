@@ -57,6 +57,7 @@ class PlaybackMixin:
         self.dice_icon = self.get_icon(DICE_ICON_PATH)
         
     def build_playback(self, playback_frame):
+        playback_frame.bind('<ButtonPress-1>', lambda *_: playback_frame.focus_set())
         self.bind('<space>', self._toggle)
         self.bind('<p>', self._prev)
         self.bind('<n>', self._next)
@@ -66,13 +67,13 @@ class PlaybackMixin:
         self.bind('<r>', self._loop)
         self.bind('<d>', self._dice)
         
-        self.bind('<Left>', lambda *_: self._move_pos(False))
-        self.bind('<Right>', lambda *_: self._move_pos(True))
-        self.bind('<Shift-Left>', lambda *_: self._move_pos(False, long=True))
-        self.bind('<Shift-Right>', lambda *_: self._move_pos(True, long=True))
+        playback_frame.bind('<Left>', lambda *_: self._move_pos(False))
+        playback_frame.bind('<Right>', lambda *_: self._move_pos(True))
+        playback_frame.bind('<Shift-Left>', lambda *_: self._move_pos(False, long=True))
+        playback_frame.bind('<Shift-Right>', lambda *_: self._move_pos(True, long=True))
 
-        self.bind('<Up>', lambda *_: self._move_volume(True))
-        self.bind('<Down>', lambda *_: self._move_volume(False))
+        playback_frame.bind('<Up>', lambda *_: self._move_volume(True))
+        playback_frame.bind('<Down>', lambda *_: self._move_volume(False))
 
         self.name_label = tk.Label(playback_frame, font=tkfont.Font(size=FONT_SIZE+6, weight='bold'))
         self.name_label.pack(pady=(0,15))
@@ -83,6 +84,7 @@ class PlaybackMixin:
         self.cover_label = tk.Label(playback_frame)
 
         self.cover_label.pack(pady=(0, 50))
+        self.cover_label.bind('<ButtonPress-1>', lambda *_: self.cover_label.focus_set())
 
         scale_frame = tk.Frame(playback_frame)
 
