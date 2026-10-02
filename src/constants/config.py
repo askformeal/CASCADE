@@ -130,6 +130,24 @@ CONFIG_SCHEME = {
         'default': 1,
         'description': 'Timeout of backend waiting for a player action to be completed. May cause error if not enough lower than IPC timeout'
     },
+    'gui_volume_step': {
+        'type': CONVERTER.pos_int,
+        'section': 'gui',
+        'default': 5,
+        'description': 'Step of volume increase/decrease on dashboard'
+    },
+    'gui_pos_step': {
+        'type': CONVERTER.pos_int,
+        'section': 'gui',
+        'default': 5,
+        'description': 'Step of position increase/decrease on GUI'
+    },
+    'gui_pos_step_long': {
+        'type': CONVERTER.pos_int,
+        'section': 'gui',
+        'default': 15,
+        'description': 'Longer step of position increase/decrease on GUI'
+    },
     'dash_volume_step': {
         'type': CONVERTER.pos_int,
         'section': 'dash',

@@ -66,6 +66,17 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
         logger.debug(f'{__name__} initialized')
 
     def _build_window(self):
+        self.bind('<Control-q>', self._exit)
+        self.bind('<Control-w>', self._exit)
+        self.bind('<Control-o>', self._on_open)
+        self.bind('<Control-a>', self._open_all)
+        
+        self.bind('<F5>', self._reload)
+        self.bind('<Control-,>', self._open_config)
+        
+        self.bind('<F11>', self._toggle_fullscreen)
+        self.bind('<Alt-Return>', self._toggle_fullscreen)
+
         self.online_icon = self.get_icon(ONLINE_ICON_PATH, (32, 23))
         self.offline_icon = self.get_icon(OFFLINE_ICON_PATH, (32, 23))
 
@@ -73,31 +84,56 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
         self.config(menu=menubar)
 
         file_menu = tk.Menu(menubar, tearoff=False)
-        file_menu.add_command(label='Open...', command=self._on_open, underline=0)
+        file_menu.add_command(
+            label='Open...', 
+            command=self._on_open,
+            accelerator='Ctrl+O',
+            underline=0
+            )
         file_menu.add_command(label='Open all', 
-                              command=lambda: self.send_command('play-all'),
+                              command=self._open_all,
                               underline=5
                               )
         self.open_playlist_menu = tk.Menu(file_menu, tearoff=False)
-        file_menu.add_cascade(label='Open playlist', menu=self.open_playlist_menu, underline=5)
+        file_menu.add_cascade(
+            label='Open playlist', 
+            menu=self.open_playlist_menu, 
+            underline=5
+            )
         file_menu.add_separator()
-        file_menu.add_command(label='Start backend', command=Thread(target=self._start_backend).start)
-        file_menu.add_command(label='Reboot backend', command=Thread(target=self._reboot_backend).start)
-        file_menu.add_command(label='Ping backend', command=Thread(target=self._check_backend).start)
+        file_menu.add_command(label='Start backend', command=self._start_backend)
+        file_menu.add_command(label='Reboot backend', command=self._reboot_backend)
+        file_menu.add_command(label='Ping backend', command=self._check_backend)
         file_menu.add_command(label='Exit backend', command=lambda: self.send_command('exit'))
         file_menu.add_separator()
-        file_menu.add_command(label='Exit', command=lambda *_: self._exit(), underline=0)
+        file_menu.add_command(
+            label='Exit', 
+            command=lambda *_: self._exit(), 
+            accelerator='Ctrl+Q',
+            underline=0
+            )
 
         edit_menu = tk.Menu(menubar, tearoff=False)
-        edit_menu.add_command(label='Configure...', command=lambda: self.process.spawn('src.frontend.config_gui'))
+        edit_menu.add_command(
+            label='Reload',
+            accelerator='F5',
+            command=self._reload
+        )
+        edit_menu.add_command(
+            label='Configure...',
+            accelerator='Ctrl+,',
+            command=self._open_config
+            )
 
         view_menu = tk.Menu(menubar, tearoff=False)
         view_menu.add_command(label='Minimize', command=lambda: self.iconify())
         self.fullscreen = tk.BooleanVar(value=False)
-        view_menu.add_checkbutton(label='Fullscreen', 
-                                  variable=self.fullscreen,
-                                  command=lambda: self.attributes('-fullscreen', self.fullscreen.get())
-                                  )
+        view_menu.add_checkbutton(
+            label='Fullscreen',
+            variable=self.fullscreen,
+            accelerator='F11',
+            command=self._apply_fullscreen
+            )
 
         help_menu = tk.Menu(menubar, tearoff=False)
         help_menu.add_command(label='GitHub repository...', command=lambda: webbrowser.open(REPO_LINK))
@@ -269,60 +305,82 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
                 self.backend_online = False
 
     def _check_backend(self):
-        response = self._send_gui_request(action='test_alive')
-        code = response['code']
-        msg = f'Received response with code {code}'
-        detail = response['msg']
-        if code == 0:
-            self.after(0, messagebox.showinfo, title='Backend online', message=msg, detail=detail)
-        else:
-            self.after(0, messagebox.showerror, title='Connection failed', message=msg, detail=detail)
+        def check():
+            response = self._send_gui_request(action='test_alive')
+            code = response['code']
+            msg = f'Received response with code {code}'
+            detail = response['msg']
+            if code == 0:
+                self.after(0, messagebox.showinfo, title='Backend online', message=msg, detail=detail)
+            else:
+                self.after(0, messagebox.showerror, title='Connection failed', message=msg, detail=detail)
+        Thread(target=check).start()
 
     def _start_backend(self):
-        result = self.process.start()
-        if result is SENTINELS.SUCCESS:
-            self.after(0, messagebox.showinfo, 
-                       title='Backend started', 
-                       message='Backend is now up and running'
-                       )
-        elif result is SENTINELS.BACKEND_ALREADY_RUNNING:
-            self.after(0, messagebox.showinfo, 
-                       title='Backend already running', 
-                       message='Backend is already running'
-                       )
-        elif result is SENTINELS.FAILED_START_BACKEND:
-            self.after(0, messagebox.showinfo, 
-                       title='Error', 
-                       message='Failed to start backend',
-                       detail='Timed out waiting for backend to be alive'
-                       )
+        def start():
+            result = self.process.start()
+            if result is SENTINELS.SUCCESS:
+                self.after(0, messagebox.showinfo, 
+                        title='Backend started', 
+                        message='Backend is now up and running'
+                        )
+            elif result is SENTINELS.BACKEND_ALREADY_RUNNING:
+                self.after(0, messagebox.showinfo, 
+                        title='Backend already running', 
+                        message='Backend is already running'
+                        )
+            elif result is SENTINELS.FAILED_START_BACKEND:
+                self.after(0, messagebox.showinfo, 
+                        title='Error', 
+                        message='Failed to start backend',
+                        detail='Timed out waiting for backend to be alive'
+                        )
+        Thread(target=start).start()
 
     def _reboot_backend(self):
-        result = self.process.reboot()
-        if result is SENTINELS.SUCCESS:
-            self.after(0, messagebox.showinfo, 
-                       title='Backend rebooted', 
-                       message='Backend is shutdown and restarted'
-                       )
-        elif result is SENTINELS.BACKEND_NOT_RUNNING:
-            self.after(0, messagebox.showinfo, 
-                       title='Error', 
-                       message='Backend is not running',
-                       )
-        elif result is SENTINELS.FAILED_EXIT_BACKEND:
-            self.after(0, messagebox.showinfo, 
-                       title='Error', 
-                       message='Failed to exit backend',
-                       )
-        elif result is SENTINELS.FAILED_START_BACKEND:
-            self.after(0, messagebox.showinfo, 
-                       title='Error', 
-                       message='Failed to start backend',
-                       detail='Backend is shutdown but failed to be restarted'
-                       )            
+        def reboot():
+            result = self.process.reboot()
+            if result is SENTINELS.SUCCESS:
+                self.after(0, messagebox.showinfo, 
+                        title='Backend rebooted', 
+                        message='Backend is shutdown and restarted'
+                        )
+            elif result is SENTINELS.BACKEND_NOT_RUNNING:
+                self.after(0, messagebox.showinfo, 
+                        title='Error', 
+                        message='Backend is not running',
+                        )
+            elif result is SENTINELS.FAILED_EXIT_BACKEND:
+                self.after(0, messagebox.showinfo, 
+                        title='Error', 
+                        message='Failed to exit backend',
+                        )
+            elif result is SENTINELS.FAILED_START_BACKEND:
+                self.after(0, messagebox.showinfo, 
+                        title='Error', 
+                        message='Failed to start backend',
+                        detail='Backend is shutdown but failed to be restarted'
+                        )
+        Thread(target=reboot).start()
 
-    def _on_open(self):
+    def _reload(self, *_):
+        self.send_command(action='load_last')
+
+    def _on_open(self, *_):
         OpenDialogue(self)
+
+    def _open_all(self, *_):
+        self.send_command('play-all')
+
+    def _toggle_fullscreen(self, *_):
+        self.fullscreen.set(not self.fullscreen.get())
+        self._apply_fullscreen()
+
+    def _apply_fullscreen(self):
+        self.attributes('-fullscreen', self.fullscreen.get())
+
+    def _open_config(self, *_):
+        self.process.spawn('src.frontend.config_gui')
 
     def _show_license(self):
         with open(LICENSE_PATH, 'r', encoding=ENCODING) as f:
@@ -340,7 +398,7 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
         )
         messagebox.showinfo('C.A.S.C.A.D.E', app_name, detail=detail)
 
-    def _exit(self):
+    def _exit(self, *_):
         logger.info('Exit GUI')
         self.running = False
         self.destroy()

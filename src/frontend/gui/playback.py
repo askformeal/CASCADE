@@ -20,6 +20,7 @@ from src.constants.paths import (
     DICE_ICON_PATH
 )
 from src.constants.gui import FONT_SIZE, COVER_SIZE
+from src.config import CONFIG
 from src.utils.time_ import format_time
 from src.sentinels import SENTINELS
 from src.frontend.cover import Cover
@@ -56,6 +57,22 @@ class PlaybackMixin:
         self.dice_icon = self.get_icon(DICE_ICON_PATH)
         
     def build_playback(self, playback_frame):
+        self.bind('<space>', self._toggle)
+        self.bind('<p>', self._prev)
+        self.bind('<n>', self._next)
+        self.bind('<x>', self._stop)
+        self.bind('<m>', self._mute)
+        self.bind('<s>', self._shuffle)
+        self.bind('<r>', self._loop)
+        self.bind('<d>', self._dice)
+        
+        self.bind('<Left>', lambda *_: self._move_pos(False))
+        self.bind('<Right>', lambda *_: self._move_pos(True))
+        self.bind('<Shift-Left>', lambda *_: self._move_pos(False, long=True))
+        self.bind('<Shift-Right>', lambda *_: self._move_pos(True, long=True))
+
+        self.bind('<Up>', lambda *_: self._move_volume(True))
+        self.bind('<Down>', lambda *_: self._move_volume(False))
 
         self.name_label = tk.Label(playback_frame, font=tkfont.Font(size=FONT_SIZE+6, weight='bold'))
         self.name_label.pack(pady=(0,15))
@@ -82,7 +99,7 @@ class PlaybackMixin:
         self.progress_scale.bind('<ButtonPress-1>', lambda *_: setattr(self, 'progress_dragging', True))
         self.progress_scale.bind('<ButtonRelease-1>', lambda *_: setattr(self, 'progress_dragging', False))
 
-        self.mute_button = tk.Button(scale_frame, command=lambda: self.send_command('mute'))
+        self.mute_button = tk.Button(scale_frame, command=self._mute)
         self.mute_button.pack(side='left', padx=(0,5))
         
         self.volume_scale = tk.Scale(scale_frame,
@@ -113,48 +130,48 @@ class PlaybackMixin:
         prev_button = tk.Button(
             bottom_bar, 
             image=self.prev_icon, 
-            command=lambda: self.send_command('prev')
+            command=self._prev
             )
         prev_button.pack(side='left', padx=(0,5))
         
         self.play_button = tk.Button(
             bottom_bar, 
-            command=lambda: self.send_command('toggle')
+            command=self._toggle
             )
         self.play_button.pack(side='left', padx=(0,5))
         
         next_button = tk.Button(
             bottom_bar, 
             image=self.next_icon, 
-            command=lambda: self.send_command('next')
+            command=self._next
             )
         next_button.pack(side='left', padx=(0,20))
 
         stop_button = tk.Button(
             bottom_bar,
             image=self.stop_icon,
-            command=lambda: self.send_command('stop')
+            command=self._stop
         )
         stop_button.pack(side='left', padx=(0, 30))
 
         self.loop_button = tk.Button(
             bottom_bar, 
             image=self.loop_icon,
-            command=lambda: self.send_command('loop')
+            command=self._loop
             )
         self.loop_button.pack(side='left', padx=(0,5))
         
         self.shuffle_button = tk.Button(
             bottom_bar, 
             image=self.shuffle_icon,
-            command=lambda: self.send_command('shuffle')
+            command=self._shuffle
             )
         self.shuffle_button.pack(side='left', padx=(0, 40))
 
         dice_button = tk.Button(
             bottom_bar,
             image=self.dice_icon,
-            command=lambda: self.send_command('dice')
+            command=self._dice
         )
         dice_button.pack(side='left')
         
@@ -234,4 +251,47 @@ class PlaybackMixin:
             self.shuffle_button.config(relief='sunken')
         else:
             self.shuffle_button.config(relief='raised')
+
+    def _toggle(self, *_):
+        self.send_command('toggle')
+
+    def _prev(self, *_):
+        self.send_command('prev')
+
+    def _next(self, *_):
+        self.send_command('next')
+
+    def _stop(self, *_):
+        self.send_command('stop')        
+
+    def _mute(self, *_):
+        self.send_command('mute')
     
+    def _loop(self, *_):
+        self.send_command('loop')
+
+    def _shuffle(self, *_):
+        self.send_command('shuffle')
+
+    def _dice(self, *_):
+        self.send_command('dice')
+
+    def _move_volume(self, increase):
+        if increase:
+            prefix = '+'
+        else:
+            prefix = '-'
+        step = f'{prefix}{CONFIG.gui_volume_step}'
+        self.send_command('volume', volume=step, silent=True)
+
+    def _move_pos(self, forward, long=False):
+        if forward:
+            prefix = '+'
+        else:
+            prefix = '-'
+        if long:
+            step = CONFIG.gui_pos_step_long
+        else:
+            step = CONFIG.gui_pos_step
+        self.send_command('seek', time=f'{prefix}{step * 1000}', ms=True, silent=True)
+        
