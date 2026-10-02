@@ -82,6 +82,7 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
         file_menu.add_cascade(label='Open playlist', menu=self.open_playlist_menu, underline=5)
         file_menu.add_separator()
         file_menu.add_command(label='Start backend', command=Thread(target=self._start_backend).start)
+        file_menu.add_command(label='Reboot backend', command=Thread(target=self._reboot_backend).start)
         file_menu.add_command(label='Ping backend', command=Thread(target=self._check_backend).start)
         file_menu.add_command(label='Exit backend', command=lambda: self.send_command('exit'))
         file_menu.add_separator()
@@ -289,12 +290,36 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
                        title='Backend already running', 
                        message='Backend is already running'
                        )
-        else:
+        elif result is SENTINELS.FAILED_START_BACKEND:
             self.after(0, messagebox.showinfo, 
                        title='Error', 
                        message='Failed to start backend',
                        detail='Timed out waiting for backend to be alive'
                        )
+
+    def _reboot_backend(self):
+        result = self.process.reboot()
+        if result is SENTINELS.SUCCESS:
+            self.after(0, messagebox.showinfo, 
+                       title='Backend rebooted', 
+                       message='Backend is shutdown and restarted'
+                       )
+        elif result is SENTINELS.BACKEND_NOT_RUNNING:
+            self.after(0, messagebox.showinfo, 
+                       title='Error', 
+                       message='Backend is not running',
+                       )
+        elif result is SENTINELS.FAILED_EXIT_BACKEND:
+            self.after(0, messagebox.showinfo, 
+                       title='Error', 
+                       message='Failed to exit backend',
+                       )
+        elif result is SENTINELS.FAILED_START_BACKEND:
+            self.after(0, messagebox.showinfo, 
+                       title='Error', 
+                       message='Failed to start backend',
+                       detail='Backend is shutdown but failed to be restarted'
+                       )            
 
     def _on_open(self):
         OpenDialogue(self)
