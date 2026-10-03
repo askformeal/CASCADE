@@ -10,18 +10,25 @@ class PlaylistMixin:
     def __init__(self):
         self.old_playlist = []
         self.old_current = None
-        self.song_numbers = []
+        self.song_indexes = []
         self.playlist_empty = False
         
         self.select_current_icon = self.get_icon(SELECT_CURRENT_ICON_PATH, 20)
         self.switch_selected_icon = self.get_icon(SWITCH_SELECTED_ICON_PATH, 20)
 
     def build_playlist(self, playlist_frame):
+        self.bind('<c>', self._select_current)
 
         box_frame = tk.Frame(playlist_frame)
         box_frame.pack(fill='both', expand=True)
 
-        self.playlist_box = tk.Listbox(box_frame, font=self.font, width=0)
+        self.playlist_box = tk.Listbox(
+            box_frame,
+            font=self.font,
+            width=0,
+            selectborderwidth=4,
+            activestyle='none',
+            )
         self.playlist_box.pack(side='left', fill='both', expand=True)
 
         scroll_bar_y = tk.Scrollbar(box_frame, orient='vertical')
@@ -57,11 +64,12 @@ class PlaylistMixin:
             command=self._on_switch)
         switch_button.pack(side='right')
 
-    def _select_current(self):
-        if self.snapshot.current_num is not EMPTY:
-            index = self.song_numbers[self.snapshot.current_num]
+    def _select_current(self, *_):
+        if self.snapshot.current_num is not EMPTY and len(self.song_indexes) > 0:
+            index = self.song_indexes[self.snapshot.current_num]
             self.playlist_box.select_clear(0, tk.END)
             self.playlist_box.select_set(index)
+            self.playlist_box.activate(index)
             self.playlist_box.see(index)
 
     def _on_switch(self, *_):
@@ -69,7 +77,7 @@ class PlaylistMixin:
             selected = self.playlist_box.curselection()
             if len(selected) > 0:
                 index = selected[0]
-                index = self.song_numbers[index]
+                index = self.song_indexes[index]
                 self.send_command('switch', number=index + 1)
 
     def update_playlist(self):
@@ -78,15 +86,15 @@ class PlaylistMixin:
             ):
             self.playlist_empty = False
             playlist = []
-            self.song_numbers = []
+            self.song_indexes = []
             for i, song in enumerate(self.snapshot.current_songs):
                 name = get_song_display_name(song)
                 playlist.append(f' {name} ')
-                self.song_numbers.append(i)
+                self.song_indexes.append(i)
         else:
             self.playlist_empty = True
             playlist = [' - No songs playing - ']
-            self.song_numbers = []
+            self.song_indexes = []
 
         if playlist != self.old_playlist:
             self.old_playlist = playlist
@@ -97,14 +105,14 @@ class PlaylistMixin:
                 self.playlist_box.insert(tk.END, name)
 
         if self.snapshot.current_num is not EMPTY:
-            if self.playlist_box.size() > 0:
-                self.playlist_box.itemconfig(self.snapshot.current_num,
+            if len(self.song_indexes) > 0:
+                current_index = self.song_indexes[self.snapshot.current_num]
+                self.playlist_box.itemconfig(current_index,
                                             bg=CURRENT_SONG_BG
                                             )
-
-            if self.old_current is not None and self.old_current != self.snapshot.current_num:
-                self.playlist_box.itemconfig(self.old_current,
-                                            bg=self.playlist_box.cget('background')
-                                            )
-            self.old_current = self.snapshot.current_num
+                if self.old_current is not None and self.old_current != current_index:
+                    self.playlist_box.itemconfig(self.old_current,
+                                                bg=self.playlist_box.cget('background')
+                                                )
+                self.old_current = current_index
 

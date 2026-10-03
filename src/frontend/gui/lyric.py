@@ -13,6 +13,7 @@ from src.constants.gui import (
     SCROLL_EVENTS,
     MAX_OFFSET
     )
+from src.config import CONFIG
 from src.sentinels import SENTINELS
 from src.utils.lyric import get_lyric_line
 from .empty import GUI_EMPTY as EMPTY
@@ -31,6 +32,11 @@ class LyricMixin:
         self.reset_offset_icon = self.get_icon(RESET_OFFSET_ICON_PATH)
 
     def build_lyric(self, lyric_frame):
+        self.bind('<backslash>', self._reset_offset)
+        self.bind('<[>', lambda *_: self._move_offset(False))
+        self.bind('<]>', lambda *_: self._move_offset(True))
+        self.bind('<z>', self._toggle_online_lyric)
+
         self.lyric_box = tk.Listbox(lyric_frame, 
                                     bg=LYRIC_BG,
                                     fg=LYRIC_FG,
@@ -46,7 +52,7 @@ class LyricMixin:
         bottom_bar = tk.Frame(lyric_frame)
         bottom_bar.pack(side='bottom', fill='x', padx=10, pady=(10, 0))
 
-        self.online_lyric_button = tk.Button(bottom_bar, command=lambda: self.send_command('lyric'))
+        self.online_lyric_button = tk.Button(bottom_bar, command=self._toggle_online_lyric)
         self.online_lyric_button.pack(side='right', padx=(10, 0))
 
         self.offset_scale = tk.Scale(bottom_bar, 
@@ -57,7 +63,7 @@ class LyricMixin:
                                      )
         self.offset_scale.pack(side='right', fill='x', expand=True, pady=(0,10))
         self.offset_scale.bind('<ButtonPress-1>', lambda *_: setattr(self, 'offset_dragging', True))
-        self.offset_scale.bind('<ButtonRelease-1>', self._set_offset)
+        self.offset_scale.bind('<ButtonRelease-1>', self._scroll_set_offset)
         
         offset_reset_button = tk.Button(bottom_bar,
                                         image=self.reset_offset_icon, 
@@ -65,12 +71,28 @@ class LyricMixin:
                                         )
         offset_reset_button.pack(side='left', padx=(0, 10))
 
+    def _toggle_online_lyric(self, *_):
+        self.send_command('lyric')
+
     def _reset_offset(self, *_):
         self.send_command('set_offset_overlay', offset=0)
 
-    def _set_offset(self, *_):
+    def _scroll_set_offset(self, *_):
         self.offset_dragging = False
         self.send_command('set_offset_overlay', offset=self.offset_scale.get())
+
+    def _move_offset(self, increase, *_):
+        if increase:
+            step = CONFIG.gui_offset_step
+        else:
+            step = -CONFIG.gui_offset_step
+        current_offset = self.offset_scale.get()
+        if current_offset + step > MAX_OFFSET:
+            step = MAX_OFFSET - current_offset
+        if current_offset + step < -MAX_OFFSET:
+            step = -MAX_OFFSET - current_offset
+
+        self.send_command('set_offset_overlay', offset=step, autoincrement=True)
 
     def update_lyric(self):
         self._update_lyric_box()

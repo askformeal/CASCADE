@@ -1,9 +1,13 @@
+import sys
 import time
 from threading import Thread
 import tkinter as tk
 import tkinter.font as tkfont
 from tkinter import messagebox
 import webbrowser
+if sys.platform == 'win32':
+    import ctypes
+    from ctypes import wintypes
 
 from PIL import Image, ImageTk
 
@@ -40,6 +44,7 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
         self.backend_online = True
         self.window_ready = False
         self.dev_label_shown = False
+        self.force_english_job = None
 
         self.old_playlists = []
 
@@ -63,7 +68,36 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
 
         self._build_window()
 
+        self.update_idletasks()
+        if sys.platform == 'win32':
+            self.imm = ctypes.windll.imm32
+            self.user32 = ctypes.windll.user32
+            self.user32.GetParent.restype = wintypes.HWND
+            self.user32.GetParent.argtypes = [wintypes.HWND]
+            self.imm.ImmGetContext.restype = ctypes.c_void_p
+            self.imm.ImmGetContext.argtypes = [wintypes.HWND]
+            self.imm.ImmReleaseContext.argtypes = [wintypes.HWND, ctypes.c_void_p]
+            self.imm.ImmSetOpenStatus.argtypes = [ctypes.c_void_p, wintypes.BOOL]
+            self.imm.ImmSetOpenStatus.restype = wintypes.BOOL
+
+            self.bind('<FocusIn>', self._on_focus_in)
+            self._on_focus_in()
+        else:
+            logger.debug('Non-windows platform detected. Auto switching to English input method will not be enabled')
+
         logger.debug(f'{__name__} initialized')
+
+    def _on_focus_in(self, *_):
+        if self.force_english_job is not None:
+            self.after_cancel(self.force_english_job)
+        self.force_english_job = self.after(100, self._force_english)
+
+    def _force_english(self):
+        hwnd = wintypes.HWND(self.user32.GetParent(self.winfo_id()))
+        himc = self.imm.ImmGetContext(hwnd)
+        if himc is not None:
+            self.imm.ImmSetOpenStatus(himc, False)
+            self.imm.ImmReleaseContext(hwnd, himc)
 
     def _build_window(self):
         self.bind('<Control-q>', self._exit)
@@ -76,6 +110,8 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
         
         self.bind('<F11>', self._toggle_fullscreen)
         self.bind('<Alt-Return>', self._toggle_fullscreen)
+
+        self.bind('<Shift-F1>', self._show_about)
 
         self.online_icon = self.get_icon(ONLINE_ICON_PATH, (32, 23))
         self.offline_icon = self.get_icon(OFFLINE_ICON_PATH, (32, 23))
@@ -139,7 +175,11 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
         help_menu.add_command(label='GitHub repository...', command=lambda: webbrowser.open(REPO_LINK))
         help_menu.add_command(label='License', command=self._show_license)
         help_menu.add_separator()
-        help_menu.add_command(label='About', command=self._show_about)
+        help_menu.add_command(
+            label='About',
+            accelerator='Shift+F1',
+            command=self._show_about
+            )
 
         menubar.add_cascade(label='File', menu=file_menu, underline=0)
         menubar.add_cascade(label='Edit', menu=edit_menu, underline=0)
@@ -387,7 +427,7 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
             license_text = f.read()
         messagebox.showinfo('License', 'MIT License', detail=license_text)
 
-    def _show_about(self):
+    def _show_about(self, *_):
         app_name = 'Command-Line Audio Stream Capture And Decoding Engine'
         detail = (
             f'Version: {__version__}\n'

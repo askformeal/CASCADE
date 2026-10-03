@@ -142,6 +142,12 @@ CONFIG_SCHEME = {
         'default': 5,
         'description': 'Step of position increase/decrease on GUI'
     },
+    'gui_offset_step': {
+        'type': CONVERTER.pos_int,
+        'section': 'gui',
+        'default': 100,
+        'description': 'Step of lyric offset increase/decrease on GUI'
+    },
     'gui_pos_step_long': {
         'type': CONVERTER.pos_int,
         'section': 'gui',
