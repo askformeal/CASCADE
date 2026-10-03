@@ -37,6 +37,7 @@ SHUFFLE_ICON_PATH = get_res('gui/shuffle.png')
 LOOP_ICON_PATH = get_res('gui/loop.png')
 DICE_ICON_PATH = get_res('gui/dice.png')
 
+FILTER_ICON_PATH = get_res('gui/filter.png')
 SELECT_CURRENT_ICON_PATH = get_res('gui/select_current.png')
 SWITCH_SELECTED_ICON_PATH = get_res('gui/switch_selected.png')
 

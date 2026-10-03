@@ -48,6 +48,8 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
 
         self.old_playlists = []
 
+        self.no_hotkey_widgets = []
+
         self.process = ProcessManager(logger)
         self.snapshot = Snapshot(self.poll_request, empty=EMPTY)
 
@@ -99,19 +101,31 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
             self.imm.ImmSetOpenStatus(himc, False)
             self.imm.ImmReleaseContext(hwnd, himc)
 
+    def hotkey(self, widget, sequence, func):
+        widget.bind(sequence, self._hotkey_func(func))
+
+    def _hotkey_func(self, func):
+        def on_hotkey(event):
+            if event.widget in self.no_hotkey_widgets:
+                return None
+            else:
+                return func(event)
+        return on_hotkey
+
     def _build_window(self):
-        self.bind('<Control-q>', self._exit)
-        self.bind('<Control-w>', self._exit)
-        self.bind('<Control-o>', self._on_open)
-        self.bind('<Control-a>', self._open_all)
+        self.hotkey(self, '<Control-q>', self._exit)
+        self.hotkey(self, '<Control-w>', self._exit)
+        self.hotkey(self, '<Control-o>', self._on_open)
+        self.hotkey(self, '<Control-a>', self._open_all)
         
-        self.bind('<F5>', self._reload)
-        self.bind('<Control-,>', self._open_config)
+        self.hotkey(self, '<F5>', self._reload)
+        self.hotkey(self, '<Control-,>', self._open_config)
         
+        self.hotkey(self, '<v>', self._toggle_lyric_visible)
         self.bind('<F11>', self._toggle_fullscreen)
         self.bind('<Alt-Return>', self._toggle_fullscreen)
 
-        self.bind('<Shift-F1>', self._show_about)
+        self.hotkey(self, '<Shift-F1>', self._show_about)
 
         self.online_icon = self.get_icon(ONLINE_ICON_PATH, (32, 23))
         self.offline_icon = self.get_icon(OFFLINE_ICON_PATH, (32, 23))
@@ -162,6 +176,13 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
             )
 
         view_menu = tk.Menu(menubar, tearoff=False)
+        self.lyric_visible = tk.BooleanVar(value=True)
+        view_menu.add_checkbutton(
+            label='Lyric',
+            variable=self.lyric_visible,
+            accelerator='V',
+            command=self._apply_lyric_visible
+            )
         view_menu.add_command(label='Minimize', command=lambda: self.iconify())
         self.fullscreen = tk.BooleanVar(value=False)
         view_menu.add_checkbutton(
@@ -193,32 +214,39 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
             padx=10, 
             pady=(5, 10)
             )
-
+        
         lyric_frame = tk.Frame(main_frame)
         self.build_lyric(lyric_frame)
-        lyric_frame.pack(
-            side='left',
-            fill='both',
-            expand=True,
-            padx=(0, 10)
-        )
 
         playback_frame = tk.Frame(main_frame)
         self.build_playback(playback_frame)
-        playback_frame.pack(
-            side='left', 
-            fill='both',
-            expand=True,
-            padx=(0, 10)
-            )
 
         playlist_frame = tk.Frame(main_frame)
         self.build_playlist(playlist_frame)
+
+        playback_frame.pack(
+            side='left', 
+            fill='y',
+            expand=True,
+            padx=(0, 10)
+        )
+
         playlist_frame.pack(
             side='right',
-            fill='both',
+            fill='y',
             expand=True
         )
+
+
+        self.lyric_pack = lambda: lyric_frame.pack(
+            before=playback_frame,
+            side='left',
+            fill='y',
+            padx=(0, 10),
+            expand=True
+        )
+        self.lyric_unpack = lyric_frame.pack_forget
+        self.lyric_pack()
 
         bottom_bar = tk.Frame(self)
         bottom_bar.pack(side='bottom', fill='x', padx=10, pady=(0,10))
@@ -418,6 +446,16 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
 
     def _apply_fullscreen(self):
         self.attributes('-fullscreen', self.fullscreen.get())
+
+    def _toggle_lyric_visible(self, *_):
+        self.lyric_visible.set(not self.lyric_visible.get())
+        self._apply_lyric_visible()
+
+    def _apply_lyric_visible(self):
+        if self.lyric_visible.get():
+            self.lyric_pack()
+        else:
+            self.lyric_unpack()
 
     def _open_config(self, *_):
         self.process.spawn('src.frontend.config_gui')

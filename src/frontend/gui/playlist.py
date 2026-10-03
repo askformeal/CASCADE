@@ -1,8 +1,13 @@
 import tkinter as tk
+import  tkinter.font as tkfont
 from tkinter import ttk
 
-from src.constants.paths import SELECT_CURRENT_ICON_PATH, SWITCH_SELECTED_ICON_PATH
-from src.constants.gui import CURRENT_SONG_BG
+from src.constants.paths import (
+    FILTER_ICON_PATH,
+    SELECT_CURRENT_ICON_PATH, 
+    SWITCH_SELECTED_ICON_PATH
+    )
+from src.constants.gui import CURRENT_SONG_BG, FONT_SIZE
 from src.utils.misc import get_song_display_name
 from .empty import GUI_EMPTY as EMPTY
 
@@ -13,11 +18,31 @@ class PlaylistMixin:
         self.song_indexes = []
         self.playlist_empty = False
         
+        self.filter_icon = self.get_icon(FILTER_ICON_PATH, 20)
         self.select_current_icon = self.get_icon(SELECT_CURRENT_ICON_PATH, 20)
         self.switch_selected_icon = self.get_icon(SWITCH_SELECTED_ICON_PATH, 20)
 
     def build_playlist(self, playlist_frame):
-        self.bind('<c>', self._select_current)
+        self.hotkey(self, '<c>', self._select_current)
+
+        filter_frame = tk.Frame(playlist_frame)
+        filter_frame.pack(fill='x', pady=(0,10))
+
+        tk.Label(filter_frame, image=self.filter_icon).pack(side='left', padx=(0,3))
+
+        self.filter_entry = tk.Entry(
+            filter_frame,
+            width=20,
+            font=self.font
+            )
+        self.filter_entry.pack(side='left', fill='x', expand=True, padx=(0,5))
+        self.no_hotkey_widgets.append(self.filter_entry)
+
+        self.song_num_label = tk.Label(
+            filter_frame,
+            font=tkfont.Font(size=FONT_SIZE, weight='bold')
+        )
+        self.song_num_label.pack(side='left')
 
         box_frame = tk.Frame(playlist_frame)
         box_frame.pack(fill='both', expand=True)
@@ -65,12 +90,16 @@ class PlaylistMixin:
         switch_button.pack(side='right')
 
     def _select_current(self, *_):
-        if self.snapshot.current_num is not EMPTY and len(self.song_indexes) > 0:
-            index = self.song_indexes[self.snapshot.current_num]
-            self.playlist_box.select_clear(0, tk.END)
-            self.playlist_box.select_set(index)
-            self.playlist_box.activate(index)
-            self.playlist_box.see(index)
+        if self.snapshot.current_num is not EMPTY:
+            try:
+                index = self.song_indexes.index(self.snapshot.current_num)
+            except ValueError:
+                ...
+            else:
+                self.playlist_box.select_clear(0, tk.END)
+                self.playlist_box.select_set(index)
+                self.playlist_box.activate(index)
+                self.playlist_box.see(index)
 
     def _on_switch(self, *_):
         if not self.playlist_empty:
@@ -81,20 +110,28 @@ class PlaylistMixin:
                 self.send_command('switch', number=index + 1)
 
     def update_playlist(self):
+        filter_ = self.filter_entry.get()
         if (self.snapshot.current_songs is not EMPTY 
             and len(self.snapshot.current_songs) > 0
             ):
+            total = len(self.snapshot.current_songs)
             self.playlist_empty = False
             playlist = []
             self.song_indexes = []
             for i, song in enumerate(self.snapshot.current_songs):
                 name = get_song_display_name(song)
-                playlist.append(f' {name} ')
-                self.song_indexes.append(i)
+                if filter_.strip().lower() in name.lower():
+                    playlist.append(f' {name} ')
+                    self.song_indexes.append(i)
+            filtered = len(playlist)
+        
         else:
+            total = 0
+            filtered = 0
             self.playlist_empty = True
             playlist = [' - No songs playing - ']
             self.song_indexes = []
+
 
         if playlist != self.old_playlist:
             self.old_playlist = playlist
@@ -105,8 +142,11 @@ class PlaylistMixin:
                 self.playlist_box.insert(tk.END, name)
 
         if self.snapshot.current_num is not EMPTY:
-            if len(self.song_indexes) > 0:
-                current_index = self.song_indexes[self.snapshot.current_num]
+            try:
+                current_index = self.song_indexes.index(self.snapshot.current_num)
+            except ValueError:
+                ...
+            else:
                 self.playlist_box.itemconfig(current_index,
                                             bg=CURRENT_SONG_BG
                                             )
@@ -116,3 +156,4 @@ class PlaylistMixin:
                                                 )
                 self.old_current = current_index
 
+        self.song_num_label.config(text=f'[{filtered}/{total}]')

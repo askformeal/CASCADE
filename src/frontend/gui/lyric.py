@@ -32,10 +32,10 @@ class LyricMixin:
         self.reset_offset_icon = self.get_icon(RESET_OFFSET_ICON_PATH)
 
     def build_lyric(self, lyric_frame):
-        self.bind('<backslash>', self._reset_offset)
-        self.bind('<[>', lambda *_: self._move_offset(False))
-        self.bind('<]>', lambda *_: self._move_offset(True))
-        self.bind('<z>', self._toggle_online_lyric)
+        self.hotkey(self, '<backslash>', self._reset_offset)
+        self.hotkey(self, '<[>', lambda *_: self._move_offset(False))
+        self.hotkey(self, '<]>', lambda *_: self._move_offset(True))
+        self.hotkey(self, '<z>', self._toggle_online_lyric)
 
         self.lyric_box = tk.Listbox(lyric_frame, 
                                     bg=LYRIC_BG,
