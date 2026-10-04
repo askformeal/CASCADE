@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [0.56.1] - 2026-10-04
+
+- Completed `pyproject.toml`.
+- Fixed `build.sh` cannot read version.
+
 ## [0.56.0] - 2026-10-04
 
 > **Major change**: starting at this update, CHANGELOG will be written by a human being.
