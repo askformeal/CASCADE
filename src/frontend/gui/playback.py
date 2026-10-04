@@ -70,6 +70,7 @@ class PlaybackMixin:
         self.hotkey(self, '<r>', self._loop)
         self.hotkey(self, '<d>', self._dice)
         
+        playback_frame.bind('<Double-Button-1>', self._toggle)
         playback_frame.bind('<ButtonPress-1>', lambda *_: playback_frame.focus_set())
         self.hotkey(playback_frame, '<Left>', lambda *_: self._move_pos(False))
         self.hotkey(playback_frame, '<Right>', lambda *_: self._move_pos(True))
@@ -95,6 +96,7 @@ class PlaybackMixin:
 
         self.cover_label = tk.Label(playback_frame, width=INIT_COVER_SIZE[0], height=INIT_COVER_SIZE[1])
 
+        self.cover_label.bind('<Double-Button-1>', self._toggle)
         self.cover_label.bind('<ButtonPress-1>', lambda *_: self.cover_label.focus_set())
 
         scale_frame = tk.Frame(playback_frame)
