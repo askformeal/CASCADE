@@ -18,7 +18,7 @@ from src.constants.paths import (
     SHUFFLE_ICON_PATH,
     DICE_ICON_PATH
 )
-from src.constants.gui import FONT_SIZE, COVER_SIZE
+from src.constants.gui import FONT_SIZE, INIT_COVER_SIZE
 from src.config import CONFIG
 from src.utils.time_ import format_time
 from src.sentinels import SENTINELS
@@ -31,7 +31,7 @@ class PlaybackMixin:
         buffer = BytesIO()
         image.save(buffer, format='PNG')
         self.no_cover = buffer.getvalue()
-        self.old_cover_hash = None
+        self.old_cover_state = (None, None, None) # hash, width, height
 
         self.cover = Cover(
             self.poll_request,
@@ -75,14 +75,13 @@ class PlaybackMixin:
         self.hotkey(playback_frame, '<Down>', lambda *_: self._move_volume(False))
 
         self.name_label = tk.Label(playback_frame, font=tkfont.Font(size=FONT_SIZE+6, weight='bold'))
-        self.name_label.pack(pady=(0,15))
+        self.name_label.pack(pady=(0,10))
 
         self.artist_label = tk.Label(playback_frame, font=tkfont.Font(size=FONT_SIZE+2, weight='bold'))
-        self.artist_label.pack(pady=(0,25))
+        self.artist_label.pack(pady=(0,15))
 
-        self.cover_label = tk.Label(playback_frame, relief='raised', bd=6)
+        self.cover_label = tk.Label(playback_frame, width=INIT_COVER_SIZE[0], height=INIT_COVER_SIZE[1])
 
-        self.cover_label.pack(pady=(0, 50))
         self.cover_label.bind('<ButtonPress-1>', lambda *_: self.cover_label.focus_set())
 
         scale_frame = tk.Frame(playback_frame)
@@ -123,7 +122,8 @@ class PlaybackMixin:
         
         bottom_bar.pack(side='bottom', fill='x', pady=(10, 0))
         scale_frame.pack(side='bottom', fill='x')
-        
+
+        self.cover_label.pack(pady=(0,10), fill='both', expand=True)        
 
     def _build_bottom_bar(self, bottom_bar):
         
@@ -133,7 +133,7 @@ class PlaybackMixin:
             command=self._prev
             )
         prev_button.pack(side='left', padx=(0,5))
-        self.balloon.bind_widget(prev_button, 'Previous song')
+        self.balloon.bind_widget(prev_button, 'Previous song (P)')
         
         self.play_button = tk.Button(
             bottom_bar, 
@@ -147,7 +147,7 @@ class PlaybackMixin:
             command=self._next
             )
         next_button.pack(side='left', padx=(0,20))
-        self.balloon.bind_widget(next_button, 'Next song')
+        self.balloon.bind_widget(next_button, 'Next song (N)')
 
         stop_button = tk.Button(
             bottom_bar,
@@ -155,7 +155,7 @@ class PlaybackMixin:
             command=self._stop
         )
         stop_button.pack(side='left', padx=(0, 30))
-        self.balloon.bind_widget(stop_button, 'Stop')
+        self.balloon.bind_widget(stop_button, 'Stop (X)')
 
         self.loop_button = tk.Button(
             bottom_bar, 
@@ -177,7 +177,7 @@ class PlaybackMixin:
             command=self._dice
         )
         dice_button.pack(side='left')
-        self.balloon.bind_widget(dice_button, 'Randomly switch to a song')
+        self.balloon.bind_widget(dice_button, 'Randomly switch to a song (D)')
         
         self.progress_label = tk.Label(
             bottom_bar, 
@@ -208,12 +208,29 @@ class PlaybackMixin:
             cover = self.no_cover
             cover_hash = SENTINELS.NO_COVER
 
-        if cover_hash != self.old_cover_hash:
+        
+        self.cover_label.update_idletasks()
+        pad = 2 * (int(self.cover_label.cget("borderwidth")) + int(self.cover_label.cget("highlightthickness")))
+        width = max(self.cover_label.winfo_width() - pad, 1)
+        height = max(self.cover_label.winfo_height() - pad, 1)
+
+        state = (cover_hash, width, height)
+        if state != self.old_cover_state:
             self.cover_image = Image.open(BytesIO(cover))
-            self.cover_image = self.cover_image.resize(COVER_SIZE, Image.Resampling.LANCZOS)
+            image_width, image_height = self.cover_image.size
+            ratio = min(
+                height / image_height,
+                width / image_width,
+                )
+            resize_width = round(image_width * ratio)
+            resize_height = round(image_height * ratio)
+            self.cover_image = self.cover_image.resize(
+                (resize_width, resize_height), 
+                Image.Resampling.LANCZOS
+                )
             self.cover_image = ImageTk.PhotoImage(self.cover_image)
             self.cover_label.config(image=self.cover_image)
-            self.old_cover_hash = cover_hash
+            self.old_cover_state = state
 
         if (
             EMPTY not in (self.snapshot.time, self.snapshot.length) 
@@ -238,31 +255,31 @@ class PlaybackMixin:
 
         if self.snapshot.mute and self.snapshot.mute is not EMPTY:
             self.mute_button.config(image=self.mute_icon)
-            self.balloon.bind_widget(self.mute_button, 'Unmute')
+            self.balloon.bind_widget(self.mute_button, 'Unmute (M)')
         else:
             self.mute_button.config(image=self.unmute_icon)
-            self.balloon.bind_widget(self.mute_button, 'Mute')
+            self.balloon.bind_widget(self.mute_button, 'Mute (M)')
 
         if self.snapshot.player_status == 'playing':
             self.play_button.config(image=self.pause_icon)
-            self.balloon.bind_widget(self.play_button, 'Pause')
+            self.balloon.bind_widget(self.play_button, 'Pause (Space)')
         else:
             self.play_button.config(image=self.play_icon)
-            self.balloon.bind_widget(self.play_button, 'Resume')
+            self.balloon.bind_widget(self.play_button, 'Resume (Space)')
 
         if self.snapshot.loop and self.snapshot.loop is not EMPTY:
             self.loop_button.config(relief='sunken')
-            self.balloon.bind_widget(self.loop_button, 'Turn off loop')
+            self.balloon.bind_widget(self.loop_button, 'Turn off loop (R)')
         else:
             self.loop_button.config(relief='raised')
-            self.balloon.bind_widget(self.loop_button, 'Turn on loop')
+            self.balloon.bind_widget(self.loop_button, 'Turn on loop (R)')
 
         if self.snapshot.shuffle and self.snapshot.shuffle is not EMPTY:
             self.shuffle_button.config(relief='sunken')
-            self.balloon.bind_widget(self.shuffle_button, 'Turn off shuffle')
+            self.balloon.bind_widget(self.shuffle_button, 'Turn off shuffle (S)')
         else:
             self.shuffle_button.config(relief='raised')
-            self.balloon.bind_widget(self.shuffle_button, 'Turn on shuffle')
+            self.balloon.bind_widget(self.shuffle_button, 'Turn on shuffle (S)')
 
     def _toggle(self, *_):
         self.send_command('toggle')

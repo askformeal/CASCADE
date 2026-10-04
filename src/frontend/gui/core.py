@@ -223,6 +223,24 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
         menubar.add_cascade(label='View', menu=view_menu, underline=0)
         menubar.add_cascade(label='Help', menu=help_menu, underline=0)
 
+        bottom_bar = tk.Frame(self)
+        bottom_bar.pack(side='bottom', fill='x', padx=10, pady=(0,10))
+        
+        self.online_button = tk.Button(bottom_bar, command=lambda: Thread(target=self._check_backend).start())
+        self.online_button.pack(side='right')
+        self.balloon.bind_widget(self.online_button, 'Ping backend')
+        
+        self.run_time_label = tk.Label(bottom_bar, font=tkfont.Font(size=FONT_SIZE, weight='bold'))
+        self.run_time_label.pack(side='left', padx=(0, 20))
+        self.balloon.bind_widget(self.run_time_label, 'Backend run time')
+        
+        self.dev_label = tk.Label(bottom_bar, 
+                                  font=tkfont.Font(size=FONT_SIZE+3, weight='bold'), 
+                                  fg=DEV_COLOR,
+                                  text='DEV'
+                                  )
+        self.balloon.bind_widget(self.dev_label, 'Development mode on')
+
         main_frame = tk.Frame(self)
         main_frame.pack(
             fill='both', 
@@ -266,24 +284,6 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
         )
         self.lyric_unpack = lyric_frame.pack_forget
         self.lyric_pack()
-
-        bottom_bar = tk.Frame(self)
-        bottom_bar.pack(side='bottom', fill='x', padx=10, pady=(0,10))
-        
-        self.online_button = tk.Button(bottom_bar, command=lambda: Thread(target=self._check_backend).start())
-        self.online_button.pack(side='right')
-        self.balloon.bind_widget(self.online_button, 'Ping backend')
-
-        self.run_time_label = tk.Label(bottom_bar, font=tkfont.Font(size=FONT_SIZE, weight='bold'))
-        self.run_time_label.pack(side='left', padx=(0, 20))
-        self.balloon.bind_widget(self.run_time_label, 'Backend run time')
-
-        self.dev_label = tk.Label(bottom_bar, 
-                                  font=tkfont.Font(size=FONT_SIZE+3, weight='bold'), 
-                                  fg=DEV_COLOR,
-                                  text='DEV'
-                                  )
-        self.balloon.bind_widget(self.dev_label, 'Development mode on')
 
     def get_icon(self, path, size=None):
         if size is None:

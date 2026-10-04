@@ -83,7 +83,7 @@ class LyricMixin:
                                         command=self._reset_offset
                                         )
         offset_reset_button.pack(side='left', padx=(0, 10))
-        self.balloon.bind_widget(offset_reset_button, 'Reset offset')
+        self.balloon.bind_widget(offset_reset_button, 'Reset offset (\\)')
 
     def _toggle_online_lyric(self, *_):
         self.send_command('lyric')
@@ -117,10 +117,10 @@ class LyricMixin:
 
         if self.snapshot.online_lyric is not EMPTY and self.snapshot.online_lyric:
             self.online_lyric_button.config(image=self.online_lyric_icon)
-            self.balloon.bind_widget(self.online_lyric_button, 'Switch to local source')
+            self.balloon.bind_widget(self.online_lyric_button, 'Switch to local source (Z)')
         else:
             self.online_lyric_button.config(image=self.local_lyric_icon)
-            self.balloon.bind_widget(self.online_lyric_button, 'Switch to online source')
+            self.balloon.bind_widget(self.online_lyric_button, 'Switch to online source (Z)')
 
         if self.snapshot.offset_overlay is not EMPTY and not self.offset_dragging:
             self.offset_scale.set(self.snapshot.offset_overlay)

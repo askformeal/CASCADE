@@ -82,14 +82,14 @@ class PlaylistMixin:
             image=self.select_current_icon, 
             command=self._select_current)
         select_current_button.pack(side='right', padx=(5, 0))
-        self.balloon.bind_widget(select_current_button, 'Select playing song')
+        self.balloon.bind_widget(select_current_button, 'Select playing song (C)')
         
         switch_button = tk.Button(
             bottom_bar, 
             image=self.switch_selected_icon, 
             command=self._on_switch)
         switch_button.pack(side='right')
-        self.balloon.bind_widget(switch_button, 'Switch to selected song')
+        self.balloon.bind_widget(switch_button, 'Switch to selected song (Enter)')
 
     def _select_current(self, *_):
         if self.snapshot.current_num is not EMPTY:
