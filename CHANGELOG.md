@@ -1,5 +1,40 @@
 # CHANGELOG
 
+## [0.56.0] - 2026-10-04
+
+> **Major change**: starting at this update, CHANGELOG be written by a human being.
+
+### Added
+
+#### GUI
+
+- **A pop-up information window** about the current song, including metadata, technical data and more.
+- **Saving cover image** to local file.
+- **A filter box on current playlist.**
+- **Hotkeys on lyric offset.** - `[` / `]` to move the offset and `\` to reset it.
+- **Hotkey `z` to switch lyric source.**
+- Backend rebooting.
+- Reloading.
+- Tooltips.
+- Play/pause switching on double-click.
+- Forcing input method to English when the window gains focus (Windows only).
+- Three new options: `gui_volume_step`, `gui_pos_step` and `gui_pos_step_long`.
+
+#### CLI
+
+- **A log file** (`cascade-cli.log`) along with a `--verbose` option to print to console.
+
+### Changed
+
+#### GUI
+
+- The album cover automatically resizes to fill all available space.
+- Real time lyric offset updating when dragging.
+
+### Fixed
+
+- `load_last` no longer forces the reference type into an integer and converts the reference only when it is an id.
+
 ## [0.55.0] - 2026-10-01
 
 ### Added
@@ -11,28 +46,28 @@
 
 ### Fixed
 
-- The CLI no longer forwards its own `-d/--direct` switch to the backend. It used to travel with every `config` request as a stray key, so a backend that took the remote route logged `Unexpected key(s) received: {'direct'}` for each one.
+- Removed stray `-d/--direct` key from CLI requests, and hence prevented annoying backend log entries.
 
 ## [0.54.0] - 2026-09-23
 
 > **⚠️ Breaking Changes**
 >
-> - **The project is renamed from CADENCE to CASCADE** — *Command-Line Audio Stream Capture And Decoding Engine*. The command is now `cascade`: the console script, every documented example and the program name in the log lines.
-> - **The data moved.** The platformdirs application name changed from `cadence` to `cascade`, so the database, the config file, the log directory and the PID file live under a new root — `%LOCALAPPDATA%\cascade\cascade\` on Windows, `~/.local/state/cascade/` on Linux, `~/Library/Logs/cascade/` on macOS. The database files are `cascade.db` / `cascade-dev.db` and every log file is `cascade*.log`. An existing installation has to move its `cadence` directory to the new name, database and log files included, or it starts with an empty library.
+> - **The project is renamed from CADENCE to CASCADE** - *Command-Line Audio Stream Capture And Decoding Engine*. The command is now `cascade`: the console script, every documented example and the program name in the log lines.
+> - **The data moved.** The platformdirs application name changed from `cadence` to `cascade`, so the database, the config file, the log directory and the PID file live under a new root - `%LOCALAPPDATA%\cascade\cascade\` on Windows, `~/.local/state/cascade/` on Linux, `~/Library/Logs/cascade/` on macOS. The database files are `cascade.db` / `cascade-dev.db` and every log file is `cascade*.log`. An existing installation has to move its `cadence` directory to the new name, database and log files included, or it starts with an empty library.
 > - The environment variables `CADENCE_DEV` / `CADENCE_CONTINUE` are now `CASCADE_DEV` / `CASCADE_CONTINUE`.
 > - The portable build now writes `dist/cascade-<version>/` and a `cascade.cmd` launcher.
 
 ### Added
 
 - **A new `config_default_remote` option** (`[config_gui]`, `true` by default) decides whether the configure GUI starts in remote mode; that mode was a hardcoded constant before. Like the service switches it is read once, when the window is created, so setting it inside the GUI takes effect the next time the GUI starts.
-- **The configure GUI answers the mouse.** Hovering a row's name shows the option's description, hovering its value shows the type a converter enforces, and the edit button keeps `Edit "<option>"`. A balloon lands at the widget's bottom-right corner and flips to the opposite side when that would leave the screen, clamped to the screen edge if even the flipped position does not fit. The offset is folded into the anchor before the check, and the size is read with `winfo_reqwidth()` / `winfo_reqheight()` — the balloon window is reused, and a hidden window still reports the size of the *previous* tooltip.
-- **The configure GUI says when there is nothing to list** — `No options available` in the empty pane, with the list no longer reacting to the mouse wheel while it has no rows.
+- **The configure GUI answers the mouse.** Hovering a row's name shows the option's description, hovering its value shows the type a converter enforces, and the edit button keeps `Edit "<option>"`. A balloon lands at the widget's bottom-right corner and flips to the opposite side when that would leave the screen, clamped to the screen edge if even the flipped position does not fit. The offset is folded into the anchor before the check, and the size is read with `winfo_reqwidth()` / `winfo_reqheight()` - the balloon window is reused, and a hidden window still reports the size of the *previous* tooltip.
+- **The configure GUI says when there is nothing to list** - `No options available` in the empty pane, with the list no longer reacting to the mouse wheel while it has no rows.
 
 ### Changed
 
 - The configure GUI window is 800x800 at `+300+20` (was 800x900 at `+300+100`).
 - The name follows through everywhere it was spelled out: the package and console-script name, the argparse program name, the tray and lyric-board titles, the dashboard header, the database and log file names, the save-file paths, the start/exit/status messages and the whole documentation.
-- The GitHub repository moved to [`askformeal/CASCADE`](https://github.com/askformeal/CASCADE) — the old URL redirects, and `REPO_LINK`, which the CLI prints in its `--help` epilog, points at the new one.
+- The GitHub repository moved to [`askformeal/CASCADE`](https://github.com/askformeal/CASCADE) - the old URL redirects, and `REPO_LINK`, which the CLI prints in its `--help` epilog, points at the new one.
 
 ### Fixed
 
@@ -42,7 +77,7 @@
 
 ### Changed
 
-- **The configure GUI lists options as rows instead of list entries.** Every option is its own row — name, value, a source chip and an edit button — inside a scrolling canvas, so a row can carry a button and a long value no longer stretches the window, and an empty value shows `<Empty>` instead of an empty chip. The window geometry, the fonts and every colour moved into `src/constants/config_gui.py` (the edit icon, `res/edit.png`, was added), and the pop-up is titled `Edit "<option>"`.
+- **The configure GUI lists options as rows instead of list entries.** Every option is its own row - name, value, a source chip and an edit button - inside a scrolling canvas, so a row can carry a button and a long value no longer stretches the window, and an empty value shows `<Empty>` instead of an empty chip. The window geometry, the fonts and every colour moved into `src/constants/config_gui.py` (the edit icon, `res/edit.png`, was added), and the pop-up is titled `Edit "<option>"`.
 
 ### Fixed
 
@@ -54,13 +89,13 @@
 ### Added
 
 - **Configure GUI.** A tkinter window (`src/frontend/config_gui/`, started with `python -m src.frontend.config_gui`) over the configuration: it lists every option as `name:  value  [SOURCE]`, says whether each value comes from `config.toml` or is the built-in default, and opens a pop-up editor on a double click or `Enter` showing the option's type, source and description with an editable value next to `Confirm`, `Unset` and `Cancel`. `F5` or the refresh button re-reads the options and the list keeps its scroll position and selection. It can read and write either through the backend or in-process, toggled with `r` or the top-right button: remote (the default) sends `config.list` / `config.set` / `config.unset`, so it edits the config file of the machine the backend runs on, while local does the same without a backend, like `cascade config … --direct`. New log file: `cascade-config-gui.log`.
-- The `config.list` and `config.show` attachment carries the option's `type` — the value name a converter enforces — and `cascade config show` prints it on a `Type:` line.
+- The `config.list` and `config.show` attachment carries the option's `type` - the value name a converter enforces - and `cascade config show` prints it on a `Type:` line.
 
 ## [0.52.1] - 2026-09-20
 
 ### Changed
 
-- **Imports now name their constants module.** `src/constants/` stopped re-exporting everything through its `__init__.py`: every import site names the submodule it needs (`from src.constants.network import ACTION_KEYS`) instead of reading attributes off the package. Importing one group no longer pulls in the others, and a moved constant is a missing name instead of a silently equal duplicate. Two submodules were added — `log.py` (log levels, log line and file size limits) and `frontend.py` (values shared by the daemon-like frontends: heartbeat and death-confirm intervals, the cover cache size, and the list of actions the CLI renders from an attachment). Constants moved to the module that consumes them: `ACK` to `network.py`, `AUDIO_FILE_TYPES` to `misc.py`, and the cover resize constants to `backend.py` (`MAX_COVER_SIDE` / `COVER_QUALITY`, while the frontend-side `MAX_COVER_CACHE` sits in `frontend.py`).
+- **Imports now name their constants module.** `src/constants/` stopped re-exporting everything through its `__init__.py`: every import site names the submodule it needs (`from src.constants.network import ACTION_KEYS`) instead of reading attributes off the package. Importing one group no longer pulls in the others, and a moved constant is a missing name instead of a silently equal duplicate. Two submodules were added - `log.py` (log levels, log line and file size limits) and `frontend.py` (values shared by the daemon-like frontends: heartbeat and death-confirm intervals, the cover cache size, and the list of actions the CLI renders from an attachment). Constants moved to the module that consumes them: `ACK` to `network.py`, `AUDIO_FILE_TYPES` to `misc.py`, and the cover resize constants to `backend.py` (`MAX_COVER_SIDE` / `COVER_QUALITY`, while the frontend-side `MAX_COVER_CACHE` sits in `frontend.py`).
 
 ## [0.52.0] - 2026-09-19
 
@@ -72,23 +107,23 @@
 
 ### Changed
 
-- **The playback core and the engine are fused.** `Playback` is now built from mixins: an `EngineMixin` (`playback/engine_mixin.py`) runs everything the engine flow does — status, progress, media count, track switching, transport, volume and mute — and calls into a thin `BaseEngine` (`playback/base_engine.py`) implementation that only decodes, which is what `vlc_engine.py` and `mini_engine.py` shrank to. Lyric state and cover art moved into `playback/lyric.py` and `playback/cover.py`, and all of them log through one shared `playback/logger.py`. Handlers and the backend act on `Playback` instead of reaching into `playback.engine`, and an engine reports the length of its media list and its progress the same way whichever engine is in use.
+- **The playback core and the engine are fused.** `Playback` is now built from mixins: an `EngineMixin` (`playback/engine_mixin.py`) runs everything the engine flow does - status, progress, media count, track switching, transport, volume and mute - and calls into a thin `BaseEngine` (`playback/base_engine.py`) implementation that only decodes, which is what `vlc_engine.py` and `mini_engine.py` shrank to. Lyric state and cover art moved into `playback/lyric.py` and `playback/cover.py`, and all of them log through one shared `playback/logger.py`. Handlers and the backend act on `Playback` instead of reaching into `playback.engine`, and an engine reports the length of its media list and its progress the same way whichever engine is in use.
 - The `VLC_ERROR` sentinel and the `VLCError` response class are renamed to `ENGINE_ERROR` / `EngineError` ("because an internal audio engine error occurred"), since the failing engine is no longer necessarily VLC.
 - `engine` is read when the backend constructs its player, so changing it needs a backend restart.
 
 ### Fixed
 
-- **A backend that could not initialize died silently.** An unopenable database or a missing audio device raised out of `Backend.__init__`, and since the backend is spawned with `stdout` and `stderr` discarded, nothing at all was logged — `cascade start` only said the backend failed. Both constructions now raise `InitializationError`, which the backend logs at `CRITICAL` and turns into exit code 1, and the start failure message points at the log files.
+- **A backend that could not initialize died silently.** An unopenable database or a missing audio device raised out of `Backend.__init__`, and since the backend is spawned with `stdout` and `stderr` discarded, nothing at all was logged - `cascade start` only said the backend failed. Both constructions now raise `InitializationError`, which the backend logs at `CRITICAL` and turns into exit code 1, and the start failure message points at the log files.
 - A choice-type config value was accepted case-insensitively but returned as written, so `engine = VLC` passed validation and then failed the lookup that consumes it. `StrChoiceList` now returns the lowercased value.
-- **The backend could not start when the VLC runtime was unreachable, even with `engine = miniaudio`.** `vlc_engine.py` imported `vlc` at module level and the playback package imports it unconditionally, so a machine without `python-vlc`, or without a `libvlc.dll` that python-vlc can find (it looks at `PYTHON_VLC_LIB_PATH`, then the registry and the usual install directories, and finally at `.\libvlc.dll` relative to the working directory), died during import — before the engine was even chosen. The import is now guarded and the failure is reported as a failed initialization, so it is only fatal when the VLC engine is the one being constructed.
+- **The backend could not start when the VLC runtime was unreachable, even with `engine = miniaudio`.** `vlc_engine.py` imported `vlc` at module level and the playback package imports it unconditionally, so a machine without `python-vlc`, or without a `libvlc.dll` that python-vlc can find (it looks at `PYTHON_VLC_LIB_PATH`, then the registry and the usual install directories, and finally at `.\libvlc.dll` relative to the working directory), died during import - before the engine was even chosen. The import is now guarded and the failure is reported as a failed initialization, so it is only fatal when the VLC engine is the one being constructed.
 
 ## [0.51.0] - 2026-09-17
 
 ### Added
 
-- **Reverse playback.** `cascade reverse` (also `b` on the dashboard, and a `Reverse` item in the tray menu next to `Shuffle` and `Loop`) turns the playlist around: when a song ends, the backend moves to the previous one instead of the next, wrapping from the first song to the last. Only the end of a song is affected — manual `prev` / `next`, `switch` and `dice` still move forward — and it composes with loop, where the current song is replayed instead. The state is reported as `reverse` by `status` and `poll`.
+- **Reverse playback.** `cascade reverse` (also `b` on the dashboard, and a `Reverse` item in the tray menu next to `Shuffle` and `Loop`) turns the playlist around: when a song ends, the backend moves to the previous one instead of the next, wrapping from the first song to the last. Only the end of a song is affected - manual `prev` / `next`, `switch` and `dice` still move forward - and it composes with loop, where the current song is replayed instead. The state is reported as `reverse` by `status` and `poll`.
 - **Reload hotkey on the dashboard.** `Ctrl+R` re-opens the last opened song or play-all session (`load_last`, the same action as `cascade reload`), so the library can be re-read without restarting the backend.
-- The dashboard now shows a toast for every playback action it triggers — open, reload, play all, play/pause, stop, seek, dice, the mode toggles, mute, volume and the lyric source — instead of only for the lyric offset.
+- The dashboard now shows a toast for every playback action it triggers - open, reload, play all, play/pause, stop, seek, dice, the mode toggles, mute, volume and the lyric source - instead of only for the lyric offset.
 
 ### Changed
 
@@ -99,7 +134,7 @@
 
 ### Added
 
-**Album cover.** The backend reads the cover of the playing song and hands it to frontends through a new `get_cover` action. The image comes from the file's own tags (FLAC pictures, ID3 `APIC` for MP3/WAV, MP4 `covr`, Vorbis `metadata_block_picture`) or, failing that, from a `cover.jpg` / `folder.jpg` / `album.jpg` / `albumart.jpg` / `front.jpg` next to it. It is re-encoded to JPEG and downscaled so its longest side is at most `MAX_COVER_SIDE` (512 px) before being served — a 1400x1400 embedded cover drops from ~170 KB to ~48 KB, and a 4 MB folder image to ~55 KB. Small covers are passed through untouched, never upscaled. A cover that cannot be decoded (corrupt, truncated, or not an image at all) simply counts as "no cover".
+**Album cover.** The backend reads the cover of the playing song and hands it to frontends through a new `get_cover` action. The image comes from the file's own tags (FLAC pictures, ID3 `APIC` for MP3/WAV, MP4 `covr`, Vorbis `metadata_block_picture`) or, failing that, from a `cover.jpg` / `folder.jpg` / `album.jpg` / `albumart.jpg` / `front.jpg` next to it. It is re-encoded to JPEG and downscaled so its longest side is at most `MAX_COVER_SIDE` (512 px) before being served - a 1400x1400 embedded cover drops from ~170 KB to ~48 KB, and a 4 MB folder image to ~55 KB. Small covers are passed through untouched, never upscaled. A cover that cannot be decoded (corrupt, truncated, or not an image at all) simply counts as "no cover".
 
 **Poster mode on the dashboard.** `f` replaces the whole layout with the current song's cover, rendered as half-block cells with true color, sized by the new `dash_poster_width` / `dash_poster_height` options and clamped to the terminal. The image is scaled proportionally and the leftover area is left transparent, so the cover sits on the terminal's own background instead of a black box. Songs without a cover show a bundled placeholder (`res/no_cover.txt`). The rendered poster is cached and only redrawn when the cover, the size or the cover hash changes.
 
@@ -109,7 +144,7 @@ New config options `dash_poster_width` (default `80` columns) and `dash_poster_h
 
 ### Changed
 
-- Log files no longer grow without a limit. Every log file is truncated in place once it passes `LOG_FILE_MAX_BYTES` (20MB), so a backend left running for weeks cannot fill the disk with one file. Only the most recent window is kept — there are no rotated backups, by design: truncating is the one way to bound a log file that several processes append to, since Windows refuses to rename a file while another process has it open.
+- Log files no longer grow without a limit. Every log file is truncated in place once it passes `LOG_FILE_MAX_BYTES` (20MB), so a backend left running for weeks cannot fill the disk with one file. Only the most recent window is kept - there are no rotated backups, by design: truncating is the one way to bound a log file that several processes append to, since Windows refuses to rename a file while another process has it open.
 
 ### Fixed
 
@@ -121,7 +156,7 @@ New config options `dash_poster_width` (default `80` columns) and `dash_poster_h
 ### Added
 
 - **ANSI colors.** The CLI now colors its `[Succeeded]` / `[Failed]` markers and the failed-action list, and the dashboard colors its `[MISSING]` placeholders and its toast. A new `escape_char` config option (default `true`) turns every escape code off, for terminals or logs that cannot handle them.
-- **Single-request frontend polling.** The dashboard, the tray icon and the floating lyric board now read everything they need from one keyless `poll` action — playback status, the playing song's library information, the lyric state, the current playlist and every playlist name — instead of running several requests on each refresh. The `get_lyric` action is gone, its state is part of the snapshot.
+- **Single-request frontend polling.** The dashboard, the tray icon and the floating lyric board now read everything they need from one keyless `poll` action - playback status, the playing song's library information, the lyric state, the current playlist and every playlist name - instead of running several requests on each refresh. The `get_lyric` action is gone, its state is part of the snapshot.
 - **`cascade reload`** re-opens the last opened song (or the last play-all session) without restarting the backend, and it re-reads the song from the library, so it also serves as a refresh after changing metadata or a lyric offset.
 - `cascade lib info` now shows the song's lyric offset.
 
@@ -136,13 +171,13 @@ New config options `dash_poster_width` (default `80` columns) and `dash_poster_h
 
 - **The backend could hard-crash with no log and leave its PID behind.** The database kept a single connection and a single cursor for every thread, and the lock covered only the statement execution, not the row fetching: the request thread and the position-memorizing thread could step and reset the same statement at the same time and take the whole process down with a native access violation inside `_sqlite3.pyd`. Windows logged it as exception `0xc0000005`, so nothing ever reached `cascade.log` and the PID cleanup never ran. Every thread now owns its connection, and cross-thread use fails loudly instead of corrupting memory.
 - Dashboard lines were truncated by raw character count, so a cut could land in the middle of an escape sequence (leaving half a sequence in the output) or leave a line wider than the terminal and wrap the layout. Lines are now truncated by display width (wide characters counted as two columns) and a whole trailing sequence is dropped instead of being split.
-- `cascade lib info` showed `?` for the lyric path of songs that do have a `.lrc` bound — the attachment key is `lyric` there, while `status` calls the same field `lyric_path`.
+- `cascade lib info` showed `?` for the lyric path of songs that do have a `.lrc` bound - the attachment key is `lyric` there, while `status` calls the same field `lyric_path`.
 
 ## [0.48.0] - 2026-09-09
 
 ### Added
 
-- **Lyric offset.** If a song's lyric is out of sync with the audio, you can now shift it in time. `cascade lib lyric offset <song> <ms>` persists a per-song offset in the library (positive delays the lyric line, negative brings it earlier). On the dashboard, `]` / `[` nudge a temporary *overlay* for the current song by `100ms` and `\` resets it — useful to find the right value live before committing it, since the persisted offset and the live overlay stack. Both the dashboard and the floating lyric board apply the offset when picking the current line.
+- **Lyric offset.** If a song's lyric is out of sync with the audio, you can now shift it in time. `cascade lib lyric offset <song> <ms>` persists a per-song offset in the library (positive delays the lyric line, negative brings it earlier). On the dashboard, `]` / `[` nudge a temporary *overlay* for the current song by `100ms` and `\` resets it - useful to find the right value live before committing it, since the persisted offset and the live overlay stack. Both the dashboard and the floating lyric board apply the offset when picking the current line.
 - The backend now owns the offset overlay (`set_offset_overlay` action, with an `autoincrement` option to accumulate or set), so it survives a dashboard restart and is shared across frontends instead of being a dashboard-local variable.
 - New action-level tests for `get_lyric` / `set_offset_overlay` (overlay served in `get_lyric`, autoincrement accumulate/overwrite, missing-key validation).
 
@@ -153,7 +188,7 @@ New config options `dash_poster_width` (default `80` columns) and `dash_poster_h
 
 ### Fixed
 
-- `lib.meta.set` crashed with `KeyError: 'offset'` after `offset` was added to the metadata columns — its key contract is now in sync (the recurring metadata-field-add trap).
+- `lib.meta.set` crashed with `KeyError: 'offset'` after `offset` was added to the metadata columns - its key contract is now in sync (the recurring metadata-field-add trap).
 - `get_lyric` referenced a non-existent `lyric_overlay` attribute and failed on every call; it now reads the real `offset_overlay`.
 
 ## [0.47.0] - 2026-09-08
@@ -168,7 +203,7 @@ New config options `dash_poster_width` (default `80` columns) and `dash_poster_h
 - The dashboard and lyric board now distinguish *loading* (shows `[Loading ...]`) from *no lyric*, instead of collapsing both into "no lyric".
 - New `lib lyric show <song>` command to print a song's parsed lyric.
 - New config options `proxy` (proxy used for online lyric requests; empty = system default) and `netease_skip_proxy` (connect to the NetEase source directly regardless of `proxy`).
-- IPC acknowledge handshake — the backend answers every request with an immediate ACK and the frontend reads the ACK under `connection_timeout` before switching to `execution_timeout` for the response, so long-running actions (e.g. a bulk lyric fetch) are no longer cut off by one shared short timeout.
+- IPC acknowledge handshake - the backend answers every request with an immediate ACK and the frontend reads the ACK under `connection_timeout` before switching to `execution_timeout` for the response, so long-running actions (e.g. a bulk lyric fetch) are no longer cut off by one shared short timeout.
 
 ### Changed
 
@@ -184,8 +219,8 @@ New config options `dash_poster_width` (default `80` columns) and `dash_poster_h
 
 ### Added
 
-- New config option `lyric_trans_bg` (default `false`) — controls whether the lyric board uses a fully transparent (keyed-out) window background instead of a plain opaque backdrop. Previously the transparent background was always on.
-- New config option `lyric_hover_solid` (default `true`) — makes the hover solidification (fully opaque + solid `lyric_bg_color` background on hover) togglable.
+- New config option `lyric_trans_bg` (default `false`) - controls whether the lyric board uses a fully transparent (keyed-out) window background instead of a plain opaque backdrop. Previously the transparent background was always on.
+- New config option `lyric_hover_solid` (default `true`) - makes the hover solidification (fully opaque + solid `lyric_bg_color` background on hover) togglable.
 
 ### Changed
 
@@ -193,38 +228,38 @@ New config options `dash_poster_width` (default `80` columns) and `dash_poster_h
 
 ### Fixed
 
-- Turning `lyric_hover_solid` off at runtime no longer leaves an already-solidified board stuck opaque — the hover state now resets back to translucent even when the feature is disabled.
+- Turning `lyric_hover_solid` off at runtime no longer leaves an already-solidified board stuck opaque - the hover state now resets back to translucent even when the feature is disabled.
 
 ## [0.45.0] - 2026-09-04
 
 ### Added
 
-- Portable build script (`build.sh`) — produces a self-contained folder + `.zip` under `dist/cascade-<version>/`, bundling a standalone CPython runtime (Astral python-build-standalone), all runtime dependencies, and a GUI-free subset of the VLC runtime (`vlc/`, no VLC install needed on the target). Launch with `cascade.cmd` in the bundle root. `VLC_SRC` overrides the VLC install the build copies from. See the README Installation section.
-- New config option `lyric_bg_color` (default `#3b3b3b`) — the solid background color shown behind the lyric text while the board is hovered.
+- Portable build script (`build.sh`) - produces a self-contained folder + `.zip` under `dist/cascade-<version>/`, bundling a standalone CPython runtime (Astral python-build-standalone), all runtime dependencies, and a GUI-free subset of the VLC runtime (`vlc/`, no VLC install needed on the target). Launch with `cascade.cmd` in the bundle root. `VLC_SRC` overrides the VLC install the build copies from. See the README Installation section.
+- New config option `lyric_bg_color` (default `#3b3b3b`) - the solid background color shown behind the lyric text while the board is hovered.
 - Lyric board now shows a solid background (`lyric_bg_color`) with padding around the text on hover, instead of just the bare text over transparency.
 
 ### Changed
 
-- The lyric board's transparent color is now picked dynamically at startup — the first color that differs from both `lyric_font_color` and `lyric_bg_color` — replacing the hardcoded `LYRIC_TRANS_COLOR` / `LYRIC_TRANS_COLOR_FALLBACK` constants. This avoids a transparent-key collision when the user picks a font or background color that equals the old hardcoded key.
+- The lyric board's transparent color is now picked dynamically at startup - the first color that differs from both `lyric_font_color` and `lyric_bg_color` - replacing the hardcoded `LYRIC_TRANS_COLOR` / `LYRIC_TRANS_COLOR_FALLBACK` constants. This avoids a transparent-key collision when the user picks a font or background color that equals the old hardcoded key.
 - Hover background switching now targets the lyric label (which fills the window) rather than the Tk root window, whose background was never visible behind the label.
 
 ### Fixed
 
-- `pyproject.toml` `dependencies` was missing five runtime deps that `requirements.in` declared (`wcwidth`, `psutil`, `tomli-w`, `pystray`, `pillow`) — a `pip install .` would crash at runtime for the tray/lyric/dash frontends. Now synced with `requirements.in`.
+- `pyproject.toml` `dependencies` was missing five runtime deps that `requirements.in` declared (`wcwidth`, `psutil`, `tomli-w`, `pystray`, `pillow`) - a `pip install .` would crash at runtime for the tray/lyric/dash frontends. Now synced with `requirements.in`.
 
 ## [0.44.0] - 2026-09-02
 
 ### Added
 
-- Lyric board frontend (`src/lyric.py`) — a floating always-on-top window showing the current lyric line of the playing song. Started with the backend (unless the `lyric` config option is off). Hidden while stopped, and optionally while paused via `pause_hide_lyric`.
+- Lyric board frontend (`src/lyric.py`) - a floating always-on-top window showing the current lyric line of the playing song. Started with the backend (unless the `lyric` config option is off). Hidden while stopped, and optionally while paused via `pause_hide_lyric`.
 - New config options (all under the `lyric` feature): `lyric` (start the board with the backend), `pause_hide_lyric`, `lyric_height`, `lyric_x_offset`, `lyric_font_family` (empty → system default font), `lyric_font_size`, `lyric_font_bold`, `lyric_font_color`, `lyric_opacity`.
-- Lyric board hover behavior — semi-transparent at rest (default 20% opacity), fades to fully opaque when the mouse is over the window (or within a 30 px ring around it). Uses `winfo_pointerxy()` polling.
+- Lyric board hover behavior - semi-transparent at rest (default 20% opacity), fades to fully opaque when the mouse is over the window (or within a 30 px ring around it). Uses `winfo_pointerxy()` polling.
 - New converters: `non_neg_int`, `hex_color`; `README` config table expanded to cover all options.
 
 ### Fixed
 
-- `READABLE_TYPE_NAMES` was missing the `non_neg_int` / `hex_color` / `box_style` converters — an invalid stored config value would raise `KeyError` while building the warning message instead of falling back to the default.
-- Lyric board no longer crashes with `NameError` when nothing is playing or the current song has no lyric — the update path only touches the label when a lyric line is actually available.
+- `READABLE_TYPE_NAMES` was missing the `non_neg_int` / `hex_color` / `box_style` converters - an invalid stored config value would raise `KeyError` while building the warning message instead of falling back to the default.
+- Lyric board no longer crashes with `NameError` when nothing is playing or the current song has no lyric - the update path only touches the label when a lyric line is actually available.
 - Empty lyric lists now return the `EMPTY_LYRIC` sentinel from `get_lyric_line()` instead of `None` (dash and lyric board both handled).
 
 ### Changed
@@ -235,21 +270,21 @@ New config options `dash_poster_width` (default `80` columns) and `dash_poster_h
 
 ### Added
 
-- Dashboard song info panel — a left column showing the current song's library info (duration, name/artist/album, bitrate/sample rate/channels, aliases and playlists). Fetched via a new `force_id` option on `lib.info` that looks songs up directly by library ID (no alias/path resolution, no `cwd` needed) — the dashboard requests it without a `cwd`.
+- Dashboard song info panel - a left column showing the current song's library info (duration, name/artist/album, bitrate/sample rate/channels, aliases and playlists). Fetched via a new `force_id` option on `lib.info` that looks songs up directly by library ID (no alias/path resolution, no `cwd` needed) - the dashboard requests it without a `cwd`.
 - `status` attachment now includes the current song's library `id`.
 - `SongOutput` gains `aliases_raw` / `playlists_raw` (the unjoined alias/playlist lists) alongside the prettified strings.
 - Tests for `lib.info` with `force_id`: basic lookup, non-existent ID, non-decimal input (no alias resolution), and `cwd=None` (direct ID lookup).
 
 ### Changed
 
-- Dashboard layout is now three columns: info panel, main panel, playlist — using the multi-column `box()`.
+- Dashboard layout is now three columns: info panel, main panel, playlist - using the multi-column `box()`.
 - `DASH_MIN_WIDTH` reduced from 80 to 50; new `DASH_INFO_MAX_WIDTH` caps the info column width.
 
 ## [0.42.0] - 2026-08-30
 
 ### Added
 
-- Dashboard `Home` / `End` keys — jump the selection to the top / bottom of the list (playlist and help screen), using a deferred `END_OF_LIST` sentinel resolved against the actual list length.
+- Dashboard `Home` / `End` keys - jump the selection to the top / bottom of the list (playlist and help screen), using a deferred `END_OF_LIST` sentinel resolved against the actual list length.
 - New config options: `dash_screen_buffer` (use the terminal alt-screen buffer for the dashboard; off leaves the dashboard drawn on the normal screen) and `auto_dash_height` (size the playlist window from the terminal height instead of the fixed `DASH_MAX_SHOW_SONG`).
 
 ### Changed
@@ -261,7 +296,7 @@ New config options `dash_poster_width` (default `80` columns) and `dash_poster_h
 
 ### Fixed
 
-- Help screen `End` key no longer crashes — `bind_selected` resolves `END_OF_LIST` like the song list does.
+- Help screen `End` key no longer crashes - `bind_selected` resolves `END_OF_LIST` like the song list does.
 
 ## [0.41.0] - 2026-08-30
 
@@ -284,13 +319,13 @@ New config options `dash_poster_width` (default `80` columns) and `dash_poster_h
 
 ### Changed
 
-- `get_lyric_line()` now returns the lyric line index (or the `BEFORE_FIRST_LYRIC` sentinel) instead of the line tuple — callers map the text themselves.
+- `get_lyric_line()` now returns the lyric line index (or the `BEFORE_FIRST_LYRIC` sentinel) instead of the line tuple - callers map the text themselves.
 - `box()` inner padding reduced from 2 to 1 space per side (tighter frames).
 - `lib list` empty playlist message changed to `Player Empty`.
 
 ### Fixed
 
-- `parse_lyric()` returned after the first parsed line (the `return result` was inside the line loop) — now returns all lines.
+- `parse_lyric()` returned after the first parsed line (the `return result` was inside the line loop) - now returns all lines.
 
 ## [0.39.0] - 2026-08-30
 
@@ -312,8 +347,8 @@ New config options `dash_poster_width` (default `80` columns) and `dash_poster_h
 - Lyric support: `lyric` backend action returns the current song's parsed lyric lines; `cascade lib lyric set <song> <path>` binds a `.lrc` file to a song (empty string unsets).
 - Dashboard shows the current lyric line (synchronized to playback position via the LRC timestamps), fetched lazily when the song's lyric path changes.
 - Dashboard `Ctrl+A` play-all key.
-- `utils.parse_lyric()` / `utils.get_lyric_line()` — LRC parsing with an encoding fallback chain (`utf-8`, `gb18030`, `big5`, `shift_jis`, `utf-16`), multi-timestamp line merging, and position lookup.
-- `DASH_MIN_WIDTH` (80) — dashboard layout enforces a minimum width so the lyric line and status rows don't collapse on narrow terminals.
+- `utils.parse_lyric()` / `utils.get_lyric_line()` - LRC parsing with an encoding fallback chain (`utf-8`, `gb18030`, `big5`, `shift_jis`, `utf-16`), multi-timestamp line merging, and position lookup.
+- `DASH_MIN_WIDTH` (80) - dashboard layout enforces a minimum width so the lyric line and status rows don't collapse on narrow terminals.
 - `utils.center()` now centers multi-line text line by line.
 
 ### Changed
@@ -326,9 +361,9 @@ New config options `dash_poster_width` (default `80` columns) and `dash_poster_h
 
 ### Added
 
-- Dashboard filter key (`/`) — filter the playlist by song name or artist. Matches are highlighted with brackets, the filter is shown in the status area, and remaining-count markers (`N ↑` / `N ↓`) indicate how many songs sit above/below the current window. Enter still switches to the filtered selection via the original playlist number.
-- Dashboard seek key (`g`) — prompt for a time (`HH:MM:SS`) to jump to.
-- `utils.wrap_text()` — word-wrap helper used for dashboard toast messages.
+- Dashboard filter key (`/`) - filter the playlist by song name or artist. Matches are highlighted with brackets, the filter is shown in the status area, and remaining-count markers (`N ↑` / `N ↓`) indicate how many songs sit above/below the current window. Enter still switches to the filtered selection via the original playlist number.
+- Dashboard seek key (`g`) - prompt for a time (`HH:MM:SS`) to jump to.
+- `utils.wrap_text()` - word-wrap helper used for dashboard toast messages.
 - Failed dashboard requests now surface as `[Failed] ...` toasts.
 
 ### Changed
@@ -339,15 +374,15 @@ New config options `dash_poster_width` (default `80` columns) and `dash_poster_h
 
 ### Fixed
 
-- Dashboard selection no longer points at the wrong song when a filter is active — filtered rows track their original playlist numbers, and `c` / `Enter` resolve through that mapping.
+- Dashboard selection no longer points at the wrong song when a filter is active - filtered rows track their original playlist numbers, and `c` / `Enter` resolve through that mapping.
 - `c` key handled `ValueError` (song not in the filtered list) instead of crashing the key handler.
 
 ## [0.36.0] - 2026-08-30
 
 ### Added
 
-- `cascade dash` subcommand — start the dashboard directly from the CLI (previously only `python -m src.dash`).
-- Dashboard `o` key — open a song from the dashboard with a prompt (song name, library ID, file path or playlist name). The display pauses while typing, then resumes.
+- `cascade dash` subcommand - start the dashboard directly from the CLI (previously only `python -m src.dash`).
+- Dashboard `o` key - open a song from the dashboard with a prompt (song name, library ID, file path or playlist name). The display pauses while typing, then resumes.
 
 ### Changed
 
@@ -360,7 +395,7 @@ New config options `dash_poster_width` (default `80` columns) and `dash_poster_h
 - Relative seek: `seek +10` / `seek -10` (forward/backward from the current position). Relative times are clamped to the song length; an unsigned time still means an absolute jump.
 - Relative volume: `volume +5` / `volume -5` (adjust by a step, clamped to 0-100). Absolute values still validated.
 - Dashboard seek keys wired: `.` / `l` / `→` jump forward, `,` / `h` / `←` jump backward (step from `dash_pos_step`).
-- Dashboard key map help screen (`?` / `F1`) — browsable list of all key bindings (`DASH_MAX_SHOW_BIND`).
+- Dashboard key map help screen (`?` / `F1`) - browsable list of all key bindings (`DASH_MAX_SHOW_BIND`).
 - `Bind` keymap class with display names plus `CHAR_TO_NAME` reverse key-name lookup in `src/constants.py`.
 - `utils.squeeze()` (clamp) and `utils.window_list()` (windowed list rendering with selection/playing markers) helpers.
 
@@ -372,17 +407,17 @@ New config options `dash_poster_width` (default `80` columns) and `dash_poster_h
 
 ### Fixed
 
-- Dashboard crashed when the playing-song index was missing (`'?'` from older daemons or `None`) while rendering the windowed playlist — the playing marker is now guarded.
+- Dashboard crashed when the playing-song index was missing (`'?'` from older daemons or `None`) while rendering the windowed playlist - the playing marker is now guarded.
 - Tests updated for the relative seek interface (`-5:30` is a valid relative jump now); added relative seek coverage (invalid, before-open, forward, backward).
 
 ## [0.34.0] - 2026-08-28
 
 ### Added
 
-- Dashboard progress bar — position/time display (`[bar] [elapsed/total]`) with `DASH_POS_BAR_LEN`.
+- Dashboard progress bar - position/time display (`[bar] [elapsed/total]`) with `DASH_POS_BAR_LEN`.
 - Dashboard volume bar and merged state row (volume left, shuffle/loop/player status right).
 - Box style system: `BOX_STYLES` named styles (`ascii`, `at`, `rounded`, `square`, `double-corner`, `heavy-corner`, `double`, `heavy`), `box(style=)` parameter, and `cli_box_style` / `dash_box_style` config options (appearance section).
-- Dashboard theme switching keys `t` / `T` (next/previous box style, runtime only — not persisted), with a toast notification (`DASH_TOAST_TIME`).
+- Dashboard theme switching keys `t` / `T` (next/previous box style, runtime only - not persisted), with a toast notification (`DASH_TOAST_TIME`).
 - Dashboard playback keys wired up: volume (`=`/`-`, step from `dash_volume_step`), mute (`m`), dice (`d`), shuffle (`s`), loop (`r`), stop (`x`), page up/down, redraw (`Ctrl+L`, `F5`).
 - `dash_volume_step` and `dash_pos_step` config options (dash section).
 - `utils.progress_bar()` and `utils.align()` helpers.
@@ -398,7 +433,7 @@ New config options `dash_poster_width` (default `80` columns) and `dash_poster_h
 
 ### Fixed
 
-- Dashboard progress bar rendered full when nothing was playing (VLC reports `time`/`length` as `-1`) — now falls back to an empty bar when either value is `<= 0`.
+- Dashboard progress bar rendered full when nothing was playing (VLC reports `time`/`length` as `-1`) - now falls back to an empty bar when either value is `<= 0`.
 - `progress_bar()` now clamps progress to `[0, length]` (no oversized bars on out-of-range input).
 - Dashboard `prev_box` theme cycle skipped a style (boundary checked `== 0` instead of `< 0`).
 - Tests updated for the box style interface change (named style keys, `ascii` default).
@@ -407,8 +442,8 @@ New config options `dash_poster_width` (default `80` columns) and `dash_poster_h
 
 ### Added
 
-- Dashboard frontend (`cascade dash`) — interactive TUI with live status display, playlist browsing, keyboard controls and alternate-screen-buffer rendering (`src/dash.py`).
-- `DASH_KEY_MAP` in constants — centralized keybindings (playback, selection, page up/down; volume/shuffle/loop/seek/dice/stop/mute declared but not wired yet).
+- Dashboard frontend (`cascade dash`) - interactive TUI with live status display, playlist browsing, keyboard controls and alternate-screen-buffer rendering (`src/dash.py`).
+- `DASH_KEY_MAP` in constants - centralized keybindings (playback, selection, page up/down; volume/shuffle/loop/seek/dice/stop/mute declared but not wired yet).
 - `dash` source in `SOURCES`, `cascade-dash.log`, `DASH_POLL_INTERVAL`, `DASH_MAX_SHOW_SONG`.
 - `utils.center()` helper and `box()` padding arguments (`l_pad`/`r_pad`).
 - Tests for `box()` and `center()` (CJK width, padding, centering).
@@ -421,21 +456,21 @@ New config options `dash_poster_width` (default `80` columns) and `dash_poster_h
 
 ### Fixed
 
-- Hotkey frontend passed only one argument to `handle_code(code, callback)` — media keys now correctly handle backend death/exit codes.
+- Hotkey frontend passed only one argument to `handle_code(code, callback)` - media keys now correctly handle backend death/exit codes.
 
 ## [0.32.0] - 2026-08-27
 
 ### Added
 
-- Tray `Open` menu item — pick a song file with a file dialog (filters from `AUDIO_FILE_TYPES`).
+- Tray `Open` menu item - pick a song file with a file dialog (filters from `AUDIO_FILE_TYPES`).
 - `[Play All]` entry at the top of the tray Playlists submenu.
-- `AUDIO_FILE_TYPES` constant — `(description, extension)` pairs for file selectors, replacing the bare `AUDIO_EXTENSIONS` set (which is now derived from it).
+- `AUDIO_FILE_TYPES` constant - `(description, extension)` pairs for file selectors, replacing the bare `AUDIO_EXTENSIONS` set (which is now derived from it).
 - README logo (`res/musical.png`, packed as package data).
 
 ### Changed
 
 - `_open_song` fallback: absolute paths open without a `cwd`; a song that is neither alias, library ID, file path nor playlist name now reports that explicitly instead of the old "valid and existing path" error.
-- Log lines are capped at `LOG_MAX_LENGTH` (500 chars) via `TruncateFilter` — huge entries (e.g. playlist song info dumps) no longer bloat `cascade.log`.
+- Log lines are capped at `LOG_MAX_LENGTH` (500 chars) via `TruncateFilter` - huge entries (e.g. playlist song info dumps) no longer bloat `cascade.log`.
 - Icon paths moved to `ICON_PATH`/`ERROR_ICON_PATH` in constants (resolved via `importlib.resources`); tray no longer resolves them itself.
 - `res/icon_error.ico` regenerated as a multi-size set (16/24/32/48/64/256 px).
 
@@ -461,7 +496,7 @@ New config options `dash_poster_width` (default `80` columns) and `dash_poster_h
 ### Added
 
 - Tray menu gains checkable items: `Mute`, `Shuffle` and `Loop` now show a checkmark reflecting the backend state, refreshed via the 0.5 s status poll.
-- Tray menu is only rebuilt when its content actually changes (signature comparison of menu text plus mute/shuffle/loop state) — avoids destroying the displayed native menu mid-open.
+- Tray menu is only rebuilt when its content actually changes (signature comparison of menu text plus mute/shuffle/loop state) - avoids destroying the displayed native menu mid-open.
 - `status` attachment now includes `shuffle` and `loop`; the CLI `status` output shows both.
 - `SongOutput` raw accessors (`mute_raw`, `shuffle_raw`, `loop_raw`, `in_lib_raw`) for frontends that need the un-prettified values.
 
@@ -475,9 +510,9 @@ New config options `dash_poster_width` (default `80` columns) and `dash_poster_h
 ### Added
 
 - System tray icon frontend (`src/tray.py`, pystray): icon in the notification area with playback controls (play/pause as the double-click default, previous/next/stop), a playlist switch submenu (each song numbered, click to switch), and a dynamic tooltip showing the current song and player status. Polls `status`/`list` silently once per second; the menu is only rebuilt when its content changes.
-- `tray` config option (`service` section, default `true`) — whether to start the tray service with the backend, mirroring the `hotkey` option.
-- `silent` request key — when true, the backend skips routine INFO logging for that request and its response. Used by the tray's high-frequency polling; errors are still logged. The key is accepted for all actions (added to `NON_ACTION_KEYS`).
-- `notify_support` request key — only requests carrying it consume and clear queued notifies. The CLI sends it (`_wrap_request`); the tray and hotkey explicitly do not, so polling no longer steals notifies meant for the CLI.
+- `tray` config option (`service` section, default `true`) - whether to start the tray service with the backend, mirroring the `hotkey` option.
+- `silent` request key - when true, the backend skips routine INFO logging for that request and its response. Used by the tray's high-frequency polling; errors are still logged. The key is accepted for all actions (added to `NON_ACTION_KEYS`).
+- `notify_support` request key - only requests carrying it consume and clear queued notifies. The CLI sends it (`_wrap_request`); the tray and hotkey explicitly do not, so polling no longer steals notifies meant for the CLI.
 - `Label` menu-item helper (tray): a disabled, non-clickable text item for submenu placeholders (e.g. `Empty`).
 - `res/` package with the tray icon (`icon.ico`, Flaticon "Three musketeers"); README gained a `## Credits` section with the required attribution.
 
@@ -495,31 +530,31 @@ New config options `dash_poster_width` (default `80` columns) and `dash_poster_h
 
 - Config options wired into runtime behavior: `backend_host`/`backend_port` (where the backend listens) and `frontend_host`/`frontend_port` (where frontends connect) are split; `ipc_timeout` applies per connection, `player_timeout` per player action, `default_volume`/`default_shuffle`/`username` at backend construction.
 - Token authentication: `backend_token` (empty = disabled, otherwise every request must carry a matching token) and `frontend_token` (what frontends send). Auth failures return code 5 (`AuthFailed`).
-- `config --direct` mode — operate on `config.toml` directly, bypassing the backend (works even when the backend is down or the port is taken).
+- `config --direct` mode - operate on `config.toml` directly, bypassing the backend (works even when the backend is down or the port is taken).
 - `cascade config list`, `config open`, `config path` commands.
 
 ## [0.27.0] - 2026-08-23
 
 ### Added
 
-- `cascade config show <option>` — show a config option's value and where it came from (`default value` or `configure file`)
-- `cascade config set <option> <value> [--overwrite-corrupt]` — write a config option to the TOML config file; invalid values are rejected with the option's expected type; `--overwrite-corrupt` replaces a corrupted config file
-- `cascade config unset <option>` — remove an option from the config file and fall back to its default value
-- Config options are defined in `CONFIG_SCHEME` (name → type/section/default); currently `port` (network), `default_volume` and `default_shuffle` (playback). **Wiring note:** the backend/CLI still read the hardcoded constants — `config set` writes the file but does not change runtime behavior until the constants are linked to `CONFIG` (next step).
+- `cascade config show <option>` - show a config option's value and where it came from (`default value` or `configure file`)
+- `cascade config set <option> <value> [--overwrite-corrupt]` - write a config option to the TOML config file; invalid values are rejected with the option's expected type; `--overwrite-corrupt` replaces a corrupted config file
+- `cascade config unset <option>` - remove an option from the config file and fall back to its default value
+- Config options are defined in `CONFIG_SCHEME` (name → type/section/default); currently `port` (network), `default_volume` and `default_shuffle` (playback). **Wiring note:** the backend/CLI still read the hardcoded constants - `config set` writes the file but does not change runtime behavior until the constants are linked to `CONFIG` (next step).
 - CLI response messages are now rendered inside the `box()` frame (success, failure, connect/exit codes).
 
 ## [0.26.1] - 2026-08-23
 
 ### Added
 
-- Config system core (not yet wired into the backend/CLI): `src/config.py` — TOML config file at the data dir, `CONFIG_SCHEME`-driven typed get/set with defaults, sentinel errors for corrupt files / unknown options / invalid values, dot-access via `__getattr__`/`__setattr__`; `src/converter.py` for boolean conversion. `tomli-w` added as a dependency for writing TOML.
+- Config system core (not yet wired into the backend/CLI): `src/config.py` - TOML config file at the data dir, `CONFIG_SCHEME`-driven typed get/set with defaults, sentinel errors for corrupt files / unknown options / invalid values, dot-access via `__getattr__`/`__setattr__`; `src/converter.py` for boolean conversion. `tomli-w` added as a dependency for writing TOML.
 - Notifies mechanism (pre-wired, no producers yet): the backend collects notify strings and attaches them to the next non-heartbeat response (`response.notifies`); `get_notifies` action lets the CLI pull queued notifies after start/reboot, shown in a box. Heartbeat and internal requests do not consume notifies.
 
 ## [0.26.0] - 2026-08-23
 
 ### Added
 
-- `lib meta read-file <song> [--name] [--artist] [--album] [--all]` — set a song's metadata in the library by reading it back from the audio file. Flags select which fields to write; `--all` writes every field that has a non-empty value in the file. Works on any library song (path, alias or ID); the file is read from the song's recorded path.
+- `lib meta read-file <song> [--name] [--artist] [--album] [--all]` - set a song's metadata in the library by reading it back from the audio file. Flags select which fields to write; `--all` writes every field that has a non-empty value in the file. Works on any library song (path, alias or ID); the file is read from the song's recorded path.
 
 ### Changed
 
@@ -529,8 +564,8 @@ New config options `dash_poster_width` (default `80` columns) and `dash_poster_h
 
 ### Added
 
-- PID file (`PID.json` in the data directory): the backend records its own PID on startup and removes it on clean exit. The hotkey process is not recorded — killing the backend makes it self-terminate via the existing heartbeat mechanism.
-- `cascade kill` — force-kill all recorded backend PIDs via psutil (`terminate()` then `kill()` after `TERMINATE_TIMEOUT`), bypassing the socket protocol entirely. Per-PID results are printed (`Gracefully Terminated` / `Forcefully Killed` / `Process Not Exist` / `PID Invalid` / `Access Denied`). `cascade exit` stays a clean socket-based shutdown.
+- PID file (`PID.json` in the data directory): the backend records its own PID on startup and removes it on clean exit. The hotkey process is not recorded - killing the backend makes it self-terminate via the existing heartbeat mechanism.
+- `cascade kill` - force-kill all recorded backend PIDs via psutil (`terminate()` then `kill()` after `TERMINATE_TIMEOUT`), bypassing the socket protocol entirely. Per-PID results are printed (`Gracefully Terminated` / `Forcefully Killed` / `Process Not Exist` / `PID Invalid` / `Access Denied`). `cascade exit` stays a clean socket-based shutdown.
 - `psutil` runtime dependency (new) for cross-platform process management.
 - Backend startup log now includes its PID.
 
@@ -547,15 +582,15 @@ New config options `dash_poster_width` (default `80` columns) and `dash_poster_h
 
 ### Changed
 
-- Request validation refactored: `_request_verify` → `_process_request` — validation now also fills declared default values for absent optional keys, so action handlers read `request[key]` directly instead of `request.get(key, default)`. `ACTION_KEYS` entries are now `(type, is_required, default_value)` triples.
-- Unknown keys (anything not in `ACTION_KEYS` nor `NON_ACTION_KEYS` — `action`/`cwd`/`source`) are logged as warnings instead of being silently ignored.
+- Request validation refactored: `_request_verify` → `_process_request` - validation now also fills declared default values for absent optional keys, so action handlers read `request[key]` directly instead of `request.get(key, default)`. `ACTION_KEYS` entries are now `(type, is_required, default_value)` triples.
+- Unknown keys (anything not in `ACTION_KEYS` nor `NON_ACTION_KEYS` - `action`/`cwd`/`source`) are logged as warnings instead of being silently ignored.
 - `lib.meta.set` now declares all seven `METADATA` fields (`duration`, `bitrate`, `sample_rate`, `channels` joined the three string fields) with `None` defaults, so setting them over the protocol is type-checked (`int`); the CLI still only exposes `--name`/`--artist`/`--album`.
 
 ## [0.24.0] - 2026-08-23
 
 ### Added
 
-- `lib add --loose-path` — allow adding songs whose path is not an existing file: any path that is format-valid is accepted, including directories and not-yet-existing files (useful for pre-registering songs before files arrive; `lib prune` later cleans up records whose files never show up). Format validation via the new `verify_path_format()` — rejects empty/NUL strings, and on Windows rejects illegal characters (`< > : " | ? *` outside the drive letter) and reserved device names (`CON`, `NUL`, `COM1`, …). Paths must still be format-valid; `lib.add` without the flag keeps rejecting missing files.
+- `lib add --loose-path` - allow adding songs whose path is not an existing file: any path that is format-valid is accepted, including directories and not-yet-existing files (useful for pre-registering songs before files arrive; `lib prune` later cleans up records whose files never show up). Format validation via the new `verify_path_format()` - rejects empty/NUL strings, and on Windows rejects illegal characters (`< > : " | ? *` outside the drive letter) and reserved device names (`CON`, `NUL`, `COM1`, …). Paths must still be format-valid; `lib.add` without the flag keeps rejecting missing files.
 - `_add_song` now resolves relative paths against `cwd` (previously a relative path was checked against the daemon's own working directory, which could judge wrongly)
 - `lib add` success responses are returned in the `attachment` (per-song add/meta/alias details) so the CLI can print them
 - New `MissingCWD` response class: a cwd-missing error now says `requires a missing key of "cwd" because one or more paths provided are not absolute paths` instead of the generic missing-key message (used by `open`, `lib.info`, `lib.del`, `lib.scan`, `lib.meta.set`, `lib.alias.*`, `lib.add`)
@@ -572,57 +607,57 @@ New config options `dash_poster_width` (default `80` columns) and `dash_poster_h
 
 ### Fixed
 
-- The new song-ID branch used `str.isdigit()`, which accepts superscript (`²`) and circled (`①`) digits that `int()` cannot parse — a request like `open ²` crashed into a generic backend error. Switched to `isdecimal()`, whose accepted set matches `int()`.
+- The new song-ID branch used `str.isdigit()`, which accepts superscript (`²`) and circled (`①`) digits that `int()` cannot parse - a request like `open ²` crashed into a generic backend error. Switched to `isdecimal()`, whose accepted set matches `int()`.
 
 ## [0.22.0] - 2026-08-23
 
 > **⚠️ Breaking Changes**
 >
-> - `lib.playlist.add` request key renamed: `song` → `songs` — now takes a list/tuple of strings (`IterType(str)`). The CLI argument order changed too: `lib playlist add <playlist> <song>...` (playlist first, then one or more songs).
-> - `lib.playlist.kick` request key renamed: `song` → `songs` — same shape; the CLI is now `lib playlist kick <playlist> <song>...`.
+> - `lib.playlist.add` request key renamed: `song` → `songs` - now takes a list/tuple of strings (`IterType(str)`). The CLI argument order changed too: `lib playlist add <playlist> <song>...` (playlist first, then one or more songs).
+> - `lib.playlist.kick` request key renamed: `song` → `songs` - same shape; the CLI is now `lib playlist kick <playlist> <song>...`.
 
 ### Added
 
-- `lib playlist add <playlist> <song>...` — add multiple songs to a playlist in one request; per-song failures (song not in library, already in playlist) go to the `failed` list, message shows `songs added to playlist [ok/total]`
-- `lib playlist kick <playlist> <song>...` — remove multiple songs from a playlist in one request; per-song failures go to the `failed` list, message shows `songs removed from playlist [ok/total]`
-- New `BatchAuto` response class: builds the batch message with the success count (`[ok/total]`), picks the response code automatically (partial success = 0, all failed = 1) and forwards the `failed` list — now used by `lib.add`/`lib.del`/`lib.alias.bind`/`lib.alias.unbind`/`lib.playlist.add`/`lib.playlist.kick`
+- `lib playlist add <playlist> <song>...` - add multiple songs to a playlist in one request; per-song failures (song not in library, already in playlist) go to the `failed` list, message shows `songs added to playlist [ok/total]`
+- `lib playlist kick <playlist> <song>...` - remove multiple songs from a playlist in one request; per-song failures go to the `failed` list, message shows `songs removed from playlist [ok/total]`
+- New `BatchAuto` response class: builds the batch message with the success count (`[ok/total]`), picks the response code automatically (partial success = 0, all failed = 1) and forwards the `failed` list - now used by `lib.add`/`lib.del`/`lib.alias.bind`/`lib.alias.unbind`/`lib.playlist.add`/`lib.playlist.kick`
 
 ### Fixed
 
 - `lib.playlist.kick` crashed with `UnboundLocalError` when the playlist did not exist (`song` was referenced outside the batch loop); now returns the normal `PlaylistNotExist` response
-- Batch messages displayed the failure count (`[failed/total]`) instead of the success count — `BatchAuto` now reports `[ok/total]` like the pre-batch messages did
-- Batch responses dropped their per-song failure details because the `failed=failed` argument was not forwarded at the call sites — all six batch actions now pass it through
+- Batch messages displayed the failure count (`[failed/total]`) instead of the success count - `BatchAuto` now reports `[ok/total]` like the pre-batch messages did
+- Batch responses dropped their per-song failure details because the `failed=failed` argument was not forwarded at the call sites - all six batch actions now pass it through
 
 ## [0.21.0] - 2026-08-22
 
 > **⚠️ Breaking Changes**
 >
-> - `lib.alias.bind` request key renamed: `alias` → `aliases` — now takes a list/tuple of strings (`IterType(str)`); the CLI takes multiple alias values after the song.
-> - `lib.alias.unbind` request key renamed: `alias` → `aliases` — same shape; the CLI takes multiple aliases to unbind.
+> - `lib.alias.bind` request key renamed: `alias` → `aliases` - now takes a list/tuple of strings (`IterType(str)`); the CLI takes multiple alias values after the song.
+> - `lib.alias.unbind` request key renamed: `alias` → `aliases` - same shape; the CLI takes multiple aliases to unbind.
 
 ### Added
 
-- `lib alias bind <song> <alias>...` — bind multiple aliases to one song in a single request; per-alias failures go to the `failed` list, message shows `bound [ok/total] aliases to <song>`
-- `lib alias unbind <alias>...` — unbind multiple aliases in one request; missing aliases go to the `failed` list, message shows `unbound [ok/total] aliases`
+- `lib alias bind <song> <alias>...` - bind multiple aliases to one song in a single request; per-alias failures go to the `failed` list, message shows `bound [ok/total] aliases to <song>`
+- `lib alias unbind <alias>...` - unbind multiple aliases in one request; missing aliases go to the `failed` list, message shows `unbound [ok/total] aliases`
 - New `EmptyList` response class for "received empty list of X" failures (`lib.add`/`lib.del`/`lib.alias.bind`/`lib.alias.unbind` all use it)
 - Request validation: optional `IterType` keys now accept an explicit `None` value (previously only the non-iterable branch did, so the CLI's `aliases=None` default failed `lib.add` validation)
 
 ### Fixed
 
-- **Backend hang on any failed response** — `send_json` serialized the top-level `Response` with `dict()`, but `Response` objects nested inside the `failed` list were never converted, so `json.dumps` raised `TypeError: Object of type X is not JSON serializable`; that exception escaped `send_json` (only socket errors were caught) and killed the `_flush_buffer` consumer thread, leaving every later request stuck at "Received request". Now `json.dumps(..., default=...)` recursively converts nested `Response` objects, and the whole `_flush_buffer` handling loop is wrapped in `try/except` so no send error can ever kill the consumer thread again.
-- `EmptyList` constructor was misspelled `__int__` (an `int()` hook, not an initializer), so `EmptyList('paths')` silently produced a response whose message was just `'paths'` — renamed to `__init__`
+- **Backend hang on any failed response** - `send_json` serialized the top-level `Response` with `dict()`, but `Response` objects nested inside the `failed` list were never converted, so `json.dumps` raised `TypeError: Object of type X is not JSON serializable`; that exception escaped `send_json` (only socket errors were caught) and killed the `_flush_buffer` consumer thread, leaving every later request stuck at "Received request". Now `json.dumps(..., default=...)` recursively converts nested `Response` objects, and the whole `_flush_buffer` handling loop is wrapped in `try/except` so no send error can ever kill the consumer thread again.
+- `EmptyList` constructor was misspelled `__int__` (an `int()` hook, not an initializer), so `EmptyList('paths')` silently produced a response whose message was just `'paths'` - renamed to `__init__`
 - Batch message wording: `successfully added`/`successfully removed` → `added`/`removed` (a failed response no longer claims success)
 
 ## [0.20.0] - 2026-08-22
 
 > **⚠️ Breaking Changes**
 >
-> - `lib.del` request key renamed: `song` → `songs` — now takes a list/tuple of strings (`IterType(str)`); the CLI takes multiple positional songs.
+> - `lib.del` request key renamed: `song` → `songs` - now takes a list/tuple of strings (`IterType(str)`); the CLI takes multiple positional songs.
 
 ### Added
 
-- `lib del <song>...` — delete multiple songs in one request (each can be a path or alias)
-- Batch delete reports per-song failures in the `failed` list (song not in library, etc.) and the message shows `successfully removed [ok/total] songs from library` — partial success is a success, all-failed is a failed response (same convention as `lib.add`/`lib.scan`)
+- `lib del <song>...` - delete multiple songs in one request (each can be a path or alias)
+- Batch delete reports per-song failures in the `failed` list (song not in library, etc.) and the message shows `successfully removed [ok/total] songs from library` - partial success is a success, all-failed is a failed response (same convention as `lib.add`/`lib.scan`)
 - Deleting the currently-playing song still degrades it to a raw path and flips `in_library` to false, same as before
 
 ### Changed
@@ -633,12 +668,12 @@ New config options `dash_poster_width` (default `80` columns) and `dash_poster_h
 
 > **⚠️ Breaking Changes**
 >
-> - `lib.add` request keys renamed: `path` → `paths`, `alias` → `aliases` — both now take a list/tuple of strings (`IterType(str)`); the CLI takes multiple positional paths and `-a/--aliases` takes multiple alias values.
+> - `lib.add` request keys renamed: `path` → `paths`, `alias` → `aliases` - both now take a list/tuple of strings (`IterType(str)`); the CLI takes multiple positional paths and `-a/--aliases` takes multiple alias values.
 
 ### Added
 
-- `lib add <path>...` — add multiple songs in one request; manual aliases via `-a/--aliases` bind positionally to the paths (count must match)
-- Batch add reports per-song failures in the `failed` list (duplicate, invalid path, etc.) and the message shows `successfully added [ok/total] songs to library` — partial success is a success, all-failed is a failed response (same convention as `lib.info`)
+- `lib add <path>...` - add multiple songs in one request; manual aliases via `-a/--aliases` bind positionally to the paths (count must match)
+- Batch add reports per-song failures in the `failed` list (duplicate, invalid path, etc.) and the message shows `successfully added [ok/total] songs to library` - partial success is a success, all-failed is a failed response (same convention as `lib.info`)
 
 ### Changed
 
@@ -654,8 +689,8 @@ New config options `dash_poster_width` (default `80` columns) and `dash_poster_h
 
 ### Added
 
-- `lib info <song>...` — accept multiple songs at once; each missing song goes to the `failed` list instead of failing the whole request, and the message reports `got information of [ok/total] songs` (`0` successes still returns a failed response)
-- `lib search <keyword>...` — multi-keyword search; by default all keywords must match (AND), `-o/--or` switches to any-keyword match (OR)
+- `lib info <song>...` - accept multiple songs at once; each missing song goes to the `failed` list instead of failing the whole request, and the message reports `got information of [ok/total] songs` (`0` successes still returns a failed response)
+- `lib search <keyword>...` - multi-keyword search; by default all keywords must match (AND), `-o/--or` switches to any-keyword match (OR)
 - `get_multi_song_aliases()` batch query so `lib search` fetches all aliases in one SQL call instead of one query per song
 
 ### Changed
@@ -672,9 +707,9 @@ New config options `dash_poster_width` (default `80` columns) and `dash_poster_h
 
 ### Added
 
-- Request validation extracted into `_request_verify()` — dispatch now verifies all keys before running the action, and validation supports element types via `IterType(element_type)` so a key can require a list/tuple of a specific type (e.g. `(IterType(str), False)` means "optional list/tuple of strings")
+- Request validation extracted into `_request_verify()` - dispatch now verifies all keys before running the action, and validation supports element types via `IterType(element_type)` so a key can require a list/tuple of a specific type (e.g. `(IterType(str), False)` means "optional list/tuple of strings")
 - `InvalidKeyType` now reports the received type; new `InvalidElementType` response for mismatched elements inside a list/tuple
-- `lib list -t/--show-tech` — show technical metadata (bitrate, sample rate, channels) in library listing
+- `lib list -t/--show-tech` - show technical metadata (bitrate, sample rate, channels) in library listing
 - `lib playlist list <name>` supports `-a` (aliases), `-p` (playlists), `-t` (tech metadata) like `lib list`
 
 ### Changed
@@ -685,8 +720,8 @@ New config options `dash_poster_width` (default `80` columns) and `dash_poster_h
 
 ### Fixed
 
-- `IterType` used a method named `self` and lacked `__init__`, so `IterType(str)` raised `TypeError` and chained calls returned `None` — replaced with a proper `__init__`
-- `READABLE_TYPE_NAMES` lookup used the `IterType` instance as key while the dict stored the class, raising `KeyError` on validation failure — now looks up the class
+- `IterType` used a method named `self` and lacked `__init__`, so `IterType(str)` raised `TypeError` and chained calls returned `None` - replaced with a proper `__init__`
+- `READABLE_TYPE_NAMES` lookup used the `IterType` instance as key while the dict stored the class, raising `KeyError` on validation failure - now looks up the class
 
 ## [0.16.0] - 2026-08-21
 
@@ -699,27 +734,27 @@ New config options `dash_poster_width` (default `80` columns) and `dash_poster_h
 ### Changed
 
 - `current_song_open` renamed to `current_playlist`; `PLAY_ALL` sentinel marks an active play-all session
-- `continue_last` no longer reads the global `last_num` setting — resume position now lives with the playlist (or play-all), so stale `last_num` values are ignored
+- `continue_last` no longer reads the global `last_num` setting - resume position now lives with the playlist (or play-all), so stale `last_num` values are ignored
 
 ### Fixed
 
-- `get_playlist_last_num()` was missing `.fetchone()`, raising `TypeError: 'sqlite3.Cursor' object is not subscriptable` — now reads the row properly
-- `set_playlist_last_num()` updated the wrong column (`SET num` instead of `SET last_num`), raising `no such column` — corrected
-- `_get_playlist_songs()` returned `None` when `return_id=False`, breaking `lib playlist list <name>` — now falls through to `return result`
-- `_play_all()` passed the raw string from `get_setting()` into `_switch_song()`, causing a `str`/`int` comparison error when resuming — now `int(last_num)`
+- `get_playlist_last_num()` was missing `.fetchone()`, raising `TypeError: 'sqlite3.Cursor' object is not subscriptable` - now reads the row properly
+- `set_playlist_last_num()` updated the wrong column (`SET num` instead of `SET last_num`), raising `no such column` - corrected
+- `_get_playlist_songs()` returned `None` when `return_id=False`, breaking `lib playlist list <name>` - now falls through to `return result`
+- `_play_all()` passed the raw string from `get_setting()` into `_switch_song()`, causing a `str`/`int` comparison error when resuming - now `int(last_num)`
 
 ## [0.15.0] - 2026-08-20
 
 ### Added
 
-- `cascade reboot -c/--continue` — resume playback after rebooting the backend, same as `start -c`
+- `cascade reboot -c/--continue` - resume playback after rebooting the backend, same as `start -c`
 - `play-all` now records `last_is_all` so `--continue` can resume an "all songs" session; `_play_all()` factored out and shared with `continue_last`
 
 ## [0.14.0] - 2026-08-20
 
 ### Added
 
-- `cascade start -c/--continue` — resume the last opened song/playlist on backend startup (reads `last_song` / `last_num` / `last_cwd` settings); open action is now factored into `_open_song()` and reused by both paths
+- `cascade start -c/--continue` - resume the last opened song/playlist on backend startup (reads `last_song` / `last_num` / `last_cwd` settings); open action is now factored into `_open_song()` and reused by both paths
 - `settings` table (key-value) in the database for persistent backend state; `last_song` stores the raw user input (alias/path/playlist name) so resume reproduces exactly how the song was opened
 - `current_song_num` is persisted via `_set_current_num()` on every navigation (prev/next/switch/dice), so the resume position stays in sync
 - `backend` source added to `SOURCES` for internal inter-process requests
@@ -728,22 +763,22 @@ New config options `dash_poster_width` (default `80` columns) and `dash_poster_h
 
 ### Added
 
-- `lib info <song> [-a] [-p]` — show detailed information of a single library song: name, artist, album, duration, bitrate, sample rate, channels, library ID, plus optional aliases (`-a`) and playlists (`-p`)
-- Technical metadata now extracted and stored per song: `bitrate` (bps), `sample_rate`, `channels` — read from the audio file when adding songs (mutagen), displayed in `lib info` as kbps
+- `lib info <song> [-a] [-p]` - show detailed information of a single library song: name, artist, album, duration, bitrate, sample rate, channels, library ID, plus optional aliases (`-a`) and playlists (`-p`)
+- Technical metadata now extracted and stored per song: `bitrate` (bps), `sample_rate`, `channels` - read from the audio file when adding songs (mutagen), displayed in `lib info` as kbps
 - `SongOutput` class unifies how CLI renders song info (status / lib info / lib list); missing values display as `N/A` (file lacks it) vs `?` (backend did not provide it)
-- Boxed output frames (`box()` + `wcwidth`) for status, lib info, and lib list — CJK-aware alignment
+- Boxed output frames (`box()` + `wcwidth`) for status, lib info, and lib list - CJK-aware alignment
 - Dependencies moved to pip-compile workflow: `requirements.in` (direct deps) compiles to `requirements.txt`; `requirements-dev.in` compiles to `requirements-dev.txt` (adds `pytest`, `bump-my-version`, `pip-tools`); `wcwidth` added as runtime dep
 
 ### Changed
 
-- `status` attachment now uses `null` for unknown path/name/artist/album (was `'[path unknown]'` etc.) — CLI renders these as `?`/`N/A`
+- `status` attachment now uses `null` for unknown path/name/artist/album (was `'[path unknown]'` etc.) - CLI renders these as `?`/`N/A`
 - `lib list` now also shows `Library ID` per song
 
 ## [0.12.0] - 2026-08-20
 
 ### Added
 
-- Opening a song that is already in the current playlist now switches to it directly instead of reloading the whole list — playback position and current song index are preserved (`open` detects the path in `current_song_info` and calls `_switch_song`)
+- Opening a song that is already in the current playlist now switches to it directly instead of reloading the whole list - playback position and current song index are preserved (`open` detects the path in `current_song_info` and calls `_switch_song`)
 
 ## [0.11.0] - 2026-08-20
 
@@ -758,7 +793,7 @@ New config options `dash_poster_width` (default `80` columns) and `dash_poster_h
 
 ### Fixed
 
-- Restart (`reboot`) no longer spams error logs with `[WinError 10054]` when the dying backend resets the connection mid-poll — `send_request` gained `expect_reset` (used by `test_alive`), silencing the expected reset in both `send_json` and `recv_json`
+- Restart (`reboot`) no longer spams error logs with `[WinError 10054]` when the dying backend resets the connection mid-poll - `send_request` gained `expect_reset` (used by `test_alive`), silencing the expected reset in both `send_json` and `recv_json`
 - `send_json` returns `False` on `ConnectionResetError` instead of implicitly falling through to `None`
 
 ## [0.10.0] - 2026-08-19
@@ -772,15 +807,15 @@ New config options `dash_poster_width` (default `80` columns) and `dash_poster_h
 
 ### Changed
 
-- `format_ms` renamed to `format_time(raw_time, unit='ms'|'sec')` — one formatter for both milliseconds and seconds (uses `typing.Literal` for the unit parameter)
+- `format_ms` renamed to `format_time(raw_time, unit='ms'|'sec')` - one formatter for both milliseconds and seconds (uses `typing.Literal` for the unit parameter)
 - Client socket `TIMEOUT` raised from 3s to 10s (slow `open` on network drives / large files)
-- `current_song_num` is only synced after a successful `prev` / `next` / `switch` / `dice` — a failed switch no longer moves the reported current song
+- `current_song_num` is only synced after a successful `prev` / `next` / `switch` / `dice` - a failed switch no longer moves the reported current song
 
 ## [0.9.0] - 2026-08-19
 
 ### Added
 
-- `lib prune` — delete all songs from the library whose file no longer exists on disk; `-d/--dry-run` shows what would be removed without deleting
+- `lib prune` - delete all songs from the library whose file no longer exists on disk; `-d/--dry-run` shows what would be removed without deleting
 
 ### Changed
 
@@ -792,7 +827,7 @@ New config options `dash_poster_width` (default `80` columns) and `dash_poster_h
 
 ### Added
 
-- `lib list --show-playlists` (`-p`) — show which playlists each song belongs to
+- `lib list --show-playlists` (`-p`) - show which playlists each song belongs to
 
 ### Fixed
 
@@ -803,18 +838,18 @@ New config options `dash_poster_width` (default `80` columns) and `dash_poster_h
 
 ### Added
 
-- `lib search <keyword>` — search songs in library by name/artist/album/alias (case-insensitive)
+- `lib search <keyword>` - search songs in library by name/artist/album/alias (case-insensitive)
 
 ### Changed
 
-- `restart` renamed to `replay` (clear memorized progress and replay the current song) — no longer confused with `reboot`
+- `restart` renamed to `replay` (clear memorized progress and replay the current song) - no longer confused with `reboot`
 
 ## [0.8.0] - 2026-08-18
 
 ### Added
 
-- Duration metadata — auto-extracted from audio files, stored in the library, shown in `lib list`
-- Database migration system — `user_version`-based, idempotent schema upgrades on startup
+- Duration metadata - auto-extracted from audio files, stored in the library, shown in `lib list`
+- Database migration system - `user_version`-based, idempotent schema upgrades on startup
 
 ### Changed
 
@@ -825,26 +860,26 @@ New config options `dash_poster_width` (default `80` columns) and `dash_poster_h
 
 ### Added
 
-- `seek` command — jump to a specific time (`HH:MM:SS`)
+- `seek` command - jump to a specific time (`HH:MM:SS`)
 
 ## [0.6.0] - 2026-08-17
 
 ### Added
 
-- Dev mode — `cascade start --dev` uses a separate development database (`cascade-dev.db`)
+- Dev mode - `cascade start --dev` uses a separate development database (`cascade-dev.db`)
 
 ## [0.5.0] - 2026-08-17
 
 ### Added
 
-- `loop` command — toggle loop mode (replay the current song on end)
+- `loop` command - toggle loop mode (replay the current song on end)
 
 ## [0.4.0] - 2026-08-17
 
 ### Added
 
-- `dice` command — switch to a random song in the current playlist
-- `play-all` command — play all songs in the library
+- `dice` command - switch to a random song in the current playlist
+- `play-all` command - play all songs in the library
 - Expanded README and TODO list
 
 ## [0.3.0] - 2026-08-16
@@ -852,10 +887,10 @@ New config options `dash_poster_width` (default `80` columns) and `dash_poster_h
 ### Added
 
 - `lib.scan` command with `recurse`, `playlist`, and `skip` options
-- Memorized playback position — resume on `open`/`switch`, restart on `prev`/`next`; `restart` command
+- Memorized playback position - resume on `open`/`switch`, restart on `prev`/`next`; `restart` command
 - Song metadata (`name`/`artist`/`album`) with `lib.meta set`, auto-extracted from files on `lib add`
-- `switch` command — switch to a song in the current playlist by number
-- `jump` command — seek by percentage of the current song
+- `switch` command - switch to a song in the current playlist by number
+- `jump` command - seek by percentage of the current song
 - `lib.playlist del` and song listing in `lib.playlist list`
 - Shuffle mode with shuffled playback order
 - Volume and mute controls
