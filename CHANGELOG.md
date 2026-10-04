@@ -2,7 +2,7 @@
 
 ## [0.56.0] - 2026-10-04
 
-> **Major change**: starting at this update, CHANGELOG be written by a human being.
+> **Major change**: starting at this update, CHANGELOG will be written by a human being.
 
 ### Added
 
