@@ -20,7 +20,14 @@ keywords = [
     "playlist",
     "lyrics",
     ]
-classifiers = ["Programming Language :: Python :: 3"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
+    "Environment :: Console",
+    "Topic :: Multimedia :: Sound/Audio :: Players",
+    "Development Status :: 3 - Alpha"
+    ]
 requires-python = ">=3.12"
 dependencies = [
     "platformdirs>=4.0",
