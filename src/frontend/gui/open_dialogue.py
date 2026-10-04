@@ -9,8 +9,11 @@ class OpenDialogue(tk.Toplevel):
         super().__init__(master=master)
         self.withdraw()
 
+        self.transient(self.master)
         self.title('Open')
         self.iconbitmap(ICON_PATH)
+        self.resizable(False, False)
+        
         self.bind('<Escape>', lambda *_: self.destroy())
         self.bind('<Return>', self._on_open)
 
