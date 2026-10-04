@@ -1,7 +1,7 @@
 from pathlib import Path
 
 class Snapshot:
-    def __init__(self, requester, empty=None):
+    def __init__(self, requester=None, empty=None):
         self.request = requester
         self.empty=empty
         self.snapshot = {}
@@ -9,6 +9,8 @@ class Snapshot:
 
     def reset(self):
         self.lib_id = self.empty
+        self.path = self.empty
+        
         self.display_name = self.empty
         self.meta_name = self.empty
         self.artist = self.empty
@@ -39,6 +41,7 @@ class Snapshot:
         
         self.aliases = self.empty
         self.added_playlists = self.empty
+        self.lyric_path = self.empty
         self.lyric = self.empty
         self.online_lyric = self.empty
         self.lyric_loading = self.empty
@@ -53,54 +56,67 @@ class Snapshot:
 
     def poll(self):
         self.reset()
-        self.snapshot = self.request('poll', silent=True)
-        if self.snapshot is not None:            
-            self.lib_id = self.get('id')
-            if self.snapshot.get('name', None) is not None:
-                self.display_name = self.snapshot['name']
-            elif self.snapshot.get('path', None) is not None:
-                self.display_name = Path(self.snapshot['path']).stem
-            else:
-                self.display_name = self.empty
+        snapshot = self.request('poll', silent=True)
+        if snapshot is not None:
+            self.parse_snapshot(snapshot)
 
-            self.meta_name = self.get('name')
-            self.artist = self.get('artist')
-            self.album = self.get('album')
-            self.time = self.get('time')
-            self.length = self.get('length')
-            self.volume = self.get('volume')
-            self.mute = self.get('mute')
-            self.shuffle = self.get('shuffle')
-            self.loop = self.get('loop')
-            self.reverse = self.get('reverse')
-            self.online_lyric = self.get('online_lyric')
-            self.current_num = self.get('current_num') # 0-based
-            self.playlist_len = self.get('playlist_len')
-            self.player_status = self.get('player_status')
+    def parse_snapshot(self, snapshot):
+        self.snapshot = snapshot
+        self.path = self.get('path')
 
-            self.engine = self.get('engine')
+        self.lib_id = self.get('id')
+        if self.snapshot.get('name', None) is not None:
+            self.display_name = self.snapshot['name']
+        elif self.snapshot.get('path', None) is not None:
+            self.display_name = Path(self.snapshot['path']).stem
+        else:
+            self.display_name = self.empty
 
-            self.duration = self.get('duration')
-            self.bitrate = self.get('bitrate')
-            self.sample_rate = self.get('sample_rate')
-            self.channels = self.get('channels')
-            self.aliases = self.get('aliases')
-            self.added_playlists = self.get('added_playlists')
+        self.meta_name = self.get('name')
+        self.artist = self.get('artist')
+        self.album = self.get('album')
+        self.time = self.get('time')
+        self.length = self.get('length')
+        self.volume = self.get('volume')
+        self.mute = self.get('mute')
+        self.shuffle = self.get('shuffle')
+        self.loop = self.get('loop')
+        self.reverse = self.get('reverse')
+        self.online_lyric = self.get('online_lyric')
+        self.current_num = self.get('current_num') # 0-based
+        self.playlist_len = self.get('playlist_len')
+        self.player_status = self.get('player_status')
 
-            self.lyric = self.get('lyric')
-            self.lyric_loading = self.get('lyric_loading')
-            self.lyric_offset = self.get('lyric_offset')
-            self.offset_overlay = self.get('offset_overlay')
-            self.current_songs = self.get('current_songs')
-            self.playlists = self.get('playlists')
+        self.engine = self.get('engine')
 
-            self.cover_hash = self.get('cover_hash')
+        self.duration = self.get('duration')
+        self.bitrate = self.get('bitrate')
+        self.sample_rate = self.get('sample_rate')
+        self.channels = self.get('channels')
+        self.aliases = self.get('aliases')
+        self.added_playlists = self.get('added_playlists')
 
-            self.run_time = self.get('run_time')
-            self.dev = self.get('dev')
+        self.lyric_path = self.get('lyric_path')
+        self.lyric = self.get('lyric')
+        self.lyric_loading = self.get('lyric_loading')
+        self.lyric_offset = self.get('lyric_offset')
+        self.offset_overlay = self.get('offset_overlay')
+        self.current_songs = self.get('current_songs')
+        self.playlists = self.get('playlists')
+
+        self.cover_hash = self.get('cover_hash')
+
+        self.run_time = self.get('run_time')
+        self.dev = self.get('dev')
 
     def get(self, name):
         value = self.snapshot.get(name, self.empty)
         if value is None:
             value = self.empty
         return value
+
+    def freeze(self):
+        frozen = Snapshot(requester=self.request, empty=self.empty)
+        frozen.parse_snapshot(self.snapshot)
+        return frozen
+    

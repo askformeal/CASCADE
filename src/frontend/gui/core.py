@@ -36,7 +36,7 @@ from src.constants.gui import (
 from src.sentinels import SENTINELS
 from src.frontend.client import send_request, test_heartbeat
 from src.frontend.snapshot import Snapshot
-from src.frontend.tkinter_widget.balloon import Balloon
+from src.frontend.tkinter_tools.balloon import Balloon
 from src.process import ProcessManager
 from src.utils.time_ import format_time
 from .empty import GUI_EMPTY as EMPTY

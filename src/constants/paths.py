@@ -21,6 +21,8 @@ COLOR_WHITE_ICON_PATH = get_res('config_gui/color_white.png')
 
 GUI_NO_COVER_PATH = get_res('gui/no_cover.png')
 
+INFO_ICON_PATH = get_res('gui/info.png')
+
 NEXT_SONG_ICON_PATH = get_res('gui/next.png')
 PREV_SONG_ICON_PATH = get_res('gui/previous.png')
 PLAY_ICON_PATH = get_res('gui/play.png')
@@ -45,6 +47,8 @@ ONLINE_LYRIC_ICON_PATH = get_res('gui/online_lyric.png')
 LOCAL_LYRIC_ICON_PATH = get_res('gui/local_lyric.png')
 
 RESET_OFFSET_ICON_PATH = get_res('gui/reset_offset.png')
+
+GUI_COPY_PATH = get_res('gui/copy.png')
 
 dirs = PlatformDirs('cascade', ensure_exists=True)
 

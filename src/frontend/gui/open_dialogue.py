@@ -2,6 +2,7 @@ import tkinter as tk
 
 from src.constants.paths import ICON_PATH
 from src.constants.gui import CANCEL_COLOR, OPEN_COLOR
+from src.frontend.tkinter_tools.to_center import to_center
 
 class OpenDialogue(tk.Toplevel):
     def __init__(self, master):
@@ -52,10 +53,7 @@ class OpenDialogue(tk.Toplevel):
                                 )
         open_button.pack(side='left')
 
-        self.update_idletasks()
-        x = self.master.winfo_x() + (self.master.winfo_width() - self.winfo_reqwidth()) // 2
-        y = self.master.winfo_y() + (self.master.winfo_height() - self.winfo_reqheight()) // 2
-        self.geometry(f'+{x}+{y}')
+        to_center(self, self.master)
 
         self.deiconify()
 

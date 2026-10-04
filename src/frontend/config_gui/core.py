@@ -43,8 +43,8 @@ from src.constants.config_gui import (
 from src.config import CONFIG
 from src.config_manager import CONFIG_MANAGER
 from src.frontend.client import send_request
-from src.frontend.tkinter_widget.scrolled_frame import ScrolledFrame
-from src.frontend.tkinter_widget.balloon import Balloon
+from src.frontend.tkinter_tools.scrolled_frame import ScrolledFrame
+from src.frontend.tkinter_tools.balloon import Balloon
 from .pop_up import Popup
 from .handler import HandlerMixin
 

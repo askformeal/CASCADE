@@ -7,6 +7,7 @@ from PIL import Image, ImageTk
 from .logger import logger
 from src.constants.paths import (
     GUI_NO_COVER_PATH,
+    INFO_ICON_PATH,
     PREV_SONG_ICON_PATH,
     NEXT_SONG_ICON_PATH,
     PLAY_ICON_PATH,
@@ -24,6 +25,7 @@ from src.utils.time_ import format_time
 from src.sentinels import SENTINELS
 from src.frontend.cover import Cover
 from .empty import GUI_EMPTY as EMPTY
+from .info_popup import InfoPopUp
 
 class PlaybackMixin:
     def __init__(self):
@@ -42,6 +44,8 @@ class PlaybackMixin:
         self.progress_dragging = False
         self.volume_dragging = False
         
+        self.info_icon = self.get_icon(INFO_ICON_PATH)
+
         self.unmute_icon = self.get_icon(UNMUTE_ICON_PATH, 18)
         self.mute_icon = self.get_icon(MUTE_ICON_PATH, 18)
 
@@ -56,6 +60,7 @@ class PlaybackMixin:
         self.dice_icon = self.get_icon(DICE_ICON_PATH)
         
     def build_playback(self, playback_frame):
+        self.hotkey(self, '<i>', self._open_info)
         self.hotkey(self, '<space>', self._toggle)
         self.hotkey(self, '<p>', self._prev)
         self.hotkey(self, '<n>', self._next)
@@ -73,6 +78,14 @@ class PlaybackMixin:
 
         self.hotkey(playback_frame, '<Up>', lambda *_: self._move_volume(True))
         self.hotkey(playback_frame, '<Down>', lambda *_: self._move_volume(False))
+
+        info_button = tk.Button(
+            playback_frame,
+            image=self.info_icon,
+            command=self._open_info
+            )
+        info_button.pack(anchor='ne')
+        self.balloon.bind_widget(info_button, 'Open song information (I)')
 
         self.name_label = tk.Label(playback_frame, font=tkfont.Font(size=FONT_SIZE+6, weight='bold'))
         self.name_label.pack(pady=(0,10))
@@ -123,7 +136,10 @@ class PlaybackMixin:
         bottom_bar.pack(side='bottom', fill='x', pady=(10, 0))
         scale_frame.pack(side='bottom', fill='x')
 
-        self.cover_label.pack(pady=(0,10), fill='both', expand=True)        
+        self.cover_label.pack(pady=(0,10), fill='both', expand=True)
+
+    def _open_info(self, *_):
+        InfoPopUp(self, self.snapshot.freeze())
 
     def _build_bottom_bar(self, bottom_bar):
         
