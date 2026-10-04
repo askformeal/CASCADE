@@ -6,6 +6,8 @@ class Balloon(tk.Toplevel):
         self.offset_x = offset_x
         self.offset_y = offset_y
         self.windup = windup
+        self.texts = {}
+        self.current_widget = None
 
         self.withdraw()
         self.overrideredirect(True)
@@ -22,12 +24,12 @@ class Balloon(tk.Toplevel):
 
         self.job = None
 
-    def _on_enter(self, widget, text):
+    def _on_enter(self, widget):
+        self.current_widget = widget
         self.job = self.after(
             self.windup, 
             self._show, 
             widget=widget, 
-            text=text
             )
 
     def _on_leave(self):
@@ -36,14 +38,19 @@ class Balloon(tk.Toplevel):
             self.job = None
         self.withdraw()
 
-    def _show(self, widget, text):
+    def refresh(self):
+        if self.current_widget is not None:
+            text = self.texts[self.current_widget]
+            self.label.config(text=text)
+
+    def _show(self, widget):
         try:
             x = widget.winfo_rootx() + widget.winfo_width() + self.offset_x
             y = widget.winfo_rooty() + widget.winfo_height() + self.offset_y
         except tk.TclError:
             ...
         else:
-            self.label.config(text=text)
+            self.refresh()
             self.update_idletasks()
 
             if x + self.winfo_reqwidth() > self.winfo_screenwidth():
@@ -58,5 +65,6 @@ class Balloon(tk.Toplevel):
             self.deiconify()
 
     def bind_widget(self, widget, text):
-        widget.bind('<Enter>', lambda *_: self._on_enter(widget, text))
+        self.texts[widget] = text
+        widget.bind('<Enter>', lambda *_: self._on_enter(widget))
         widget.bind('<Leave>', lambda *_: self._on_leave())

@@ -47,10 +47,20 @@ class LyricMixin:
                                     width=0,
                                     activestyle='none',
                                     )
-        self.lyric_box.pack(fill='both', expand=True)
+        self.lyric_box.pack(fill='both', expand=True, pady=(0, 10))
+
+        offset_bar = tk.Frame(lyric_frame)
+        offset_bar.pack(fill='x', padx=5, pady=(0,10))
+        
+        self.base_offset_label = tk.Label(offset_bar, font=self.font)
+        self.base_offset_label.pack(side='left', padx=(0,10))
+        self.offset_overlay_label = tk.Label(offset_bar, font=self.font)
+        self.offset_overlay_label.pack(side='left')
+        self.total_offset = tk.Label(offset_bar, font=self.font)
+        self.total_offset.pack(side='right')
 
         bottom_bar = tk.Frame(lyric_frame)
-        bottom_bar.pack(side='bottom', fill='x', padx=10, pady=(10, 0))
+        bottom_bar.pack(side='bottom', fill='x', padx=10)
 
         self.online_lyric_button = tk.Button(bottom_bar, command=self._toggle_online_lyric)
         self.online_lyric_button.pack(side='right', padx=(10, 0))
@@ -59,17 +69,21 @@ class LyricMixin:
                                      font=self.font,
                                      from_=-MAX_OFFSET, 
                                      to=MAX_OFFSET,
-                                     orient='horizontal'
+                                     orient='horizontal',
+                                     showvalue=False,
+                                     command=self._set_offset
                                      )
-        self.offset_scale.pack(side='right', fill='x', expand=True, pady=(0,10))
+        self.offset_scale.pack(side='right', fill='x', expand=True)
         self.offset_scale.bind('<ButtonPress-1>', lambda *_: setattr(self, 'offset_dragging', True))
-        self.offset_scale.bind('<ButtonRelease-1>', self._scroll_set_offset)
+        self.offset_scale.bind('<ButtonRelease-1>', lambda *_: setattr(self, 'offset_dragging', False))
+        self.balloon.bind_widget(self.offset_scale, 'Offset overlay (ms)')
         
         offset_reset_button = tk.Button(bottom_bar,
                                         image=self.reset_offset_icon, 
                                         command=self._reset_offset
                                         )
         offset_reset_button.pack(side='left', padx=(0, 10))
+        self.balloon.bind_widget(offset_reset_button, 'Reset offset')
 
     def _toggle_online_lyric(self, *_):
         self.send_command('lyric')
@@ -77,9 +91,13 @@ class LyricMixin:
     def _reset_offset(self, *_):
         self.send_command('set_offset_overlay', offset=0)
 
-    def _scroll_set_offset(self, *_):
-        self.offset_dragging = False
-        self.send_command('set_offset_overlay', offset=self.offset_scale.get())
+    def _set_offset(self, *_):
+        if self.offset_dragging:
+            self.send_command(
+                'set_offset_overlay',
+                offset=self.offset_scale.get(),
+                silent=True
+                )
 
     def _move_offset(self, increase, *_):
         if increase:
@@ -99,13 +117,22 @@ class LyricMixin:
 
         if self.snapshot.online_lyric is not EMPTY and self.snapshot.online_lyric:
             self.online_lyric_button.config(image=self.online_lyric_icon)
+            self.balloon.bind_widget(self.online_lyric_button, 'Switch to local source')
         else:
             self.online_lyric_button.config(image=self.local_lyric_icon)
+            self.balloon.bind_widget(self.online_lyric_button, 'Switch to online source')
 
         if self.snapshot.offset_overlay is not EMPTY and not self.offset_dragging:
             self.offset_scale.set(self.snapshot.offset_overlay)
 
     def _update_lyric_box(self):
+        if self.snapshot.lyric_offset is not EMPTY:
+            self.base_offset_label.config(text=f'Base: {self.snapshot.lyric_offset}ms')
+        if self.snapshot.offset_overlay is not EMPTY:
+            self.offset_overlay_label.config(text=f'Overlay: {self.snapshot.offset_overlay}ms')
+        if EMPTY not in (self.snapshot.lyric_offset, self.snapshot.offset_overlay):
+            self.total_offset.config(text=f'Total: {self.snapshot.lyric_offset + self.snapshot.offset_overlay}ms')
+
         if self.snapshot.lyric_loading is not EMPTY and self.snapshot.lyric_loading:
             lyric = [' - Loading ... - ']
             index = 0

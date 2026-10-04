@@ -18,6 +18,12 @@ LYRIC_CURRENT_FG = 'black'
 OPEN_COLOR = 'light green'
 CANCEL_COLOR = 'light grey'
 
+BALLOON_BG = '#FFFFE1'
+BALLOON_WRAP = 200
+BALLOON_OFFSET_X = 0
+BALLOON_OFFSET_Y = 1
+BALLOON_WINDUP = 200
+
 SCROLL_EVENTS = (
     '<MouseWheel>',
     '<Button-4>',

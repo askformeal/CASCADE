@@ -1,6 +1,5 @@
 import tkinter as tk
 import  tkinter.font as tkfont
-from tkinter import ttk
 
 from src.constants.paths import (
     FILTER_ICON_PATH,
@@ -28,7 +27,9 @@ class PlaylistMixin:
         filter_frame = tk.Frame(playlist_frame)
         filter_frame.pack(fill='x', pady=(0,10))
 
-        tk.Label(filter_frame, image=self.filter_icon).pack(side='left', padx=(0,3))
+        filter_label = tk.Label(filter_frame, image=self.filter_icon)
+        filter_label.pack(side='left', padx=(0,3))
+        self.balloon.bind_widget(filter_label, 'Filter songs')
 
         self.filter_entry = tk.Entry(
             filter_frame,
@@ -37,6 +38,7 @@ class PlaylistMixin:
             )
         self.filter_entry.pack(side='left', fill='x', expand=True, padx=(0,5))
         self.no_hotkey_widgets.append(self.filter_entry)
+        self.balloon.bind_widget(self.filter_entry, 'Filter songs')
 
         self.song_num_label = tk.Label(
             filter_frame,
@@ -72,22 +74,22 @@ class PlaylistMixin:
         self.playlist_box.bind('<Return>', self._on_switch)
         self.playlist_box.bind('<Double-Button-1>', self._on_switch)
 
-        ttk.Separator(playlist_frame, orient='horizontal').pack(fill='x')
-
         bottom_bar = tk.Frame(playlist_frame)
-        bottom_bar.pack(side='bottom', fill='x', padx=5, pady=(10, 0))
+        bottom_bar.pack(side='bottom', fill='x', padx=5)
         
         select_current_button = tk.Button(
             bottom_bar, 
             image=self.select_current_icon, 
             command=self._select_current)
         select_current_button.pack(side='right', padx=(5, 0))
+        self.balloon.bind_widget(select_current_button, 'Select playing song')
         
         switch_button = tk.Button(
             bottom_bar, 
             image=self.switch_selected_icon, 
             command=self._on_switch)
         switch_button.pack(side='right')
+        self.balloon.bind_widget(switch_button, 'Switch to selected song')
 
     def _select_current(self, *_):
         if self.snapshot.current_num is not EMPTY:

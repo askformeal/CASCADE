@@ -2,6 +2,7 @@ import sys
 import time
 from threading import Thread
 import tkinter as tk
+from tkinter import ttk
 import tkinter.font as tkfont
 from tkinter import messagebox
 import webbrowser
@@ -25,11 +26,17 @@ from src.constants.gui import (
     UPDATE_INTERVAL,
     FONT_SIZE,
     ICON_SIZE,
-    DEV_COLOR
+    DEV_COLOR,
+    BALLOON_BG,
+    BALLOON_OFFSET_X,
+    BALLOON_OFFSET_Y,
+    BALLOON_WINDUP,
+    BALLOON_WRAP
     )
 from src.sentinels import SENTINELS
 from src.frontend.client import send_request, test_heartbeat
 from src.frontend.snapshot import Snapshot
+from src.frontend.tkinter_widget.balloon import Balloon
 from src.process import ProcessManager
 from src.utils.time_ import format_time
 from .empty import GUI_EMPTY as EMPTY
@@ -57,6 +64,15 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
         PlaybackMixin.__init__(self)
         PlaylistMixin.__init__(self)
         LyricMixin.__init__(self)
+
+        self.balloon = Balloon(
+            self,
+            bg=BALLOON_BG,
+            wrap_len=BALLOON_WRAP,
+            offset_x=BALLOON_OFFSET_X,
+            offset_y=BALLOON_OFFSET_Y,
+            windup=BALLOON_WINDUP
+            )
 
         self.withdraw()
         
@@ -157,7 +173,7 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
         file_menu.add_command(label='Exit backend', command=lambda: self.send_command('exit'))
         file_menu.add_separator()
         file_menu.add_command(
-            label='Exit', 
+            label='Exit GUI',
             command=lambda *_: self._exit(), 
             accelerator='Ctrl+Q',
             underline=0
@@ -224,12 +240,15 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
         playlist_frame = tk.Frame(main_frame)
         self.build_playlist(playlist_frame)
 
+        left_separator = ttk.Separator(main_frame, orient='vertical')
+        left_separator.pack(side='left', fill='y', padx=5)
         playback_frame.pack(
             side='left', 
             fill='y',
             expand=True,
             padx=(0, 10)
         )
+        ttk.Separator(main_frame, orient='vertical').pack(side='left', fill='y', padx=5)
 
         playlist_frame.pack(
             side='right',
@@ -239,7 +258,7 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
 
 
         self.lyric_pack = lambda: lyric_frame.pack(
-            before=playback_frame,
+            before=left_separator,
             side='left',
             fill='y',
             padx=(0, 10),
@@ -253,15 +272,18 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
         
         self.online_button = tk.Button(bottom_bar, command=lambda: Thread(target=self._check_backend).start())
         self.online_button.pack(side='right')
+        self.balloon.bind_widget(self.online_button, 'Ping backend')
 
         self.run_time_label = tk.Label(bottom_bar, font=tkfont.Font(size=FONT_SIZE, weight='bold'))
         self.run_time_label.pack(side='left', padx=(0, 20))
+        self.balloon.bind_widget(self.run_time_label, 'Backend run time')
 
         self.dev_label = tk.Label(bottom_bar, 
                                   font=tkfont.Font(size=FONT_SIZE+3, weight='bold'), 
                                   fg=DEV_COLOR,
                                   text='DEV'
                                   )
+        self.balloon.bind_widget(self.dev_label, 'Development mode on')
 
     def get_icon(self, path, size=None):
         if size is None:
@@ -330,6 +352,7 @@ class GUI(tk.Tk, PlaybackMixin, PlaylistMixin, LyricMixin):
 
             self.deiconify()
             self.window_ready = True
+        self.balloon.refresh()
 
     def _send_gui_request(self, action, **kwargs):
         silent = kwargs.get('silent', False)

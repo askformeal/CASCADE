@@ -1,5 +1,4 @@
 import tkinter as tk
-from tkinter import ttk
 import tkinter.font as tkfont
 from io import BytesIO
 
@@ -123,8 +122,7 @@ class PlaybackMixin:
         self._build_bottom_bar(bottom_bar)
         
         bottom_bar.pack(side='bottom', fill='x', pady=(10, 0))
-        ttk.Separator(playback_frame, orient='horizontal').pack(side='bottom', fill='x')
-        scale_frame.pack(side='bottom', fill='x', pady=(0,20))
+        scale_frame.pack(side='bottom', fill='x')
         
 
     def _build_bottom_bar(self, bottom_bar):
@@ -135,6 +133,7 @@ class PlaybackMixin:
             command=self._prev
             )
         prev_button.pack(side='left', padx=(0,5))
+        self.balloon.bind_widget(prev_button, 'Previous song')
         
         self.play_button = tk.Button(
             bottom_bar, 
@@ -148,6 +147,7 @@ class PlaybackMixin:
             command=self._next
             )
         next_button.pack(side='left', padx=(0,20))
+        self.balloon.bind_widget(next_button, 'Next song')
 
         stop_button = tk.Button(
             bottom_bar,
@@ -155,6 +155,7 @@ class PlaybackMixin:
             command=self._stop
         )
         stop_button.pack(side='left', padx=(0, 30))
+        self.balloon.bind_widget(stop_button, 'Stop')
 
         self.loop_button = tk.Button(
             bottom_bar, 
@@ -176,6 +177,7 @@ class PlaybackMixin:
             command=self._dice
         )
         dice_button.pack(side='left')
+        self.balloon.bind_widget(dice_button, 'Randomly switch to a song')
         
         self.progress_label = tk.Label(
             bottom_bar, 
@@ -236,23 +238,31 @@ class PlaybackMixin:
 
         if self.snapshot.mute and self.snapshot.mute is not EMPTY:
             self.mute_button.config(image=self.mute_icon)
+            self.balloon.bind_widget(self.mute_button, 'Unmute')
         else:
             self.mute_button.config(image=self.unmute_icon)
+            self.balloon.bind_widget(self.mute_button, 'Mute')
 
         if self.snapshot.player_status == 'playing':
             self.play_button.config(image=self.pause_icon)
+            self.balloon.bind_widget(self.play_button, 'Pause')
         else:
             self.play_button.config(image=self.play_icon)
+            self.balloon.bind_widget(self.play_button, 'Resume')
 
         if self.snapshot.loop and self.snapshot.loop is not EMPTY:
             self.loop_button.config(relief='sunken')
+            self.balloon.bind_widget(self.loop_button, 'Turn off loop')
         else:
             self.loop_button.config(relief='raised')
+            self.balloon.bind_widget(self.loop_button, 'Turn on loop')
 
         if self.snapshot.shuffle and self.snapshot.shuffle is not EMPTY:
             self.shuffle_button.config(relief='sunken')
+            self.balloon.bind_widget(self.shuffle_button, 'Turn off shuffle')
         else:
             self.shuffle_button.config(relief='raised')
+            self.balloon.bind_widget(self.shuffle_button, 'Turn on shuffle')
 
     def _toggle(self, *_):
         self.send_command('toggle')
