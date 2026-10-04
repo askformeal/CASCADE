@@ -44,7 +44,7 @@ VLC_LIB="${VLC_DIR}/libvlc.dll"       # relative to bundle root (env var target)
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$ROOT"
 
-VERSION="$(sed -n "s/^version = '\([0-9.]*\)'$/\1/p" src/__init__.py)"
+VERSION="$(sed -n "s/^__version__ = '\([0-9.]*\)'$/\1/p" src/__init__.py)"
 if [[ -z "$VERSION" ]]; then
     echo "ERROR: could not read version from src/__init__.py" >&2
     exit 1

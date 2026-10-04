@@ -9,6 +9,18 @@ description = "Command-Line Audio Stream Capture And Decoding Engine"
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
+authors = [{name="Edward", email="muzhi1014@outlook.com"}]
+keywords = [
+    "music-player",
+    "audio-player",
+    "command-line",
+    "cli",
+    "tui",
+    "terminal",
+    "playlist",
+    "lyrics",
+    ]
+classifiers = ["Programming Language :: Python :: 3"]
 requires-python = ">=3.12"
 dependencies = [
     "platformdirs>=4.0",
@@ -24,6 +36,9 @@ dependencies = [
     "syncedlyrics>=1.0",
     "just_playback>=0.1.9",
 ]
+
+[project.urls]
+Repository = "https://github.com/askformeal/CASCADE"
 
 [project.scripts]
 cascade = "src.frontend.cli.core:main"
