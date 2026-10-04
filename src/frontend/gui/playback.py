@@ -1,12 +1,16 @@
 import tkinter as tk
+from tkinter import filedialog
+from tkinter import messagebox
 import tkinter.font as tkfont
 from io import BytesIO
+from pathlib import Path
 
 from PIL import Image, ImageTk
 
 from .logger import logger
 from src.constants.paths import (
     GUI_NO_COVER_PATH,
+    SAVE_COVER_ICON_PATH,
     INFO_ICON_PATH,
     PREV_SONG_ICON_PATH,
     NEXT_SONG_ICON_PATH,
@@ -20,8 +24,10 @@ from src.constants.paths import (
     DICE_ICON_PATH
 )
 from src.constants.gui import FONT_SIZE, INIT_COVER_SIZE
+from src.constants.misc import IMAGE_FILE_TYPES
 from src.config import CONFIG
 from src.utils.time_ import format_time
+from src.utils.image import test_save
 from src.sentinels import SENTINELS
 from src.frontend.cover import Cover
 from .empty import GUI_EMPTY as EMPTY
@@ -34,6 +40,7 @@ class PlaybackMixin:
         image.save(buffer, format='PNG')
         self.no_cover = buffer.getvalue()
         self.old_cover_state = (None, None, None) # hash, width, height
+        self.have_cover = False
 
         self.cover = Cover(
             self.poll_request,
@@ -45,6 +52,7 @@ class PlaybackMixin:
         self.volume_dragging = False
         
         self.info_icon = self.get_icon(INFO_ICON_PATH)
+        self.save_cover_icon = self.get_icon(SAVE_COVER_ICON_PATH)
 
         self.unmute_icon = self.get_icon(UNMUTE_ICON_PATH, 18)
         self.mute_icon = self.get_icon(MUTE_ICON_PATH, 18)
@@ -139,9 +147,43 @@ class PlaybackMixin:
         scale_frame.pack(side='bottom', fill='x')
 
         self.cover_label.pack(pady=(0,10), fill='both', expand=True)
+        save_cover_button = tk.Button(
+            playback_frame, 
+            image=self.save_cover_icon,
+            command=self._save_cover
+            )
+        save_cover_button.pack(anchor='e', pady=(0,10))
+        self.balloon.bind_widget(save_cover_button, 'Download cover')
 
     def _open_info(self, *_):
         InfoPopUp(self, self.snapshot.freeze())
+
+    def _save_cover(self, *_):
+        if self.have_cover:
+            if self.snapshot.display_name is EMPTY:
+                filename = 'cover.png'
+            else:
+                filename = f'{self.snapshot.display_name}.png'
+            path = filedialog.asksaveasfilename(
+                parent=self,
+                title='Save cover',
+                filetypes=(*IMAGE_FILE_TYPES, ('Any File', '')),
+                defaultextension='.png',
+                initialfile=filename,
+                )
+            if path != '':
+                logger.info(f'Save cover to {path}')
+                image = Image.open(BytesIO(self.raw_cover))
+                suffix = Path(path).suffix
+                if not test_save(image, suffix=suffix):
+                    logger.debug(f'Test save of {path} failed, convert to RGB')
+                    image = image.convert('RGB')
+                try:
+                    image.save(path)
+                except OSError as e:
+                    messagebox.showerror('Failed to save cover', e)
+        else:
+            messagebox.showerror('Error', 'No cover available')
 
     def _build_bottom_bar(self, bottom_bar):
         
@@ -220,11 +262,13 @@ class PlaybackMixin:
         self.artist_label.config(text=self.snapshot.artist)
 
         if self.snapshot.cover_hash is not EMPTY:
-            cover = self.cover.get_cover(self.snapshot.cover_hash)
+            self.raw_cover = self.cover.get_cover(self.snapshot.cover_hash)
             cover_hash = self.snapshot.cover_hash
+            self.have_cover = True
         else:
-            cover = self.no_cover
+            self.raw_cover = self.no_cover
             cover_hash = SENTINELS.NO_COVER
+            self.have_cover = False
 
         
         self.cover_label.update_idletasks()
@@ -234,7 +278,7 @@ class PlaybackMixin:
 
         state = (cover_hash, width, height)
         if state != self.old_cover_state:
-            self.cover_image = Image.open(BytesIO(cover))
+            self.cover_image = Image.open(BytesIO(self.raw_cover))
             image_width, image_height = self.cover_image.size
             ratio = min(
                 height / image_height,
