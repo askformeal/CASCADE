@@ -167,7 +167,7 @@ class PlaybackMixin:
             path = filedialog.asksaveasfilename(
                 parent=self,
                 title='Save cover',
-                filetypes=(*IMAGE_FILE_TYPES, ('Any File', '')),
+                filetypes=(*IMAGE_FILE_TYPES, ('Any File', '*')),
                 defaultextension='.png',
                 initialfile=filename,
                 )
