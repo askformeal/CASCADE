@@ -72,6 +72,7 @@ class PlaylistMixin:
 
         self.playlist_box.bind('<Return>', self._on_switch)
         self.playlist_box.bind('<Double-Button-1>', self._on_switch)
+        self.playlist_box.bind('<FocusOut>', lambda *_: self.playlist_box.select_clear(0, tk.END))
 
         bottom_bar = tk.Frame(playlist_frame)
         bottom_bar.pack(side='bottom', fill='x', padx=5)
