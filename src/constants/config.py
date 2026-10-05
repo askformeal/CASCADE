@@ -166,6 +166,18 @@ CONFIG_SCHEME = {
         'default': 5,
         'description': 'Step of position forward/backward on dashboard'
     },
+    'gui_font': {
+        'type': str,
+        'section': 'appearance',
+        'default': '',
+        'description': 'Font of GUI'
+    },
+    'config_gui_font': {
+        'type': str,
+        'section': 'appearance',
+        'default': '',
+        'description': 'Font of config GUI'
+    },
     'escape_char': {
         'type': CONVERTER.boolean,
         'section': 'appearance',

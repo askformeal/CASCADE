@@ -23,6 +23,7 @@ from src.constants.gui import (
     BALLOON_WINDUP,
     BALLOON_WRAP
     )
+from src.config import CONFIG
 from src.frontend.client import send_request
 from src.frontend.snapshot import Snapshot
 from src.frontend.tkinter_tools.balloon import Balloon
@@ -60,8 +61,8 @@ class GUI(tk.Tk, MainWinMixin, PlaybackMixin, PlaylistMixin, LyricMixin, Lifecyc
 
         default_font = tkfont.nametofont("TkDefaultFont")
         available_families = tuple(map(lambda x: x.lower(), tkfont.families()))
-        for i, family in enumerate(FAMILY_FALLBACK):
-            if family.lower() in available_families:
+        for i, family in enumerate((CONFIG.gui_font, *FAMILY_FALLBACK)):
+            if family != '' and family.lower() in available_families:
                 default_font.config(family=family)
                 logger.debug(f'Fallback to the {i+1}th font: {family}')
                 break

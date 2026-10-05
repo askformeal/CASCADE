@@ -61,8 +61,8 @@ class ConfigGUI(tk.Tk, HandlerMixin):
 
         default_font = tkfont.nametofont("TkDefaultFont")
         available_families = tuple(map(lambda x: x.lower(), tkfont.families()))
-        for i, family in enumerate(FAMILY_FALLBACK):
-            if family.lower() in available_families:
+        for i, family in enumerate((CONFIG.config_gui_font, *FAMILY_FALLBACK)):
+            if family != '' and family.lower() in available_families:
                 default_font.config(family=family)
                 logger.debug(f'Fallback to the {i+1}th font: {family}')
                 break
@@ -98,7 +98,7 @@ class ConfigGUI(tk.Tk, HandlerMixin):
     def get_font(self, *args, family=None, **kwargs):
         if family is None:
             family = self.font_family
-        return tkfont.Font(*args, family=family, **kwargs)        
+        return tkfont.Font(*args, family=family, **kwargs)
 
     def _build_window(self):
         button_frame = tk.Frame(self)
