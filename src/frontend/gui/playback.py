@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog
 from tkinter import messagebox
-import tkinter.font as tkfont
 from io import BytesIO
 from pathlib import Path
 
@@ -96,10 +95,10 @@ class PlaybackMixin:
         info_button.pack(anchor='ne')
         self.balloon.bind_widget(info_button, 'Open song information (I)')
 
-        self.name_label = tk.Label(playback_frame, font=tkfont.Font(size=FONT_SIZE+6, weight='bold'))
+        self.name_label = tk.Label(playback_frame, font=self.get_font(size=FONT_SIZE+6, weight='bold'))
         self.name_label.pack(pady=(0,10))
 
-        self.artist_label = tk.Label(playback_frame, font=tkfont.Font(size=FONT_SIZE+2, weight='bold'))
+        self.artist_label = tk.Label(playback_frame, font=self.get_font(size=FONT_SIZE+2, weight='bold'))
         self.artist_label.pack(pady=(0,15))
 
         self.cover_label = tk.Label(playback_frame, width=INIT_COVER_SIZE[0], height=INIT_COVER_SIZE[1])
@@ -241,7 +240,7 @@ class PlaybackMixin:
         
         self.progress_label = tk.Label(
             bottom_bar, 
-            font=tkfont.Font(size=FONT_SIZE+2, weight='bold'),
+            font=self.get_font(size=FONT_SIZE+2, weight='bold'),
             relief='solid',
             bd=2,
             padx=5,

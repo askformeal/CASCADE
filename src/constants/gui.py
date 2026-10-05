@@ -1,4 +1,6 @@
 UPDATE_INTERVAL = 0.1
+
+FAMILY_FALLBACK = ('Cascadia Mono', 'Consolas', 'Courier New')
 FONT_SIZE = 12
 
 ICON_SIZE = (22, 22)

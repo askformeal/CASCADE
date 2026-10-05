@@ -14,6 +14,7 @@ from .logger import logger
 from src.constants.paths import ICON_PATH
 from src.constants.gui import (
     UPDATE_INTERVAL,
+    FAMILY_FALLBACK,
     FONT_SIZE,
     ICON_SIZE,
     BALLOON_BG,
@@ -56,10 +57,20 @@ class GUI(tk.Tk, MainWinMixin, PlaybackMixin, PlaylistMixin, LyricMixin, Lifecyc
             )
 
         self.withdraw()
+
+        default_font = tkfont.nametofont("TkDefaultFont")
+        available_families = tuple(map(lambda x: x.lower(), tkfont.families()))
+        for i, family in enumerate(FAMILY_FALLBACK):
+            if family.lower() in available_families:
+                default_font.config(family=family)
+                logger.debug(f'Fallback to the {i+1}th font: {family}')
+                break
+        else:
+            logger.debug('No font in fallback chain available, use default')
         
-        self.font = tkfont.Font(
-            size=FONT_SIZE
-        )
+        self.font_family = default_font.actual()['family']
+        
+        self.font = self.get_font(size=FONT_SIZE)
 
         self.title('C.A.S.C.A.D.E')
         self.iconbitmap(ICON_PATH)
@@ -85,6 +96,11 @@ class GUI(tk.Tk, MainWinMixin, PlaybackMixin, PlaylistMixin, LyricMixin, Lifecyc
             logger.debug('Non-windows platform detected. Auto switching to English input method will not be enabled')
 
         logger.debug(f'{__name__} initialized')
+
+    def get_font(self, *args, family=None, **kwargs):
+        if family is None:
+            family = self.font_family
+        return tkfont.Font(*args, family=family, **kwargs)
 
     def _on_focus_in(self, *_):
         if self.force_english_job is not None:

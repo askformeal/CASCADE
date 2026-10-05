@@ -1,5 +1,4 @@
 import tkinter as tk
-import  tkinter.font as tkfont
 
 from src.constants.paths import (
     FILTER_ICON_PATH,
@@ -42,7 +41,7 @@ class PlaylistMixin:
 
         self.song_num_label = tk.Label(
             filter_frame,
-            font=tkfont.Font(size=FONT_SIZE, weight='bold')
+            font=self.get_font(size=FONT_SIZE, weight='bold')
         )
         self.song_num_label.pack(side='left')
 

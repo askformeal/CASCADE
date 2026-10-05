@@ -1,6 +1,5 @@
 import tkinter as tk
 from tkinter import ttk
-import tkinter.font as tkfont
 
 from src.constants.paths import ICON_PATH, GUI_COPY_PATH
 from src.constants.gui import FONT_SIZE
@@ -28,7 +27,7 @@ class InfoPopUp(tk.Toplevel):
         tk.Label(
             self,
             text='Song Information',
-            font=tkfont.Font(size=FONT_SIZE+5, weight='bold')
+            font=self.master.get_font(size=FONT_SIZE+5, weight='bold')
             ).pack(pady=(0,10))
 
         basic_frame = self._build_section('Basic')
@@ -94,7 +93,7 @@ class InfoPopUp(tk.Toplevel):
         frame = tk.LabelFrame(
             self, 
             text=name,
-            font=tkfont.Font(size=FONT_SIZE+2, weight='bold'),
+            font=self.master.get_font(size=FONT_SIZE+2, weight='bold'),
             padx=5,
             pady=3
             )
@@ -113,7 +112,7 @@ class InfoPopUp(tk.Toplevel):
         
         tk.Label(
             frame,
-            font=tkfont.Font(size=FONT_SIZE, weight='bold'),
+            font=self.master.get_font(size=FONT_SIZE, weight='bold'),
             text=f'{name}:'
             ).pack(side='left', padx=(0,5))
 
