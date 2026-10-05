@@ -1,5 +1,4 @@
 import tkinter as tk
-import tkinter.font as tkfont
 
 from .logger import logger
 from src.constants.paths import ICON_PATH
@@ -53,7 +52,7 @@ class Popup(tk.Toplevel, EditorMixin):
         logger.debug('Pop-up Window pop up')
 
     def _build_window(self):
-        self.font = tkfont.Font(
+        self.font = self.master.get_font(
             size=FONT_SIZE,
         )
 
@@ -70,7 +69,7 @@ class Popup(tk.Toplevel, EditorMixin):
         logger.debug('Pop-up window built')
 
     def _build_name(self):
-        name_font = tkfont.Font(
+        name_font = self.master.get_font(
             size=FONT_SIZE+2,
             weight='bold',
             slant='roman'
@@ -145,7 +144,7 @@ class Popup(tk.Toplevel, EditorMixin):
             ).pack(side='right', padx=(20, 10))
 
     def _build_desc(self):
-        desc_font = tkfont.Font(
+        desc_font = self.master.get_font(
             size=FONT_SIZE,
             slant='italic'
         )

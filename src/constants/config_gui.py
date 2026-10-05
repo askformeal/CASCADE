@@ -6,6 +6,7 @@ POS_Y = 20
 RESIZE = (False, False)
 ICON_SIZE = (32, 32)
 
+FAMILY_FALLBACK = ('Cascadia Mono', 'Consolas', 'Courier New')
 FONT_SIZE = 20
 
 EDIT_COLOR = 'light blue'

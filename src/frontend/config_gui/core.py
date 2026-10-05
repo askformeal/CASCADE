@@ -32,6 +32,7 @@ from src.constants.config_gui import (
     COPY_COLOR,
     RESIZE,
     ICON_SIZE,
+    FAMILY_FALLBACK,
     FONT_SIZE,
 
     BALLOON_BG, 
@@ -58,6 +59,18 @@ class ConfigGUI(tk.Tk, HandlerMixin):
         self.geometry(f'{WIDTH}x{HEIGHT}+{POS_X}+{POS_Y}')
         self.resizable(*RESIZE)
 
+        default_font = tkfont.nametofont("TkDefaultFont")
+        available_families = tuple(map(lambda x: x.lower(), tkfont.families()))
+        for i, family in enumerate(FAMILY_FALLBACK):
+            if family.lower() in available_families:
+                default_font.config(family=family)
+                logger.debug(f'Fallback to the {i+1}th font: {family}')
+                break
+        else:
+            logger.debug('No font in fallback chain available, use default')
+
+        self.font_family = default_font.actual()['family']
+
         self.bind('<Escape>', lambda *_: self.destroy())
         self.bind('<F5>', self._update_options)
         self.bind('<r>', self._toggle_remote)
@@ -81,6 +94,11 @@ class ConfigGUI(tk.Tk, HandlerMixin):
 
         self._build_window()
         logger.debug(f'{__name__} initialized')
+
+    def get_font(self, *args, family=None, **kwargs):
+        if family is None:
+            family = self.font_family
+        return tkfont.Font(*args, family=family, **kwargs)        
 
     def _build_window(self):
         button_frame = tk.Frame(self)
@@ -192,7 +210,7 @@ class ConfigGUI(tk.Tk, HandlerMixin):
 
         logger.debug(f'Fetched info of {len(info)} option(s) from {route}')
 
-        no_option_font = tkfont.Font(
+        no_option_font = self.get_font(
             size=FONT_SIZE + 2,
             weight='bold'
         )
@@ -221,10 +239,10 @@ class ConfigGUI(tk.Tk, HandlerMixin):
         logger.info(f'Updated option(s)')
 
     def _build_option(self, option):
-        font = tkfont.Font(
+        font = self.get_font(
             size=FONT_SIZE
         )
-        empty_font = tkfont.Font(
+        empty_font = self.get_font(
             size=FONT_SIZE,
             slant='italic'
         )

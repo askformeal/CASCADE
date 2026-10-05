@@ -1,5 +1,4 @@
 import tkinter as tk
-import tkinter.font as tkfont
 from tkinter import colorchooser
 
 from src.constants.config_gui import (
@@ -35,7 +34,7 @@ class EditorMixin:
         self.get_val = var.get
         
     def build_percent_editor(self, value_frame):
-        scale_font = tkfont.Font(
+        scale_font = self.master.get_font(
             size=FONT_SIZE-3,
             slant='italic',
         )
