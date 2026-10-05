@@ -171,7 +171,7 @@ class GUI(tk.Tk, MainWinMixin, PlaybackMixin, PlaylistMixin, LyricMixin, Lifecyc
         request = {
             'action':action, 
             'source':'gui',
-            'notify_support':False,
+            'notify_support':True,
             **kwargs
         }
         if not silent:
@@ -181,8 +181,14 @@ class GUI(tk.Tk, MainWinMixin, PlaybackMixin, PlaylistMixin, LyricMixin, Lifecyc
         
         if not silent:
             logger.debug(f'Response received: {response}')
-
+        notifies = response.get('notifies', [])
+        if len(notifies) > 0:
+            self._show_notifies(notifies)
         return response
+
+    def _show_notifies(self, notifies):
+        for notify in notifies:
+            self.after(0, messagebox.showinfo, title='Notify', message=notify)
 
     def poll_request(self, action, **kwargs):
         response = self._send_gui_request(action=action, **kwargs)
