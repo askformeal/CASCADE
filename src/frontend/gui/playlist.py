@@ -122,8 +122,18 @@ class PlaylistMixin:
             self.song_indexes = []
             for i, song in enumerate(self.snapshot.current_songs):
                 name = get_song_display_name(song)
-                if filter_.strip().lower() in name.lower():
-                    playlist.append(f' {name} ')
+                artist = song.get('artist', None)
+                if artist is None:
+                    artist = ''
+                keyword = filter_.strip().lower()
+                if (
+                    keyword in name.lower()
+                    or keyword in artist.lower()
+                    ):
+                    song_str = name
+                    if artist != '':
+                        song_str += f' - {artist}'
+                    playlist.append(f' {song_str} ')
                     self.song_indexes.append(i)
             filtered = len(playlist)
         
