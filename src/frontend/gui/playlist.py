@@ -120,12 +120,12 @@ class PlaylistMixin:
             self.playlist_empty = False
             playlist = []
             self.song_indexes = []
+            keyword = filter_.strip().lower()
             for i, song in enumerate(self.snapshot.current_songs):
                 name = get_song_display_name(song)
                 artist = song.get('artist', None)
                 if artist is None:
                     artist = ''
-                keyword = filter_.strip().lower()
                 if (
                     keyword in name.lower()
                     or keyword in artist.lower()

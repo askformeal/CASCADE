@@ -20,6 +20,7 @@ from src.constants.paths import (
     MUTE_ICON_PATH,
     LOOP_ICON_PATH,
     SHUFFLE_ICON_PATH,
+    REVERSE_ICON_PATH,
     DICE_ICON_PATH
 )
 from src.constants.gui import FONT_SIZE, INIT_COVER_SIZE
@@ -64,6 +65,7 @@ class PlaybackMixin:
 
         self.loop_icon = self.get_icon(LOOP_ICON_PATH)
         self.shuffle_icon = self.get_icon(SHUFFLE_ICON_PATH)
+        self.reverse_icon = self.get_icon(REVERSE_ICON_PATH)
         self.dice_icon = self.get_icon(DICE_ICON_PATH)
         
     def build_playback(self, playback_frame):
@@ -75,6 +77,7 @@ class PlaybackMixin:
         self.hotkey(self, '<m>', self._mute)
         self.hotkey(self, '<s>', self._shuffle)
         self.hotkey(self, '<r>', self._loop)
+        self.hotkey(self, '<b>', self._reverse)
         self.hotkey(self, '<d>', self._dice)
         
         playback_frame.bind('<Double-Button-1>', self._toggle)
@@ -228,7 +231,14 @@ class PlaybackMixin:
             image=self.shuffle_icon,
             command=self._shuffle
             )
-        self.shuffle_button.pack(side='left', padx=(0, 40))
+        self.shuffle_button.pack(side='left', padx=(0, 5))
+        
+        self.reverse_button = tk.Button(
+            bottom_bar, 
+            image=self.reverse_icon,
+            command=self._reverse
+            )
+        self.reverse_button.pack(side='left', padx=(0, 40))
 
         dice_button = tk.Button(
             bottom_bar,
@@ -342,6 +352,13 @@ class PlaybackMixin:
             self.shuffle_button.config(relief='raised')
             self.balloon.bind_widget(self.shuffle_button, 'Turn on shuffle (S)')
 
+        if self.snapshot.reverse and self.snapshot.reverse is not EMPTY:
+            self.reverse_button.config(relief='sunken')
+            self.balloon.bind_widget(self.reverse_button, 'Turn off reverse playback (B)')
+        else:
+            self.reverse_button.config(relief='raised')
+            self.balloon.bind_widget(self.reverse_button, 'Turn on reverse playback (B)')
+
     def _toggle(self, *_):
         self.send_command('toggle')
 
@@ -362,6 +379,9 @@ class PlaybackMixin:
 
     def _shuffle(self, *_):
         self.send_command('shuffle')
+    
+    def _reverse(self, *_):
+        self.send_command('reverse')
 
     def _dice(self, *_):
         self.send_command('dice')

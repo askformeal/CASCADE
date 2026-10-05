@@ -38,6 +38,7 @@ OFFLINE_ICON_PATH = get_res('gui/offline.png')
 
 SHUFFLE_ICON_PATH = get_res('gui/shuffle.png')
 LOOP_ICON_PATH = get_res('gui/loop.png')
+REVERSE_ICON_PATH = get_res('gui/reverse.png')
 DICE_ICON_PATH = get_res('gui/dice.png')
 
 FILTER_ICON_PATH = get_res('gui/filter.png')
