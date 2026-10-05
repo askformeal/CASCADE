@@ -57,42 +57,43 @@ bash build.sh          # on Windows: from git-bash
 
 ## Screenshots
 
-### Dashboard TUI
-```
-╭──────────────────────────────────────┬────────────────────────────────────────────────────────┬─────────────────────────────────────────────────────────────────────────╮
-│  Information                         │               CASCADE 0.54.0 Dashboard                 │  Playlist                                                               │
-│                                      │  ==================================================    │                                                                   0 ↑   │
-│  Library ID: 16                      │                                                        │  > -[ Attero Dominatus ]- <                                             │
-│                                      │               Attero Dominatus [1/160]                 │  Coat of Arms                                                           │
-│  Duration: 00:03:43                  │                                                        │  Dominium Maris Baltici                                                 │
-│                                      │  ████░░░░░░░░░░░░░░░░░░░░░░░░░░ [00:00:29/00:03:43]    │  Hellrider                                                              │
-│  Name: Attero Dominatus              │                                                        │  Night Witches                                                          │
-│  Artist: Sabaton                     │                                                        │  Primo Victoria                                                         │
-│  Album: Attero Dominatus (Re-Armed)  │  ████████████████████ [100%]    [Ol Lyric] [Paused]    │  Templars                                                               │
-│                                      │                                                        │  Sparta                                                                 │
-│  Bitrate: 1051.179 kbps              │  ╭──────────────────────────────────────────────────╮  │  Stormtroopers                                                          │
-│  Sample Rate: 44100                  │  │                     Interimo!                    │  │  Sun Tzu Says                                                           │
-│  Channels: 2                         │  │                                                  │  │  The Future of Warfare                                                  │
-│                                      │  │            -[ The reich has fallen ]-            │  │  Dreadnought                                                            │
-│  Aliases:                            │  │                                                  │  │  Ghost Division                                                         │
-│    Attero Dominatus                  │  │          We stand at the gates of Berlin         │  │  Last Dying Breath                                                      │
-│                                      │  │          With two and a half million men         │  │  Midway                                                                 │
-│  Playlists:                          │  ╰──────────────────────────────────────────────────╯  │  No Bullets Fly                                                         │
-│    Attero Dominatus                  │  Play/Pause                                            │  Nuclear Attack                                                         │
-│                                      │                                                        │                                                                 143 ↓   │
-│  Audio Engine: Miniaudio             │                                                        │                                                                         │
-╰──────────────────────────────────────┴────────────────────────────────────────────────────────┴─────────────────────────────────────────────────────────────────────────╯
-```
-
 *Yep, that's Sabaton right there*
 
-### Floating lyric
+### GUI + Floating lyric
 
-![Floating lyric board](docs/images/lyric_board.png)
+![GUI + Floating lyric](docs/images/gui_lyricboard.png)
 
 ### System tray
 
 ![System tray](docs/images/tray.png)
+
+### Dashboard TUI
+
+```
+╭────────────────────────────┬────────────────────────────────────────────────────────┬─────────────────────────────────────────╮
+│  Information               │               CASCADE 0.56.1 Dashboard                 │  Playlist                               │
+│                            │  ==================================================    │                                   0 ↑   │
+│  Library ID: 78            │                                                        │  -[ Coat of Arms ]-                     │
+│                            │               The Final Solution [5/13]                │  Midway                                 │
+│  Duration: 00:04:56        │                                                        │  Uprising                               │
+│                            │  ██████░░░░░░░░░░░░░░░░░░░░░░░░ [00:01:00/00:04:56]    │  Screaming Eagles                       │
+│  Name: The Final Solution  │                                                        │  > The Final Solution <                 │
+│  Artist: Sabaton           │                                                        │  Aces in Exile                          │
+│  Album: Coat of Arms       │  ████████████████████ [100%]    [Ol Lyric] [Paused]    │  Saboteurs                              │
+│                            │                                                        │  Wehrmacht                              │
+│  Bitrate: 1052.805 kbps    │  ╭──────────────────────────────────────────────────╮  │  White Death                            │
+│  Sample Rate: 44100        │  │                     No Lyric                     │  │  Metal Ripper                           │
+│  Channels: 2               │  ╰──────────────────────────────────────────────────╯  │  Coat of Arms (Instrumental)            │
+│                            │  Play/Pause                                            │  Metal Ripper (Instrumental)            │
+│  Aliases:                  │                                                        │  White Death (Instrumental)             │
+│    The Final Solution      │                                                        │                                   0 ↓   │
+│                            │                                                        │                                         │
+│  Playlists:                │                                                        │                                         │
+│    Coat of Arms            │                                                        │                                         │
+│                            │                                                        │                                         │
+│  Audio Engine: Miniaudio   │                                                        │                                         │
+╰────────────────────────────┴────────────────────────────────────────────────────────┴─────────────────────────────────────────╯
+```
 
 ### Configure GUI
 

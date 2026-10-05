@@ -64,7 +64,8 @@
 - [X] Dual audio engine: miniaudio + VLC
 - [X] GUI configure editor
 - [X] Add ~~a wiki~~ full document
-- [ ] GUI frontend
+- [X] GUI frontend
+- [ ] GUI library manager
 - [ ] HTTP frontend
 - [ ] Audio visualization
 - [ ] PyInstaller packaging
