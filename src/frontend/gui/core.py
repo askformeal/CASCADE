@@ -188,7 +188,7 @@ class GUI(tk.Tk, MainWinMixin, PlaybackMixin, PlaylistMixin, LyricMixin, Lifecyc
 
     def _show_notifies(self, notifies):
         for notify in notifies:
-            self.after(0, messagebox.showinfo, title='Notify', message=notify)
+            self.after(0, lambda n=notify: messagebox.showinfo('Notify', message=n))
 
     def poll_request(self, action, **kwargs):
         response = self._send_gui_request(action=action, **kwargs)

@@ -142,7 +142,7 @@ class Lyric(tk.Tk):
 
                 if self.lyric_on and (self.snapshot.player_status == 'playing' or (self.snapshot.player_status == 'paused' and not CONFIG.pause_hide_lyric)):
                     if self.snapshot.lyric_loading is not None and self.snapshot.lyric_loading:
-                        self.after(0, self._update_text, text='[Loading ...]')
+                        self.after(0, lambda: self._update_text(text='[Loading ...]'))
                         self._show()
 
                     elif None not in (self.snapshot.time, 
@@ -163,7 +163,7 @@ class Lyric(tk.Tk):
                             current_line = self.snapshot.lyric[index][1].strip()
 
                         if current_line != '':
-                            self.after(0, self._update_text, text=current_line)
+                            self.after(0, lambda: self._update_text(text=current_line))
                             self._show()
                         else:
                             self._hide()

@@ -51,13 +51,11 @@ class HandlerMixin:
             self.clipboard_clear()
             self.clipboard_append(path)
             logger.info(f'Copied to clipboard: {path}')
-            self.after(
-                0, 
-                messagebox.showinfo, 
+            self.after(0, lambda: messagebox.showinfo(
                 title='Path copied', 
                 message=f'Copied to clipboard',
                 detail=path
-                )
+                ))
 
     def _handle_response(self, response, update=True):
         logger.info(f'Handle response: {response}')
@@ -67,9 +65,9 @@ class HandlerMixin:
             return True
         else:
             msg = response['msg']
-            self.after(0, messagebox.showerror,
-                title='Failed', 
+            self.after(0, lambda: messagebox.showerror(
+                title='Failed',
                 message='Unsuccessful response',
                 detail=msg
-                )
+                ))
             return False

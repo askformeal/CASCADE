@@ -72,5 +72,5 @@ class OpenDialogue(tk.Toplevel):
                     'Playlist': 'playlist',
                     'File': 'file'
                     }[self.type_.get()]
-            self.master.after(0, self.master.send_command, action='open', song=song, type=type_)
+            self.master.after(0, lambda: self.master.send_command(action='open', song=song, type=type_))
         self.destroy()

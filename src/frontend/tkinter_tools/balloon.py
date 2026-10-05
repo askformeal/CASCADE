@@ -26,11 +26,7 @@ class Balloon(tk.Toplevel):
 
     def _on_enter(self, widget):
         self.current_widget = widget
-        self.job = self.after(
-            self.windup, 
-            self._show, 
-            widget=widget, 
-            )
+        self.job = self.after(self.windup, lambda: self._show(widget=widget))
 
     def _on_leave(self):
         if self.job is not None:
