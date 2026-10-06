@@ -23,9 +23,12 @@ class MenubarMixin:
             underline=5
             )
         file_menu.add_separator()
-        file_menu.add_command(label='Start backend', command=self._start_backend)
-        file_menu.add_command(label='Reboot backend', command=self._reboot_backend)
-        file_menu.add_command(label='Ping backend', command=self._check_backend)
+        file_menu.add_command(
+            label='Start / reboot backend...',
+            command=self._open_start,
+            accelerator='Ctrl+B'
+            )
+        file_menu.add_command(label='Ping backend', command=self.check_backend)
         file_menu.add_command(label='Exit backend', command=lambda: self.send_command('exit'))
         file_menu.add_separator()
         file_menu.add_command(

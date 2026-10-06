@@ -12,7 +12,7 @@ class LifecycleMixin:
     def __init__(self):
         self.process = ProcessManager(logger)
 
-    def _check_backend(self):
+    def check_backend(self):
         def check():
             response = self._send_gui_request(action='test_alive')
             code = response['code']
@@ -24,9 +24,11 @@ class LifecycleMixin:
                 self.after(0, lambda: messagebox.showerror(title='Connection failed', message=msg, detail=detail))
         Thread(target=check).start()
 
-    def _start_backend(self):
-        def start():
-            result = self.process.start()
+    def start_backend(self, continue_=False, dev=False):
+        def start(continue_, dev):
+            continue_ = str(int(continue_))
+            dev = str(int(dev))
+            result = self.process.start(CASCADE_CONTINUE=continue_, CASCADE_DEV=dev)
             if result is SENTINELS.SUCCESS:
                 self.after(0, lambda: messagebox.showinfo( 
                         title='Backend started', 
@@ -43,11 +45,13 @@ class LifecycleMixin:
                         message='Failed to start backend',
                         detail='Timed out waiting for backend to be alive'
                         ))
-        Thread(target=start).start()
+        Thread(target=start, args=(continue_, dev)).start()
 
-    def _reboot_backend(self):
-        def reboot():
-            result = self.process.reboot()
+    def reboot_backend(self, continue_=False, dev=False):
+        def reboot(continue_, dev):
+            continue_ = str(int(continue_))
+            dev = str(int(dev))
+            result = self.process.reboot(CASCADE_CONTINUE=continue_, CASCADE_DEV=dev)
             if result is SENTINELS.SUCCESS:
                 self.after(0, lambda: messagebox.showinfo(
                         title='Backend rebooted', 
@@ -69,9 +73,9 @@ class LifecycleMixin:
                         message='Failed to start backend',
                         detail='Backend is shutdown but failed to be restarted'
                         ))
-        Thread(target=reboot).start()
+        Thread(target=reboot, args=(continue_, dev)).start()
 
-    def _monitor_heartbeat(self):
+    def monitor_heartbeat(self):
         while self.running:
             time.sleep(HEARTBEAT_POLL_INTERVAL)
 

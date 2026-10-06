@@ -209,7 +209,7 @@ class GUI(tk.Tk, MainWinMixin, PlaybackMixin, PlaylistMixin, LyricMixin, Lifecyc
         self.destroy()
 
     def run(self):
-        Thread(target=self._monitor_heartbeat, daemon=True).start()
+        Thread(target=self.monitor_heartbeat, daemon=True).start()
         Thread(target=self._update, daemon=True).start()
         logger.info('Start main loop')
         try:

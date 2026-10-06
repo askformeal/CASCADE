@@ -15,6 +15,7 @@ from src.utils.time_ import format_time
 from .empty import GUI_EMPTY as EMPTY
 from .menubar import MenubarMixin
 from .open_dialogue import OpenDialogue
+from .start_popup import StartPopUp
 
 class MainWinMixin(MenubarMixin):
     def __init__(self):
@@ -29,6 +30,7 @@ class MainWinMixin(MenubarMixin):
         self.hotkey(self, '<Control-w>', self._exit)
         self.hotkey(self, '<Control-o>', self._on_open)
         self.hotkey(self, '<Control-a>', self._open_all)
+        self.hotkey(self, '<Control-b>', self._open_start)
     
         self.hotkey(self, '<F5>', self._reload)
         self.hotkey(self, '<Control-,>', self._open_config)
@@ -49,7 +51,7 @@ class MainWinMixin(MenubarMixin):
         bottom_bar = tk.Frame(self)
         bottom_bar.pack(side='bottom', fill='x', padx=10, pady=(0,10))
     
-        self.online_button = tk.Button(bottom_bar, command=lambda: Thread(target=self._check_backend).start())
+        self.online_button = tk.Button(bottom_bar, command=lambda: Thread(target=self.check_backend).start())
         self.online_button.pack(side='right')
         self.balloon.bind_widget(self.online_button, 'Ping backend')
     
@@ -147,6 +149,9 @@ class MainWinMixin(MenubarMixin):
 
     def _open_all(self, *_):
         self.send_command('play-all')
+
+    def _open_start(self, *_):
+        StartPopUp(self)
 
     def _toggle_fullscreen(self, *_):
         self.fullscreen.set(not self.fullscreen.get())

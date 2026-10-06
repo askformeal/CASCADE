@@ -16,7 +16,6 @@ class PopUp(tk.Toplevel):
         self.bind('<Escape>', lambda *_: self.destroy())
         self.bind('<Control-w>', lambda *_: self.destroy())
 
-
     def show_window(self):
         to_center(self, self.master)
         
