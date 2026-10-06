@@ -28,6 +28,20 @@ def get_status(ctx):
         info = ctx.playback.get_playing_info()
         playlist_len = len(ctx.playback.current_song_info)
         current_num = ctx.playback.current_song_num
+
+    if ctx.playback.current_playlist is SENTINELS.PLAY_ALL:
+        playlist_name = None
+        playing_all = True
+    else:
+        playing_all = False
+        if ctx.playback.current_playlist is not None:
+            playlist_info = ctx.database.get_playlists_info(ctx.playback.current_playlist)
+            if len(playlist_info) > 0:
+                playlist_name = playlist_info[0]['name']
+            else:
+                playlist_name = None
+        else:
+            playlist_name = None
     
     status = {
         'id': info.get('id', None),
@@ -50,6 +64,8 @@ def get_status(ctx):
         'online_lyric': ctx.playback.online_lyric,
         'playlist_len': playlist_len,
         'current_num': current_num,
+        'playlist_name': playlist_name,
+        'playing_all': playing_all,
         'engine': ctx.playback.get_engine_name(),
         'run_time': time.time() - ctx.start_time
     }

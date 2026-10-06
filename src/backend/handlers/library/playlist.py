@@ -95,6 +95,8 @@ def del_(ctx, request):
     playlist_id = ctx.database.get_playlist_via_name(request['playlist'])
     if playlist_id is not SENTINELS.PLAYLIST_NOT_FOUND:
         ctx.database.del_playlist(playlist_id)
+        if playlist_id == ctx.playback.current_playlist:
+            ctx.playback.current_playlist = None
         return gen_response.Success(f"deleted playlist \"{request['playlist']}\"")
     else:
         return gen_response.PlaylistNotExist(f"delete playlist \"{request['playlist']}\"")

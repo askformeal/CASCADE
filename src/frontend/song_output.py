@@ -102,6 +102,13 @@ class SongOutput:
         if isinstance(self.current_num, int):
             self.current_num += 1
 
+        self.playlist_name = info.get('playlist_name', None)
+        if self.playlist_name is None:
+            self.playlist_name = '?'
+        self.playing_all = info.get('playing_all', None)
+        if self.playing_all is None:
+            self.playing_all = False
+
         self.engine = info.get('engine', '?')
     
         self.run_time = format_time(info.get('run_time', -1), 'sec')

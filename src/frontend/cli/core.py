@@ -147,22 +147,34 @@ def main():
                         
                         output = SongOutput(attachment)
 
+                        if output.playing_all:
+                            playlist = '[ Playing all songs in library ]'
+                        else:
+                            playlist = f'Playlist: {output.playlist_name}'
+
                         text = '\n'.join((
                                         f'\n{output.display_name} - {output.artist} [{output.current_num} / {output.playlist_len}]',
                                         f'[{output.time} / {output.length}] {output.percentage}%\n',
                                         f'In library: {output.in_lib}',
                                         f'Album: {output.album}',
-                                        f'Path: {output.path}\n',
+                                        '',
+                                        playlist,
+                                        '',
+                                        f'Path: {output.path}',
                                         f'Lyric File Path: {output.lyric}',
+                                        '',
                                         f'Player status: {output.player_status}',
                                         f'Volume: {output.volume}%',
                                         f'Mute: {output.mute}',
-                                        f'\nShuffle: {output.shuffle}',
+                                        '',
+                                        f'Shuffle: {output.shuffle}',
                                         f'Loop: {output.loop}',
                                         f'Reverse: {output.reverse}',
                                         f'Online Lyric: {output.online_lyric}',
-                                        f'\nAudio Engine: {output.engine}',
-                                        f'\nCASCADE backend has been running for {output.run_time}',
+                                        '',
+                                        f'Audio Engine: {output.engine}',
+                                        '',
+                                        f'CASCADE backend has been running for {output.run_time}',
                         ))
 
                         if output.dev:
