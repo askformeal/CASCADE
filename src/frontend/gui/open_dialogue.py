@@ -1,20 +1,12 @@
 import tkinter as tk
 
-from src.constants.paths import ICON_PATH
 from src.constants.gui import CANCEL_COLOR, OPEN_COLOR
-from src.frontend.tkinter_tools.to_center import to_center
+from .pop_up import PopUp
 
-class OpenDialogue(tk.Toplevel):
+class OpenDialogue(PopUp):
     def __init__(self, master):
-        super().__init__(master=master)
-        self.withdraw()
-
-        self.transient(self.master)
-        self.title('Open')
-        self.iconbitmap(ICON_PATH)
-        self.resizable(False, False)
+        super().__init__(master, title='Open')
         
-        self.bind('<Escape>', lambda *_: self.destroy())
         self.bind('<Return>', self._on_open)
 
         self.config(padx=10, pady=10)
@@ -56,12 +48,7 @@ class OpenDialogue(tk.Toplevel):
                                 )
         open_button.pack(side='left')
 
-        to_center(self, self.master)
-
-        self.deiconify()
-
-        self.wait_visibility()
-        self.grab_set()
+        self.show_window()
         self.entry.focus_set()
 
     def _on_open(self, *_):

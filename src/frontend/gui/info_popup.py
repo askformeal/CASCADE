@@ -1,26 +1,17 @@
 import tkinter as tk
 from tkinter import ttk
 
-from src.constants.paths import ICON_PATH, GUI_COPY_PATH
+from src.constants.paths import GUI_COPY_PATH
 from src.constants.gui import FONT_SIZE
-from src.frontend.tkinter_tools.to_center import to_center
 from src.utils.time_ import format_time
 from .empty import GUI_EMPTY as EMPTY
+from .pop_up import PopUp
 
-class InfoPopUp(tk.Toplevel):
+class InfoPopUp(PopUp):
     def __init__(self, master, snapshot, *args, **kwargs):
-        super().__init__(master, *args, **kwargs)
+        super().__init__(master, *args, title='Song information', **kwargs)
         
         self.config(padx=15, pady=5)
-        self.withdraw()
-        self.transient(self.master)
-        self.resizable(False, False)
-
-        self.title('Song information')
-        self.iconbitmap(ICON_PATH)
-        
-        self.bind('<Escape>', lambda *_: self.destroy())
-        self.bind('<Control-w>', lambda *_: self.destroy())
 
         self.copy_icon = self.master.get_icon(GUI_COPY_PATH)
 
@@ -72,13 +63,8 @@ class InfoPopUp(tk.Toplevel):
             )
         close_button.pack(pady=(10,10))
         self.master.balloon.bind_widget(close_button, 'Close (Esc)')
-        
-        to_center(self,  self.master)
 
-        self.deiconify()
-        
-        self.wait_visibility()
-        self.grab_set()
+        self.show_window()
 
     def _copy_text(self, text):
         self.clipboard_clear()
