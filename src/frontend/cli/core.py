@@ -11,7 +11,7 @@ from src.constants.paths import CLI_LOG_PATH
 from src.constants.frontend import ATTACHMENT_REQUIRED_ACTIONS
 from src.constants.cli import FAIL_TAG, OK_TAG
 from src.config_manager import CONFIG_MANAGER
-from src.frontend.song_output import SongOutput
+from .song_output import SongOutput
 from src.utils.escape_code import ESCAPE_CODE as EC
 from src.utils.time_ import format_time
 from .build_parser import Builder

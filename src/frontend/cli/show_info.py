@@ -1,5 +1,5 @@
 from src.config import CONFIG
-from src.frontend.song_output import SongOutput
+from .song_output import SongOutput
 from src.utils.tui import box
 
 def cli_box(*args, **kwargs):
