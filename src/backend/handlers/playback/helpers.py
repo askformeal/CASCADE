@@ -116,7 +116,7 @@ def open_type(ctx, type_, reference):
     else:
         current_paths = list(map(lambda s: s['path'], ctx.playback.current_song_info))
 
-    if len(paths_to_load) == 1 and paths_to_load[0] in current_paths:
+    if len(paths_to_load) == 1 and paths_to_load[0] in current_paths and type_ == 'song':
         num = current_paths.index(paths_to_load[0])
         ctx.playback.current_song_info[num] = info_to_set[0][0]
         response = gen_response.Success('song in current playlist. try to switch')
