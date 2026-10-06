@@ -124,9 +124,12 @@ class PlaylistMixin:
             and len(self.snapshot.current_songs) > 0
             ):
             total = len(self.snapshot.current_songs)
+            
+            playlist_signature = []
             self.playlist_empty = False
             playlist = []
             self.song_indexes = []
+            
             keyword = filter_.strip().lower()
             for i, song in enumerate(self.snapshot.current_songs):
                 name = get_song_display_name(song)
@@ -142,19 +145,22 @@ class PlaylistMixin:
                         song_str += f' - {artist}'
                     playlist.append(f' {song_str} ')
                     self.song_indexes.append(i)
+                    playlist_signature.append(song.copy())
+
             filtered = len(playlist)
         
         else:
             total = 0
-            filtered = 0
+            playlist_signature = []
             self.playlist_empty = True
             playlist = [' - No songs playing - ']
             self.song_indexes = []
-
-
-        if playlist != self.old_playlist:
-            self.old_playlist = playlist
+            filtered = 0
+                
+        if playlist_signature != self.old_playlist:
+            self.old_playlist = playlist_signature.copy()
             self.old_current = None
+
 
             self.playlist_box.delete(0, tk.END)
             for name in playlist:
@@ -166,13 +172,27 @@ class PlaylistMixin:
             except ValueError:
                 ...
             else:
-                self.playlist_box.itemconfig(current_index,
-                                            bg=CURRENT_SONG_BG
-                                            )
-                if self.old_current is not None and self.old_current != current_index:
-                    self.playlist_box.itemconfig(self.old_current,
-                                                bg=self.playlist_box.cget('background')
+                if current_index != self.old_current:
+                    self._mark_item(current_index)
+                    self.playlist_box.itemconfig(current_index,
+                                                bg=CURRENT_SONG_BG
                                                 )
-                self.old_current = current_index
+                    if self.old_current is not None and self.old_current != current_index:
+                        self._unmark_item(self.old_current)
+                        self.playlist_box.itemconfig(self.old_current,
+                                                    bg=self.playlist_box.cget('background')
+                                                    )
+                    self.old_current = current_index
 
         self.song_num_label.config(text=f'[{filtered}/{total}]')
+
+    def _mark_item(self, index):
+        text = self.playlist_box.get(index)
+        self.playlist_box.delete(index)
+        self.playlist_box.insert(index, f' [{text.strip()}] ')
+    
+    def _unmark_item(self, index):
+        text = self.playlist_box.get(index)
+        self.playlist_box.delete(index)
+        self.playlist_box.insert(index, f' {text[2:-2]} ')
+
