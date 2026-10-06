@@ -24,6 +24,7 @@ GUI_NO_COVER_PATH = get_res('gui/no_cover.png')
 INFO_ICON_PATH = get_res('gui/info.png')
 SAVE_COVER_ICON_PATH = get_res('gui/save_cover.png')
 RELOAD_ICON_PATH = get_res('gui/reload.png')
+START_ICON_PATH = get_res('gui/start.png')
 
 NEXT_SONG_ICON_PATH = get_res('gui/next.png')
 PREV_SONG_ICON_PATH = get_res('gui/previous.png')
