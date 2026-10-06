@@ -90,13 +90,24 @@ class PlaybackMixin:
         self.hotkey(playback_frame, '<Up>', lambda *_: self._move_volume(True))
         self.hotkey(playback_frame, '<Down>', lambda *_: self._move_volume(False))
 
+        top_bar = tk.Frame(playback_frame)
+        top_bar.pack(fill='x')
+
         info_button = tk.Button(
-            playback_frame,
+            top_bar,
             image=self.info_icon,
             command=self._open_info
             )
-        info_button.pack(anchor='ne')
+        info_button.pack(side='right', padx=(5,0))
         self.balloon.bind_widget(info_button, 'Open song information (I)')
+
+        save_cover_button = tk.Button(
+            top_bar,
+            image=self.save_cover_icon,
+            command=self._save_cover
+            )
+        save_cover_button.pack(side='right')
+        self.balloon.bind_widget(save_cover_button, 'Download cover')
 
         self.name_label = tk.Label(playback_frame, font=self.get_font(size=FONT_SIZE+6, weight='bold'))
         self.name_label.pack(pady=(0,10))
@@ -149,13 +160,6 @@ class PlaybackMixin:
         scale_frame.pack(side='bottom', fill='x')
 
         self.cover_label.pack(pady=(0,10), fill='both', expand=True)
-        save_cover_button = tk.Button(
-            playback_frame, 
-            image=self.save_cover_icon,
-            command=self._save_cover
-            )
-        save_cover_button.pack(anchor='e', pady=(0,10))
-        self.balloon.bind_widget(save_cover_button, 'Download cover')
 
     def _open_info(self, *_):
         InfoPopUp(self, self.snapshot.freeze())
