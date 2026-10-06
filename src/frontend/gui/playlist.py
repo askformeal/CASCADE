@@ -5,7 +5,12 @@ from src.constants.paths import (
     SELECT_CURRENT_ICON_PATH, 
     SWITCH_SELECTED_ICON_PATH
     )
-from src.constants.gui import CURRENT_SONG_BG, FONT_SIZE
+from src.constants.gui import (
+    PLAYLIST_SELECT_BG,
+    PLAYLIST_SELECT_FG,
+    CURRENT_SONG_BG,
+    FONT_SIZE
+    )
 from src.utils.misc import get_song_display_name
 from .empty import GUI_EMPTY as EMPTY
 
@@ -52,6 +57,8 @@ class PlaylistMixin:
             box_frame,
             font=self.font,
             width=0,
+            selectbackground=PLAYLIST_SELECT_BG,
+            selectforeground=PLAYLIST_SELECT_FG,
             selectborderwidth=4,
             activestyle='none',
             )

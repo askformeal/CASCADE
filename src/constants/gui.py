@@ -7,6 +7,8 @@ ICON_SIZE = (22, 22)
 
 INIT_COVER_SIZE = (400, 400)
 
+PLAYLIST_SELECT_BG = 'blue'
+PLAYLIST_SELECT_FG = 'white'
 CURRENT_SONG_BG = 'cyan'
 
 LYRIC_BG = 'snow'
