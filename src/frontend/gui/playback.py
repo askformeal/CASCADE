@@ -11,6 +11,7 @@ from src.constants.paths import (
     GUI_NO_COVER_PATH,
     SAVE_COVER_ICON_PATH,
     INFO_ICON_PATH,
+    RELOAD_ICON_PATH,
     PREV_SONG_ICON_PATH,
     NEXT_SONG_ICON_PATH,
     PLAY_ICON_PATH,
@@ -53,6 +54,7 @@ class PlaybackMixin:
         
         self.info_icon = self.get_icon(INFO_ICON_PATH)
         self.save_cover_icon = self.get_icon(SAVE_COVER_ICON_PATH)
+        self.reload_icon = self.get_icon(RELOAD_ICON_PATH)
 
         self.unmute_icon = self.get_icon(UNMUTE_ICON_PATH, 18)
         self.mute_icon = self.get_icon(MUTE_ICON_PATH, 18)
@@ -98,7 +100,7 @@ class PlaybackMixin:
             image=self.info_icon,
             command=self._open_info
             )
-        info_button.pack(side='right', padx=(5,0))
+        info_button.pack(side='right', padx=(7,0))
         self.balloon.bind_widget(info_button, 'Open song information (I)')
 
         save_cover_button = tk.Button(
@@ -106,8 +108,16 @@ class PlaybackMixin:
             image=self.save_cover_icon,
             command=self._save_cover
             )
-        save_cover_button.pack(side='right')
+        save_cover_button.pack(side='right', padx=(7,0))
         self.balloon.bind_widget(save_cover_button, 'Download cover')
+
+        reload_button = tk.Button(
+            top_bar,
+            image=self.reload_icon,
+            command=self._reload
+        )
+        reload_button.pack(side='right')
+        self.balloon.bind_widget(reload_button, 'Reload (F5)')
 
         self.name_label = tk.Label(playback_frame, font=self.get_font(size=FONT_SIZE+6, weight='bold'))
         self.name_label.pack(pady=(0,10))

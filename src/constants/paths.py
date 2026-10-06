@@ -20,9 +20,10 @@ COLOR_BLACK_ICON_PATH = get_res('config_gui/color_black.png')
 COLOR_WHITE_ICON_PATH = get_res('config_gui/color_white.png')
 
 GUI_NO_COVER_PATH = get_res('gui/no_cover.png')
-SAVE_COVER_ICON_PATH = get_res('gui/save_cover.png')
 
 INFO_ICON_PATH = get_res('gui/info.png')
+SAVE_COVER_ICON_PATH = get_res('gui/save_cover.png')
+RELOAD_ICON_PATH = get_res('gui/reload.png')
 
 NEXT_SONG_ICON_PATH = get_res('gui/next.png')
 PREV_SONG_ICON_PATH = get_res('gui/previous.png')
