@@ -14,6 +14,7 @@ class MenubarMixin:
             )
         file_menu.add_command(label='Open all', 
                               command=self._open_all,
+                              accelerator='Ctrl+A',
                               underline=5
                               )
         self.open_playlist_menu = tk.Menu(file_menu, tearoff=False)
