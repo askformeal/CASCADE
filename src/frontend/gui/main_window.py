@@ -33,6 +33,7 @@ class MainWinMixin(MenubarMixin):
         self.hotkey(self, '<Control-b>', self._open_start)
     
         self.hotkey(self, '<F5>', self._reload)
+        self.hotkey(self, '<Control-r>', self._reload)
         self.hotkey(self, '<Control-,>', self._open_config)
     
         self.hotkey(self, '<v>', self._toggle_lyric_visible)
