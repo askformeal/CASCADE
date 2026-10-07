@@ -38,6 +38,7 @@ class GUI(tk.Tk, MainWinMixin, PlaybackMixin, PlaylistMixin, LyricMixin, Lifecyc
     def __init__(self):
         self.force_english_job = None
         self.no_hotkey_widgets = []
+        self.widget_hotkeys = {}
 
         self.snapshot = Snapshot(self.poll_request, empty=EMPTY)
 
@@ -115,8 +116,29 @@ class GUI(tk.Tk, MainWinMixin, PlaybackMixin, PlaylistMixin, LyricMixin, Lifecyc
             self.imm.ImmSetOpenStatus(himc, False)
             self.imm.ImmReleaseContext(hwnd, himc)
 
-    def hotkey(self, widget, sequence, func):
+    def hotkey(self, widgets, sequence, func):
+        if not isinstance(widgets, (list, tuple)):
+            widgets = (widgets,)
+        for widget in widgets:
+            self._bind_hotkey(widget, sequence, func)
+
+    def copy_hotkey(self, target_widget, source_widget): 
+        # copy all hotkeys of target_widget to widget
+        bounds = self.widget_hotkeys.get(source_widget, [])
+        for bound in bounds:
+            self._bind_hotkey(target_widget, *bound)
+            
+    def _bind_hotkey(self, widget, sequence, func):
         widget.bind(sequence, self._hotkey_func(func))
+        bound = self.widget_hotkeys.get(widget, tuple()) + ((sequence, func),)
+        self.widget_hotkeys[widget] = bound
+
+    def tag_children(self, widget):
+        for child in widget.winfo_children():
+            tags = child.bindtags()
+            if str(widget) not in tags:
+                child.bindtags(tags+(widget,))
+            self.tag_children(child)
 
     def _hotkey_func(self, func):
         def on_hotkey(event):

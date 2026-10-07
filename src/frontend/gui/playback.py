@@ -135,10 +135,14 @@ class PlaybackMixin:
         self.artist_label = tk.Label(playback_frame, font=self.get_font(size=FONT_SIZE+2, weight='bold'))
         self.artist_label.pack(pady=(0,15))
 
-        self.cover_label = tk.Label(playback_frame, width=INIT_COVER_SIZE[0], height=INIT_COVER_SIZE[1])
+        self.cover_label = tk.Label(
+            playback_frame,
+            width=INIT_COVER_SIZE[0],
+            height=INIT_COVER_SIZE[1],
+            )
 
         self.cover_label.bind('<Double-Button-1>', self._toggle)
-        self.cover_label.bind('<ButtonPress-1>', lambda *_: self.cover_label.focus_set())
+        # self.cover_label.bindtags(self.cover_label.bindtags()+(playback_frame,))
 
         scale_frame = tk.Frame(playback_frame)
 
@@ -180,6 +184,7 @@ class PlaybackMixin:
         scale_frame.pack(side='bottom', fill='x')
 
         self.cover_label.pack(pady=(0,10), fill='both', expand=True)
+        self.tag_children(playback_frame)
 
     def _open_info(self, *_):
         InfoPopUp(self, self.snapshot.freeze())
