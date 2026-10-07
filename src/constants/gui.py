@@ -11,6 +11,8 @@ PLAYLIST_SELECT_BG = 'blue'
 PLAYLIST_SELECT_FG = 'white'
 CURRENT_SONG_BG = 'cyan'
 
+PLAYLIST_MAX_CHAR = 45
+
 LYRIC_BG = 'snow'
 LYRIC_FG = 'black'
 

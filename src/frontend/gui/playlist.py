@@ -9,9 +9,11 @@ from src.constants.gui import (
     PLAYLIST_SELECT_BG,
     PLAYLIST_SELECT_FG,
     CURRENT_SONG_BG,
+    PLAYLIST_MAX_CHAR,
     FONT_SIZE
     )
 from src.utils.misc import get_song_display_name
+from src.utils.text import strlen
 from .empty import GUI_EMPTY as EMPTY
 
 class PlaylistMixin:
@@ -186,8 +188,13 @@ class PlaylistMixin:
 
 
             self.playlist_box.delete(0, tk.END)
-            for name in playlist:
-                self.playlist_box.insert(tk.END, name)
+            for song_str in playlist:
+                self.playlist_box.insert(tk.END, song_str)
+            
+            if len(playlist) > 0 and max(map(strlen, playlist)) > PLAYLIST_MAX_CHAR:
+                self.playlist_box.config(width=PLAYLIST_MAX_CHAR)
+            else:
+                self.playlist_box.config(width=0) # 0 = auto width
 
         if self.snapshot.current_num is not EMPTY:
             try:
