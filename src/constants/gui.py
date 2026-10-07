@@ -19,8 +19,6 @@ DEV_COLOR = 'blue'
 LYRIC_CURRENT_BG = 'cyan'
 LYRIC_CURRENT_FG = 'black'
 
-LYRIC_WRAP = 50
-
 OPEN_COLOR = 'light green'
 CANCEL_COLOR = 'light grey'
 

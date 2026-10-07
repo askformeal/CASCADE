@@ -172,6 +172,12 @@ CONFIG_SCHEME = {
         'default': '',
         'description': 'Font of GUI'
     },
+    'gui_lyric_wrap': {
+        'type': CONVERTER.pos_int,
+        'section': 'appearance',
+        'default': 50,
+        'description': 'Max length of each lyric line of GUI (characters)'
+    },
     'config_gui_font': {
         'type': str,
         'section': 'appearance',

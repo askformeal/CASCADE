@@ -11,8 +11,7 @@ from src.constants.gui import (
     LYRIC_CURRENT_BG, 
     LYRIC_CURRENT_FG, 
     SCROLL_EVENTS,
-    MAX_OFFSET,
-    LYRIC_WRAP
+    MAX_OFFSET
     )
 from src.config import CONFIG
 from src.sentinels import SENTINELS
@@ -169,7 +168,7 @@ class LyricMixin:
 
             self.lyric_box.delete(0, tk.END)
             for line in lyric:
-                lines = wrap_text(line, LYRIC_WRAP).splitlines()
+                lines = wrap_text(line, CONFIG.gui_lyric_wrap).splitlines()
                 self.lyric_index.append([])
                 for line in lines:
                     self.lyric_box.insert(tk.END, f' {line} ')
