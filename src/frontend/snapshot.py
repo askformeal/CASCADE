@@ -49,6 +49,9 @@ class Snapshot:
         self.offset_overlay = self.empty
         self.playlists = self.empty
 
+        self.playlist_name = self.empty
+        self.playing_all = self.empty
+
         self.cover_hash = self.empty
 
         self.run_time = self.empty
@@ -105,6 +108,9 @@ class Snapshot:
         self.playlists = self.get('playlists')
 
         self.cover_hash = self.get('cover_hash')
+
+        self.playlist_name = self.get('playlist_name')
+        self.playing_all = self.get('playing_all')
 
         self.run_time = self.get('run_time')
         self.dev = self.get('dev')
