@@ -1,5 +1,6 @@
 import tkinter as tk
 
+from .logger import logger
 from src.constants.paths import (
     ONLINE_LYRIC_ICON_PATH,
     LOCAL_LYRIC_ICON_PATH,
@@ -9,7 +10,7 @@ from src.constants.gui import (
     LYRIC_BG,
     LYRIC_FG,
     LYRIC_CURRENT_BG, 
-    LYRIC_CURRENT_FG, 
+    LYRIC_CURRENT_FG,
     SCROLL_EVENTS,
     MAX_OFFSET
     )
@@ -26,6 +27,8 @@ class LyricMixin:
         self.scroll_on = True
         self.bound_scroll = {}
         self.lyric_index = []
+        self.lyric_index_to_num = {}
+        self.lyric_times = {}
 
         self.offset_dragging = False
 
@@ -50,6 +53,7 @@ class LyricMixin:
                                     activestyle='none',
                                     )
         self.lyric_box.pack(fill='both', expand=True, pady=(0, 10))
+        self.lyric_box.bind('<Double-Button-1>', self._on_lyric_jump)
 
         offset_bar = tk.Frame(lyric_frame)
         offset_bar.pack(fill='x', padx=5, pady=(0,10))
@@ -86,6 +90,15 @@ class LyricMixin:
                                         )
         offset_reset_button.pack(side='left', padx=(0, 10))
         self.balloon.bind_widget(offset_reset_button, 'Reset offset (\\)')
+
+    def _on_lyric_jump(self, event):
+        index = self.lyric_box.nearest(event.y)
+        lyric_num = self.lyric_index_to_num.get(index, None)
+        time_ = self.lyric_times.get(lyric_num, None)
+        logger.info(f'Jump to lyric line \"{self.lyric_box.get(index).strip()}\", #{lyric_num} at {time_}ms')
+        if time_ is not None:
+            self.send_command('seek', time=str(time_), ms=True)
+            self.lyric_box.select_clear(0, tk.END)
 
     def _toggle_online_lyric(self, *_):
         self.send_command('lyric')
@@ -138,6 +151,7 @@ class LyricMixin:
         if self.snapshot.lyric_loading is not EMPTY and self.snapshot.lyric_loading:
             lyric_num = 0
             lyric = [' - Loading ... - ']
+            self.lyric_times = {}
         else:
             lyric_num = 0
             if EMPTY not in (self.snapshot.time, 
@@ -146,23 +160,31 @@ class LyricMixin:
                         self.snapshot.offset_overlay
                         ):
                 lyric = []
-                for line in self.snapshot.lyric:
+                self.lyric_times = {}
+                
+                offset = self.snapshot.lyric_offset + self.snapshot.offset_overlay
+
+                for i, line in enumerate(self.snapshot.lyric):
                     lyric.append(line[1].strip())
+                    self.lyric_times[i] = max(line[0] + offset, 0)
 
                 lyric_num = get_lyric_line(self.snapshot.lyric,
                                     self.snapshot.time,
-                                    self.snapshot.lyric_offset + self.snapshot.offset_overlay
+                                    offset
                                     )
                 if lyric_num is SENTINELS.BEFORE_FIRST_LYRIC:
                     lyric_num = 0
                 elif lyric_num is SENTINELS.EMPTY_LYRIC:
                     lyric = [' - Empty Lyric - ']
+                    self.lyric_times = {}
                     lyric_num = 0
             else:
                 lyric = [' - No Lyric - ']
+                self.lyric_times = {}
 
         if lyric != self.old_lyric:
             self.lyric_index = []
+            self.lyric_index_to_num = {}
             self.old_lyric = lyric
             self.old_lyric_num = None
 
@@ -174,7 +196,26 @@ class LyricMixin:
                     self.lyric_box.insert(tk.END, f' {line} ')
                     self.lyric_index[-1].append(self.lyric_box.size()-1)
                 self.lyric_box.insert(tk.END, '')
-        
+
+            for num, indexes in enumerate(self.lyric_index):
+                for index in indexes:
+                    self.lyric_index_to_num[index] = num
+
+        self._mark_line(lyric_num)
+    
+        if self.snapshot.player_status == 'playing':
+            self._disable_scroll()
+            bbox = self.lyric_box.bbox(self.lyric_box.index('@0,0'))
+            if bbox is not None:
+                item_height = bbox[3]
+                visible_lines = self.lyric_box.winfo_height() // item_height
+                indexes = self.lyric_index[lyric_num]
+                if len(indexes) > 0:
+                    self.lyric_box.yview(max(0, indexes[0] - (visible_lines // 2)))
+        else:
+            self._enable_scroll()
+
+    def _mark_line(self, lyric_num):
         if self.lyric_box.size() > 0:
             for line_index in self.lyric_index[lyric_num]:
                 self.lyric_box.itemconfig(line_index, 
@@ -189,19 +230,6 @@ class LyricMixin:
                                         fg=LYRIC_FG
                                         )
         self.old_lyric_num = lyric_num
-
-
-        if self.snapshot.player_status == 'playing':
-            self._disable_scroll()
-            bbox = self.lyric_box.bbox(self.lyric_box.index('@0,0'))
-            if bbox is not None:
-                item_height = bbox[3]
-                visible_lines = self.lyric_box.winfo_height() // item_height
-                indexes = self.lyric_index[lyric_num]
-                if len(indexes) > 0:
-                    self.lyric_box.yview(max(0, indexes[0] - (visible_lines // 2)))
-        else:
-            self._enable_scroll()
 
     def _disable_scroll(self):
         if self.scroll_on:
