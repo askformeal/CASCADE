@@ -28,6 +28,9 @@ class PlaylistMixin:
     def build_playlist(self, playlist_frame):
         self.hotkey(self, '<c>', self._select_current)
 
+        self.playlist_label = tk.Label(playlist_frame)
+        self.playlist_label.pack()
+
         filter_frame = tk.Frame(playlist_frame)
         filter_frame.pack(fill='x', pady=(0,10))
 
@@ -119,6 +122,27 @@ class PlaylistMixin:
                 self.send_command('switch', number=index + 1)
 
     def update_playlist(self):
+        if self.snapshot.playing_all is not EMPTY and self.snapshot.playing_all:
+            self.playlist_label.config(
+                text='Library',
+                font=self.get_font(
+                    size=FONT_SIZE+2,
+                    weight='bold',
+                    slant='italic'
+                    )
+                )
+
+        elif self.snapshot.playlist_name is not EMPTY:
+            self.playlist_label.config(
+                text=self.snapshot.playlist_name,
+                font=self.get_font(size=FONT_SIZE+2, weight='bold')
+                )
+        else:
+            self.playlist_label.config(
+                text='',
+                height=0,
+                )
+
         filter_ = self.filter_entry.get()
         if (self.snapshot.current_songs is not EMPTY 
             and len(self.snapshot.current_songs) > 0
