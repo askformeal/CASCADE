@@ -11,19 +11,22 @@ from src.constants.gui import (
     LYRIC_CURRENT_BG, 
     LYRIC_CURRENT_FG, 
     SCROLL_EVENTS,
-    MAX_OFFSET
+    MAX_OFFSET,
+    LYRIC_WRAP
     )
 from src.config import CONFIG
 from src.sentinels import SENTINELS
 from src.utils.lyric import get_lyric_line
+from src.utils.text import wrap_text
 from .empty import GUI_EMPTY as EMPTY
 
 class LyricMixin:
     def __init__(self):
         self.old_lyric = []
-        self.old_index = None
+        self.old_lyric_num = None
         self.scroll_on = True
         self.bound_scroll = {}
+        self.lyric_index = []
 
         self.offset_dragging = False
 
@@ -134,10 +137,10 @@ class LyricMixin:
             self.total_offset.config(text=f'Total: {self.snapshot.lyric_offset + self.snapshot.offset_overlay}ms')
 
         if self.snapshot.lyric_loading is not EMPTY and self.snapshot.lyric_loading:
+            lyric_num = 0
             lyric = [' - Loading ... - ']
-            index = 0
         else:
-            index = 0
+            lyric_num = 0
             if EMPTY not in (self.snapshot.time, 
                         self.snapshot.lyric,
                         self.snapshot.lyric_offset, 
@@ -145,40 +148,48 @@ class LyricMixin:
                         ):
                 lyric = []
                 for line in self.snapshot.lyric:
-                    lyric.append(f' {line[1].strip()} ')
+                    lyric.append(line[1].strip())
 
-                index = get_lyric_line(self.snapshot.lyric,
+                lyric_num = get_lyric_line(self.snapshot.lyric,
                                     self.snapshot.time,
                                     self.snapshot.lyric_offset + self.snapshot.offset_overlay
                                     )
-                if index is SENTINELS.BEFORE_FIRST_LYRIC:
-                    index = 0
-                elif index is SENTINELS.EMPTY_LYRIC:
+                if lyric_num is SENTINELS.BEFORE_FIRST_LYRIC:
+                    lyric_num = 0
+                elif lyric_num is SENTINELS.EMPTY_LYRIC:
                     lyric = [' - Empty Lyric - ']
-                    index = 0
+                    lyric_num = 0
             else:
                 lyric = [' - No Lyric - ']
 
         if lyric != self.old_lyric:
+            self.lyric_index = []
             self.old_lyric = lyric
-            self.old_index = None
+            self.old_lyric_num = None
 
             self.lyric_box.delete(0, tk.END)
             for line in lyric:
-                self.lyric_box.insert(tk.END, line)
+                lines = wrap_text(line, LYRIC_WRAP).splitlines()
+                self.lyric_index.append([])
+                for line in lines:
+                    self.lyric_box.insert(tk.END, f' {line} ')
+                    self.lyric_index[-1].append(self.lyric_box.size()-1)
+                self.lyric_box.insert(tk.END, '')
         
         if self.lyric_box.size() > 0:
-            self.lyric_box.itemconfig(index, 
-                                    bg=LYRIC_CURRENT_BG,
-                                    fg=LYRIC_CURRENT_FG
-                                    )
+            for line_index in self.lyric_index[lyric_num]:
+                self.lyric_box.itemconfig(line_index, 
+                                        bg=LYRIC_CURRENT_BG,
+                                        fg=LYRIC_CURRENT_FG
+                                        )
         
-        if self.old_index is not None and self.old_index != index:
-            self.lyric_box.itemconfig(self.old_index,
-                                    bg=LYRIC_BG,
-                                    fg=LYRIC_FG
-                                    )
-        self.old_index = index
+        if self.old_lyric_num is not None and self.old_lyric_num != lyric_num:
+            for line_index in self.lyric_index[self.old_lyric_num]:
+                self.lyric_box.itemconfig(line_index,
+                                        bg=LYRIC_BG,
+                                        fg=LYRIC_FG
+                                        )
+        self.old_lyric_num = lyric_num
 
 
         if self.snapshot.player_status == 'playing':
@@ -187,7 +198,9 @@ class LyricMixin:
             if bbox is not None:
                 item_height = bbox[3]
                 visible_lines = self.lyric_box.winfo_height() // item_height
-                self.lyric_box.yview(max(0, index - (visible_lines // 2)))
+                indexes = self.lyric_index[lyric_num]
+                if len(indexes) > 0:
+                    self.lyric_box.yview(max(0, indexes[0] - (visible_lines // 2)))
         else:
             self._enable_scroll()
 

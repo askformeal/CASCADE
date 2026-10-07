@@ -11,13 +11,12 @@ from src.sentinels import SENTINELS
 from src.utils.lyric import get_lyric_line
 from src.utils.escape_code import ESCAPE_CODE as EC
 from src.utils.time_ import format_time
+from src.utils.text import strlen, wrap_text
 from src.utils.tui import (
-    strlen, 
     align, 
     center, 
     progress_bar, 
-    window_list, 
-    wrap_text
+    window_list
     )
 from .empty import DASH_EMPTY as EMPTY
 

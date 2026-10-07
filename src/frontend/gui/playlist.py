@@ -139,8 +139,7 @@ class PlaylistMixin:
                 )
         else:
             self.playlist_label.config(
-                text='',
-                height=0,
+                text=''
                 )
 
         filter_ = self.filter_entry.get()

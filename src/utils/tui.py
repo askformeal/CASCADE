@@ -1,16 +1,10 @@
 from io import BytesIO
 import math
-import re
 
-from wcwidth import wcswidth
 from PIL import Image, ImageOps
 
 from src.constants.misc import BOX_STYLES
-
-ESCAPE_PATTERN = re.compile(r'\x1b\[[0-?]*[ -/]*[@-~]')
-
-def strlen(text):
-    return wcswidth(ESCAPE_PATTERN.sub('', text))
+from .text import strlen
 
 def box(*texts: str, l_pad=2, r_pad=2, style='ascii'):
     style = str(style)
@@ -74,18 +68,6 @@ def align(width, left='', right=''):
 def progress_bar(progress, length):
     progress = min(max(round(progress), 0), length)
     return f"{'█'*progress}{'░'*(length-progress)}"
-
-def wrap_text(text, max_len):
-    lines = ['']
-    words = text.split(' ')
-    for word in words:
-        if strlen(lines[-1]) + strlen(word) + 1 <= max_len:
-            if lines[-1] != '':
-                lines[-1] += ' '
-            lines[-1] += word
-        else:
-            lines.append(word)
-    return '\n'.join(lines)
 
 def window_list(lines, window_len, selected, current=None, filter='', newline_selected=False, mark_unshown=True, left_align=True, end_of_line_char=''):
     from .misc import squeeze

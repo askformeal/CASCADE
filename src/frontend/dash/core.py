@@ -28,8 +28,8 @@ from src.utils.misc import (
     get_song_display_name,
     base642bytes
     )
+from src.utils.text import strlen
 from src.utils.tui import (
-    strlen, 
     box, 
     window_list,
     render_tui_cover
