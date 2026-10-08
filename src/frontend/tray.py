@@ -19,6 +19,7 @@ from src.constants.tray import TRAY_POLL_INTERVAL, TRAY_ERROR_DISPLAY_TIME
 from src.constants.misc import AUDIO_FILE_TYPES
 from src.frontend.client import send_request, test_heartbeat, handle_code
 from src.frontend.snapshot import Snapshot
+from src.process import ProcessManager
 from src.utils.misc import get_song_display_name
 from src.utils.tray import Label
 
@@ -27,6 +28,7 @@ logger = setup_logger(__name__, TRAY_LOG_PATH)
 class Tray(Icon):
     def __init__(self):
         self.snapshot = Snapshot(self._send_tray_request)
+        self.process = ProcessManager(logger)
         self.running = True
         self.tk_window = tk.Tk() # file dialog will act weird without this
         self.tk_window.withdraw()
@@ -111,6 +113,8 @@ class Tray(Icon):
                         MenuItem('75%', lambda *_: self._send_tray_request('volume', volume='75')),
                         MenuItem('100%', lambda *_: self._send_tray_request('volume', volume='100')),
                     )),
+                    Menu.SEPARATOR,
+                    MenuItem('Open GUI', lambda *_: self.process.spawn('src.frontend.gui.core')),
                     Menu.SEPARATOR,
                     MenuItem('Quit Tray', lambda *_: self.exit()),
                     MenuItem('Exit CASCADE', lambda *_: self._send_tray_request('exit')),
