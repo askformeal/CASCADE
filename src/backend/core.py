@@ -11,10 +11,10 @@ from src.log import setup_logger
 from src.constants.log import SILENT_LOG_LEVEL
 from src.constants.backend import LOOP_INTERVAL, PLAY_DEAD_TIME, REQUEST_COUNT_BUFFER
 from src.constants.paths import (
-    BACKEND_LOG,
     DATABASE,
     DATABASE_DEV,
 )
+from src.constants.paths.log import BACKEND_LOG
 from src.constants.network import (
     BACKLOG,
     ACTION_KEYS,

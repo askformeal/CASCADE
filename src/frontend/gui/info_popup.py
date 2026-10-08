@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 
-from src.constants.paths import GUI_COPY
+from src.constants.paths.res.gui import GUI_COPY
 from src.constants.gui import FONT_SIZE
 from src.utils.time_ import format_time
 from .empty import GUI_EMPTY as EMPTY

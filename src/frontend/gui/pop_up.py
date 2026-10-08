@@ -1,6 +1,6 @@
 import tkinter as tk
 
-from src.constants.paths import ICON
+from src.constants.paths.res import ICON
 from src.frontend.tkinter_tools.to_center import to_center
 
 class PopUp(tk.Toplevel):

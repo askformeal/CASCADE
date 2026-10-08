@@ -2,7 +2,7 @@ import socket
 from time import sleep
 
 from src.log import setup_logger
-from src.constants.paths import SOCKET_LOG
+from src.constants.paths.log import SOCKET_LOG
 from src.constants.frontend import DEATH_CONFIRM_INTERVAL, DEATH_CONFIRM_NUMBER
 from src.config import CONFIG
 from src.connection import send_json, recv_json

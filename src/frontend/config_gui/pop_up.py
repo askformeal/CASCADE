@@ -1,7 +1,7 @@
 import tkinter as tk
 
 from .logger import logger
-from src.constants.paths import ICON
+from src.constants.paths.res import ICON
 from src.constants.config_gui import (
     POP_UP_POS_X, 
     POP_UP_POS_Y, 

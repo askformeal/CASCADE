@@ -1,7 +1,7 @@
 import random
 
 from src.log import setup_logger
-from src.constants.paths import BACKEND_LOG
+from src.constants.paths.log import BACKEND_LOG
 from src.sentinels import SENTINELS
 from src import gen_response
 from .helpers import (

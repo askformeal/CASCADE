@@ -1,7 +1,7 @@
 import tkinter as tk
 
 from .logger import logger
-from src.constants.paths import (
+from src.constants.paths.res.gui import (
     ONLINE_LYRIC_ICON,
     LOCAL_LYRIC_ICON,
     RESET_OFFSET_ICON

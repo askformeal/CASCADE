@@ -9,8 +9,8 @@ from PIL import Image
 
 from src.log import setup_logger
 
-from src.constants.paths import (
-    TRAY_LOG,
+from src.constants.paths.log import TRAY_LOG
+from src.constants.paths.res import (
     ICON,
     ERROR_ICON,
 )

@@ -4,8 +4,8 @@ import tkinter.font as tkfont
 from PIL import Image, ImageTk
 
 from .logger import logger
-from src.constants.paths import (
-    ICON, 
+from src.constants.paths.res import ICON
+from src.constants.paths.res.config_gui import (
     REMOTE_ICON,
     REFRESH_ICON,
     EDIT_ICON,

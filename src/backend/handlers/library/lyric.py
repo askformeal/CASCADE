@@ -2,7 +2,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from src.log import setup_logger
-from src.constants.paths import BACKEND_LOG
+from src.constants.paths.log import BACKEND_LOG
 from src.constants.misc import ENCODING
 from src.constants.backend import LYRIC_FETCH_MAX_WORKERS
 from src.sentinels import SENTINELS

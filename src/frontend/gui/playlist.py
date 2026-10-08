@@ -1,6 +1,6 @@
 import tkinter as tk
 
-from src.constants.paths import (
+from src.constants.paths.res.gui import (
     FILTER_ICON,
     SELECT_CURRENT_ICON, 
     SWITCH_SELECTED_ICON

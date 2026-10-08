@@ -7,7 +7,7 @@ from pathlib import Path
 from PIL import Image, ImageTk
 
 from .logger import logger
-from src.constants.paths import (
+from src.constants.paths.res.gui import (
     GUI_NO_COVER,
     SAVE_COVER_ICON,
     INFO_ICON,

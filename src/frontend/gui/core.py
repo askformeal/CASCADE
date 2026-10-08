@@ -11,7 +11,7 @@ if sys.platform == 'win32':
 from PIL import Image, ImageTk
 
 from .logger import logger
-from src.constants.paths import ICON
+from src.constants.paths.res import ICON
 from src.constants.gui import (
     UPDATE_INTERVAL,
     FAMILY_FALLBACK,

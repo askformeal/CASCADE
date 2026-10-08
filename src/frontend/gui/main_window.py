@@ -4,8 +4,8 @@ from tkinter import ttk
 from tkinter import messagebox
 
 from src import __version__
-from src.constants.paths import (
-    LICENSE,
+from src.constants.paths.res import LICENSE
+from src.constants.paths.res.gui import (
     ONLINE_ICON,
     OFFLINE_ICON,
     START_ICON

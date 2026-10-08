@@ -9,7 +9,8 @@ from PIL import Image
 
 from src.frontend.client import handle_code, send_request, test_heartbeat
 from src.config import CONFIG
-from src.constants.paths import LYRIC_LOG, LYRIC_ICON
+from src.constants.paths.log import LYRIC_LOG
+from src.constants.paths.res import LYRIC_ICON
 from src.constants.frontend import HEARTBEAT_POLL_INTERVAL
 from src.constants.lyric import LYRIC_POLL_INTERVAL, LYRIC_HOVER_EXTENSION as HOVER_EXT
 from src.log import setup_logger
