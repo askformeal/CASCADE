@@ -29,7 +29,10 @@ class Builder:
         self.base = argparse.ArgumentParser(add_help=False)
         self.base.add_argument('--verbose', action='store_true', help='Print log to console')
 
-        parser = argparse.ArgumentParser(prog=f'CASCADE {__version__}', epilog=f'GitHub Repository: {REPO_LINK}')
+        parser = argparse.ArgumentParser(
+            prog='cascade',
+            epilog=f'GitHub Repository: {REPO_LINK}',
+            )
 
         command_sub = parser.add_subparsers(dest='action', required=True)
 
