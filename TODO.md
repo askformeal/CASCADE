@@ -65,6 +65,7 @@
 - [X] GUI configure editor
 - [X] Add ~~a wiki~~ full document
 - [X] GUI frontend
+- [ ] Manually managing playlist sorting
 - [ ] GUI library manager
 - [ ] HTTP frontend
 - [ ] Audio visualization
