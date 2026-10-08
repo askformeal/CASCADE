@@ -1,8 +1,8 @@
 import argparse
 from pathlib import Path
 
-from src import __version__
-from src.constants.misc import REPO_LINK
+from src.constants.cli import HELP_DESCRIPTION
+from src.utils.text import strlen
 
 class Builder:
     def _path(self, val):
@@ -25,13 +25,29 @@ class Builder:
         result.set_defaults(**{parser.dest: action})
         return result
 
+    def _get_description(self):
+        description = ''
+        lines = HELP_DESCRIPTION.splitlines()
+        max_len = max(map(strlen, lines))
+        separator = '=' * (max_len + 6)
+        description += separator
+        for line in lines:
+            if len(line.strip()) > 0:
+                description += f'\n   {line}'
+            else:
+                description += f'\n\n'
+        description += f'\n\n{separator}'
+        
+        return description
+
     def build_parser(self):
         self.base = argparse.ArgumentParser(add_help=False)
         self.base.add_argument('--verbose', action='store_true', help='Print log to console')
 
         parser = argparse.ArgumentParser(
             prog='cascade',
-            epilog=f'GitHub Repository: {REPO_LINK}',
+            description=self._get_description(),
+            formatter_class=argparse.RawDescriptionHelpFormatter
             )
 
         command_sub = parser.add_subparsers(dest='action', required=True)
