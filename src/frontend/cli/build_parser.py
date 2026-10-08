@@ -1,6 +1,7 @@
 import argparse
 from pathlib import Path
 
+from src import __version__
 from src.constants.cli import HELP_DESCRIPTION
 from src.utils.text import strlen
 
@@ -51,6 +52,8 @@ class Builder:
             )
 
         command_sub = parser.add_subparsers(dest='action', required=True)
+
+        parser.add_argument('-v', '--version', action='version', version=f'CASCADE version {__version__}')
 
         start_parser = self._add_parser(command_sub, 'start', help='Start CASCADE backend')
         start_parser.add_argument('-c', '--continue', action='store_true', help='Continue playing last song')
