@@ -9,7 +9,7 @@ from src.frontend.client import send_request
 from src.process import ProcessManager
 from src.constants.paths import CLI_LOG_PATH
 from src.constants.frontend import ATTACHMENT_REQUIRED_ACTIONS
-from src.constants.cli import FAIL_TAG, OK_TAG
+from src.constants.cli import FAIL_TAG, OK_TAG, NON_REQUEST_KEYS
 from src.config_manager import CONFIG_MANAGER
 from .song_output import SongOutput
 from src.utils.escape_code import ESCAPE_CODE as EC
@@ -82,8 +82,6 @@ def main():
             dev_status = True
         else:
             dev_status = False
-        if 'dev' in args.keys():
-            del args['dev']
 
         if 'direct' in args.keys() and args['direct'] is None:
             args['direct'] = False
@@ -97,7 +95,6 @@ def main():
             if answer == 'n':
                 print('Cancelled')
                 return
-            del args['yes']
 
 # -------------------------------------- Pre-response --------------------------------------
 
@@ -117,8 +114,7 @@ def main():
             logger.info(f'Getting response from local config manager...')
             response = dict(response)
         else:
-            if 'direct' in args.keys():
-                del args['direct']
+            args = _filter_args(args)
             request = _wrap_request(args)
             logger.info(f'Sending request to backend...\n{json.dumps(request, indent=4)}')
             response = send_request(**request)
@@ -200,7 +196,7 @@ def main():
                                 'DEVELOPMENT MODE ON'
                                 )
                         text = '\n'.join(text)
-                        
+
                         print(cli_box(text))
 
                     elif action == 'list':
@@ -335,6 +331,13 @@ def _reboot_backend(process, **kwargs):
         print(f'{FAIL_TAG} Failed to exit backend')
     elif result is SENTINELS.FAILED_START_BACKEND:
         print(f'{FAIL_TAG} Backend is exited but failed to start. Examine log files for more information')
+
+def _filter_args(args):
+    for key in NON_REQUEST_KEYS:
+        if key in args.keys():
+            del args[key]
+
+    return args
 
 
 if __name__ == '__main__':
