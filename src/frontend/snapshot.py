@@ -57,6 +57,8 @@ class Snapshot:
         self.run_time = self.empty
         self.dev = self.empty
 
+        self.request_rate = self.empty
+
     def poll(self):
         self.reset()
         snapshot = self.request('poll', silent=True)
@@ -114,6 +116,8 @@ class Snapshot:
 
         self.run_time = self.get('run_time')
         self.dev = self.get('dev')
+
+        self.request_rate = self.get('request_rate')
 
     def get(self, name):
         value = self.snapshot.get(name, self.empty)

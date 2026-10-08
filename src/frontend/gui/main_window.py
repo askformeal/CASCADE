@@ -20,6 +20,7 @@ from .start_popup import StartPopUp
 class MainWinMixin(MenubarMixin):
     def __init__(self):
         self.running = True
+        self.dev_bar_on = tk.BooleanVar(value=False)
         self.backend_online = True
         self.window_ready = False
         self.dev_label_shown = False
@@ -39,6 +40,7 @@ class MainWinMixin(MenubarMixin):
         self.hotkey(self, '<v>', self._toggle_lyric_visible)
         self.bind('<F11>', self._toggle_fullscreen)
         self.bind('<Alt-Return>', self._toggle_fullscreen)
+        self.bind('<F12>', self._toggle_dev_bar)
     
         self.hotkey(self, '<Shift-F1>', self._show_about)
     
@@ -55,10 +57,6 @@ class MainWinMixin(MenubarMixin):
         self.online_button = tk.Button(bottom_bar, command=lambda: Thread(target=self.check_backend).start())
         self.online_button.pack(side='right')
         self.balloon.bind_widget(self.online_button, 'Ping backend')
-    
-        self.run_time_label = tk.Label(bottom_bar, font=self.get_font(size=FONT_SIZE, weight='bold'))
-        self.run_time_label.pack(side='left', padx=(0, 20))
-        self.balloon.bind_widget(self.run_time_label, 'Backend run time')
     
         self.dev_label = tk.Label(bottom_bar, 
                                   font=self.get_font(size=FONT_SIZE+3, weight='bold'), 
@@ -111,6 +109,26 @@ class MainWinMixin(MenubarMixin):
         self.lyric_unpack = lyric_frame.pack_forget
         self.lyric_pack()
 
+        self.dev_bar = tk.Frame(self)
+        self.pack_dev_bar = lambda: self.dev_bar.pack(
+            side='bottom',
+            fill='x',
+            before=bottom_bar,
+            pady=(0,15),
+            padx=10
+            )
+
+        dev_font = self.get_font(size=FONT_SIZE, weight='bold')
+
+        self.run_time_label = tk.Label(self.dev_bar, font=dev_font)
+        self.run_time_label.pack(side='left', padx=(0, 10))
+        self.balloon.bind_widget(self.run_time_label, 'Backend run time')
+
+        self.request_rate_label = tk.Label(self.dev_bar, font=dev_font)
+        self.request_rate_label.pack(side='left')
+        self.balloon.bind_widget(self.request_rate_label, 'Request received per second')
+
+
     def _update_main_window(self):
         if self.snapshot.playlists is EMPTY:
             current_playlists = []
@@ -131,9 +149,10 @@ class MainWinMixin(MenubarMixin):
             self.online_button.config(image=self.offline_icon)
         
         if self.snapshot.run_time is not EMPTY:
-            self.run_time_label.config(text=format_time(self.snapshot.run_time, unit='sec'))
+            run_time = format_time(self.snapshot.run_time, unit='sec')
         else:
-            self.run_time_label.config(text='--:--:--')
+            run_time = '--:--:--'
+        self.run_time_label.config(text=f'Run time: {run_time}')
         
         if (self.snapshot.dev is not EMPTY 
             and self.snapshot.dev
@@ -141,6 +160,23 @@ class MainWinMixin(MenubarMixin):
             ):
             self.dev_label.pack(side='left')
             self.dev_label_shown = True
+
+        if self.snapshot.request_rate is not EMPTY:
+            request_rate = f'{self.snapshot.request_rate:.2f}Hz'
+        else:
+            request_rate = EMPTY
+
+        self.request_rate_label.config(text=f'Request rate: {request_rate}')
+
+    def _toggle_dev_bar(self, *_):
+        self.dev_bar_on.set(not self.dev_bar_on.get())
+        self._apply_dev_bar()
+
+    def _apply_dev_bar(self, *_):
+        if self.dev_bar_on.get():
+            self.pack_dev_bar()
+        else:
+            self.dev_bar.pack_forget()
 
     def _reload(self, *_):
         self.send_command(action='load_last')

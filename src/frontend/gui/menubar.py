@@ -67,6 +67,12 @@ class MenubarMixin:
             accelerator='F11',
             command=self._apply_fullscreen
             )
+        view_menu.add_checkbutton(
+            label='Development info',
+            variable=self.dev_bar_on,
+            accelerator='F12',
+            command=self._apply_dev_bar
+            )
         
         help_menu = tk.Menu(menubar, tearoff=False)
         help_menu.add_command(label='GitHub repository...', command=lambda: webbrowser.open(REPO_LINK))
