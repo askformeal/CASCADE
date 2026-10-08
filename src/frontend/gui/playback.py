@@ -12,7 +12,6 @@ from src.constants.paths import (
     SAVE_COVER_ICON_PATH,
     INFO_ICON_PATH,
     RELOAD_ICON_PATH,
-    START_ICON_PATH,
     PREV_SONG_ICON_PATH,
     NEXT_SONG_ICON_PATH,
     PLAY_ICON_PATH,
@@ -56,7 +55,6 @@ class PlaybackMixin:
         self.info_icon = self.get_icon(INFO_ICON_PATH)
         self.save_cover_icon = self.get_icon(SAVE_COVER_ICON_PATH)
         self.reload_icon = self.get_icon(RELOAD_ICON_PATH)
-        self.start_icon = self.get_icon(START_ICON_PATH)
 
         self.unmute_icon = self.get_icon(UNMUTE_ICON_PATH, 18)
         self.mute_icon = self.get_icon(MUTE_ICON_PATH, 18)
@@ -120,14 +118,6 @@ class PlaybackMixin:
         )
         reload_button.pack(side='right')
         self.balloon.bind_widget(reload_button, 'Reload (F5)')
-
-        start_button = tk.Button(
-            top_bar,
-            image=self.start_icon,
-            command=self._open_start,
-        )
-        start_button.pack(side='left')
-        self.balloon.bind_widget(start_button, 'Start / Reboot (Ctrl+B)')
 
         self.name_label = tk.Label(playback_frame, font=self.get_font(size=FONT_SIZE+6, weight='bold'))
         self.name_label.pack(pady=(0,10))

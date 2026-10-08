@@ -7,7 +7,8 @@ from src import __version__
 from src.constants.paths import (
     LICENSE_PATH,
     ONLINE_ICON_PATH,
-    OFFLINE_ICON_PATH
+    OFFLINE_ICON_PATH,
+    START_ICON_PATH
     )
 from src.constants.gui import DEV_COLOR, FONT_SIZE
 from src.constants.misc import ENCODING, REPO_LINK
@@ -46,6 +47,7 @@ class MainWinMixin(MenubarMixin):
     
         self.online_icon = self.get_icon(ONLINE_ICON_PATH, (32, 23))
         self.offline_icon = self.get_icon(OFFLINE_ICON_PATH, (32, 23))
+        self.start_icon = self.get_icon(START_ICON_PATH)
     
         menubar = tk.Menu(self)
         self.config(menu=menubar)
@@ -53,10 +55,20 @@ class MainWinMixin(MenubarMixin):
     
         bottom_bar = tk.Frame(self)
         bottom_bar.pack(side='bottom', fill='x', padx=10, pady=(0,10))
+
+        ttk.Separator(self).pack(side='bottom', fill='x', pady=(0,10), padx=3)
     
         self.online_button = tk.Button(bottom_bar, command=lambda: Thread(target=self.check_backend).start())
-        self.online_button.pack(side='right')
+        self.online_button.pack(side='right', padx=(10,0))
         self.balloon.bind_widget(self.online_button, 'Ping backend')
+
+        start_button = tk.Button(
+            bottom_bar,
+            image=self.start_icon,
+            command=self._open_start,
+        )
+        start_button.pack(side='right')
+        self.balloon.bind_widget(start_button, 'Start / Reboot (Ctrl+B)')
     
         self.dev_label = tk.Label(bottom_bar, 
                                   font=self.get_font(size=FONT_SIZE+3, weight='bold'), 
@@ -115,7 +127,7 @@ class MainWinMixin(MenubarMixin):
             fill='x',
             before=bottom_bar,
             pady=(0,15),
-            padx=10
+            padx=5
             )
 
         dev_font = self.get_font(size=FONT_SIZE, weight='bold')
