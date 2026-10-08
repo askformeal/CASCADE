@@ -43,7 +43,7 @@ class Builder:
 
     def build_parser(self):
         self.base = argparse.ArgumentParser(add_help=False)
-        self.base.add_argument('--verbose', action='store_true', help='Print log to console')
+        self.base.add_argument('-v', '--verbose', action='store_true', help='Print log to console')
 
         parser = argparse.ArgumentParser(
             prog='cascade',
@@ -53,7 +53,7 @@ class Builder:
 
         command_sub = parser.add_subparsers(dest='action', required=True)
 
-        parser.add_argument('-v', '--version', action='version', version=f'CASCADE version {__version__}')
+        parser.add_argument('-V', '--version', action='version', version=f'CASCADE version {__version__}')
 
         start_parser = self._add_parser(command_sub, 'start', help='Start CASCADE backend')
         start_parser.add_argument('-c', '--continue', action='store_true', help='Continue playing last song')
