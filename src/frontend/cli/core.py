@@ -78,6 +78,13 @@ def main():
         ConfigGUI(args['direct']).run()
 
     else:
+        if args['action'] == 'status' and args['dev']:
+            dev_status = True
+        else:
+            dev_status = False
+        if 'dev' in args.keys():
+            del args['dev']
+
         if 'direct' in args.keys() and args['direct'] is None:
             args['direct'] = False
 
@@ -152,34 +159,48 @@ def main():
                         else:
                             playlist = f'Playlist: {output.playlist_name}'
 
-                        text = '\n'.join((
-                                        f'\n{output.display_name} - {output.artist} [{output.current_num} / {output.playlist_len}]',
-                                        f'[{output.time} / {output.length}] {output.percentage}%\n',
-                                        f'In library: {output.in_lib}',
-                                        f'Album: {output.album}',
-                                        '',
-                                        playlist,
-                                        '',
-                                        f'Path: {output.path}',
-                                        f'Lyric File Path: {output.lyric}',
-                                        '',
-                                        f'Player status: {output.player_status}',
-                                        f'Volume: {output.volume}%',
-                                        f'Mute: {output.mute}',
-                                        '',
-                                        f'Shuffle: {output.shuffle}',
-                                        f'Loop: {output.loop}',
-                                        f'Reverse: {output.reverse}',
-                                        f'Online Lyric: {output.online_lyric}',
-                                        '',
-                                        f'Audio Engine: {output.engine}',
-                                        '',
-                                        f'CASCADE backend has been running for {output.run_time}',
-                        ))
+                        text = (
+                            f'\n{output.display_name} - {output.artist} [{output.current_num} / {output.playlist_len}]',
+                            f'[{output.time} / {output.length}] {output.percentage}%\n',
+                            f'In library: {output.in_lib}',
+                            f'Album: {output.album}',
+                            '',
+                            playlist,
+                            '',
+                            f'Path: {output.path}',
+                            f'Lyric File Path: {output.lyric}',
+                            '',
+                            f'Player status: {output.player_status}',
+                            f'Volume: {output.volume}%',
+                            f'Mute: {output.mute}',
+                            '',
+                            f'Shuffle: {output.shuffle}',
+                            f'Loop: {output.loop}',
+                            f'Reverse: {output.reverse}',
+                            f'Online Lyric: {output.online_lyric}',
+                            '',
+                            f'Audio Engine: {output.engine}',
+                            
+                        )
+
+                        if dev_status:
+                            text += (
+                                '',
+                                f'{EC.bold}Development information{EC.reset}',
+                                '',
+                                f'Backend run time: {output.run_time}',
+                                '',
+                                f'Request rate: {output.request_rate}'
+                            )
 
                         if output.dev:
-                            text += '\n\nDEVELOPMENT MODE ON'
-
+                            text += (
+                                '',
+                                '',
+                                'DEVELOPMENT MODE ON'
+                                )
+                        text = '\n'.join(text)
+                        
                         print(cli_box(text))
 
                     elif action == 'list':

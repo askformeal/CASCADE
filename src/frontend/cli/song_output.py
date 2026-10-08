@@ -115,6 +115,12 @@ class SongOutput:
     
         self.dev = info.get('dev', False)
 
+        self.request_rate = info.get('request_rate', None)
+        if self.request_rate is None:
+            self.request_rate = '?'
+        else:
+            self.request_rate = round(self.request_rate, 2)
+
         if self.name is None:
             if self.path != '?' and self.path is not None:
                 self.display_name = Path(self.path).stem

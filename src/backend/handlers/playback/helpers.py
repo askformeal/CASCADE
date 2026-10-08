@@ -67,7 +67,8 @@ def get_status(ctx):
         'playlist_name': playlist_name,
         'playing_all': playing_all,
         'engine': ctx.playback.get_engine_name(),
-        'run_time': time.time() - ctx.start_time
+        'run_time': time.time() - ctx.start_time,
+        'request_rate': ctx.get_request_rate()
     }
     progress = ctx.playback.get_progress()
     status['length'] = progress['length']

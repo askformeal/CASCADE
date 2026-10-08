@@ -44,6 +44,7 @@ class Builder:
         gui_parser = self._add_parser(command_sub, 'gui', help='Open GUI')
 
         status_parser = self._add_parser(command_sub, 'status', help='Show CASCADE status')
+        status_parser.add_argument('-d', '--dev', action='store_true', help='Show dev info')
 
         open_epilog = 'You can open a song in library, a playlist or a file on disk, and you can specify it with the --type option.'
         open_parser = self._add_parser(command_sub, 'open', help='Open a song or playlist. Supports alias, file path and playlist name', epilog=open_epilog)

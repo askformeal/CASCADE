@@ -9,7 +9,7 @@ import time
 from src import __version__
 from src.log import setup_logger
 from src.constants.log import SILENT_LOG_LEVEL
-from src.constants.backend import LOOP_INTERVAL, PLAY_DEAD_TIME
+from src.constants.backend import LOOP_INTERVAL, PLAY_DEAD_TIME, REQUEST_COUNT_BUFFER
 from src.constants.paths import (
     BACKEND_LOG_PATH,
     DATABASE_PATH,
@@ -57,6 +57,9 @@ class Backend:
         
         self.dispatch_buffer = queue.Queue() # single way
         self.notifies = []
+        
+        self.request_count = {} # request number of the last n active seconds
+        self.request_rate = 0 # average request per second
 
         try:
             self.database = Database(database_path)
@@ -70,7 +73,8 @@ class Backend:
                 playback=self.playback,
                 exit_=self.exit_,
                 start_time=time.time(),
-                dev=self.dev
+                dev=self.dev,
+                get_request_rate=self.get_request_rate
             )
 
             self.notifies.append(f'{CONFIG.username}, welcome to Command-Line Audio Stream Capture And Decoding Engine') # just for fun
@@ -95,6 +99,7 @@ class Backend:
 
             Thread(target=self._listen, daemon=True).start()
             Thread(target=self._memorize_pos, daemon=True).start()
+            Thread(target=self._update_request_count, daemon=True).start()
             self._flush_thread = Thread(target=self._flush_buffer, daemon=True)
             self._flush_thread.start()
 
@@ -120,7 +125,25 @@ class Backend:
         remove_pid(self.pid)
         sys.exit(self.exit_code)
 
-    def buffer_request(self, request, connection=None, address=None):            
+    def _update_request_count(self):
+        while self.running:
+            time_ = int(time.time())
+            if len(self.request_count) > 0:
+                earliest = min(self.request_count.keys())
+                if earliest < time_ - REQUEST_COUNT_BUFFER:
+                    del self.request_count[earliest]
+            try:
+                self.request_rate = sum(self.request_count.values()) / len(self.request_count)
+            except ZeroDivisionError:
+                self.request_rate = 0
+            time.sleep(LOOP_INTERVAL)
+
+    def get_request_rate(self):
+        return self.request_rate
+
+    def buffer_request(self, request, connection=None, address=None):
+        time_ = int(time.time())
+        self.request_count[time_] = self.request_count.get(time_, 0) + 1
         if self.dying:
             if connection is not None:
                 send_json(connection, gen_response.Dying())
