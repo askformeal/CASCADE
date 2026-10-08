@@ -1,6 +1,6 @@
 import tkinter as tk
 
-from src.constants.paths import ICON_PATH
+from src.constants.paths import ICON
 from src.frontend.tkinter_tools.to_center import to_center
 
 class PopUp(tk.Toplevel):
@@ -10,7 +10,7 @@ class PopUp(tk.Toplevel):
 
         self.transient(self.master)
         self.title(title)
-        self.iconbitmap(ICON_PATH)
+        self.iconbitmap(ICON)
         self.resizable(False, False)
         
         self.bind('<Escape>', lambda *_: self.destroy())

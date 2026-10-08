@@ -10,9 +10,9 @@ from PIL import Image
 from src.log import setup_logger
 
 from src.constants.paths import (
-    TRAY_LOG_PATH,
-    ICON_PATH,
-    ERROR_ICON_PATH,
+    TRAY_LOG,
+    ICON,
+    ERROR_ICON,
 )
 from src.constants.frontend import HEARTBEAT_POLL_INTERVAL
 from src.constants.tray import TRAY_POLL_INTERVAL, TRAY_ERROR_DISPLAY_TIME
@@ -23,7 +23,7 @@ from src.process import ProcessManager
 from src.utils.misc import get_song_display_name
 from src.utils.tray import Label
 
-logger = setup_logger(__name__, TRAY_LOG_PATH)
+logger = setup_logger(__name__, TRAY_LOG)
 
 class Tray(Icon):
     def __init__(self):
@@ -32,8 +32,8 @@ class Tray(Icon):
         self.running = True
         self.tk_window = tk.Tk() # file dialog will act weird without this
         self.tk_window.withdraw()
-        self.ok_icon = Image.open(Path(ICON_PATH).open('rb'))
-        self.error_icon = Image.open(Path(ERROR_ICON_PATH).open('rb'))
+        self.ok_icon = Image.open(Path(ICON).open('rb'))
+        self.error_icon = Image.open(Path(ERROR_ICON).open('rb'))
 
         super().__init__('cascade', self.ok_icon)
         self._last_sig = None

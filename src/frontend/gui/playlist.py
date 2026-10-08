@@ -1,9 +1,9 @@
 import tkinter as tk
 
 from src.constants.paths import (
-    FILTER_ICON_PATH,
-    SELECT_CURRENT_ICON_PATH, 
-    SWITCH_SELECTED_ICON_PATH
+    FILTER_ICON,
+    SELECT_CURRENT_ICON, 
+    SWITCH_SELECTED_ICON
     )
 from src.constants.gui import (
     PLAYLIST_SELECT_BG,
@@ -23,9 +23,9 @@ class PlaylistMixin:
         self.song_indexes = []
         self.playlist_empty = False
         
-        self.filter_icon = self.get_icon(FILTER_ICON_PATH, 20)
-        self.select_current_icon = self.get_icon(SELECT_CURRENT_ICON_PATH, 20)
-        self.switch_selected_icon = self.get_icon(SWITCH_SELECTED_ICON_PATH, 20)
+        self.filter_icon = self.get_icon(FILTER_ICON, 20)
+        self.select_current_icon = self.get_icon(SELECT_CURRENT_ICON, 20)
+        self.switch_selected_icon = self.get_icon(SWITCH_SELECTED_ICON, 20)
 
     def build_playlist(self, playlist_frame):
         self.hotkey(self, '<c>', self._select_current)

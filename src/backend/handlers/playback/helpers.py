@@ -3,14 +3,14 @@ import random
 from pathlib import Path
 
 from src.log import setup_logger
-from src.constants.paths import BACKEND_LOG_PATH
+from src.constants.paths import BACKEND_LOG
 
 from src.sentinels import SENTINELS
 from src import gen_response
 from src.utils.misc import sort_songs
 from src.utils.time_ import format_time
 
-logger = setup_logger(__name__, BACKEND_LOG_PATH)
+logger = setup_logger(__name__, BACKEND_LOG)
 
 def get_status(ctx):
     player_status = {

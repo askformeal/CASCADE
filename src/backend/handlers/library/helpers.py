@@ -3,14 +3,14 @@ from pathlib import Path
 import syncedlyrics
 
 from src.log import setup_logger
-from src.constants.paths import BACKEND_LOG_PATH
+from src.constants.paths import BACKEND_LOG
 from src import gen_response
 from src.sentinels import SENTINELS
 from src.utils.file_extract import extract_file_meta
 from src.utils.misc import sort_songs, verify_path_format
 from src.utils.time_ import format_time
 
-logger = setup_logger(__name__, BACKEND_LOG_PATH)
+logger = setup_logger(__name__, BACKEND_LOG)
 
 def get_song(ctx, song, cwd): # try to get song id from database
     id = ctx.database.get_song_via_alias(song)

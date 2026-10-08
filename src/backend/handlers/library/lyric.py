@@ -2,7 +2,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from src.log import setup_logger
-from src.constants.paths import BACKEND_LOG_PATH
+from src.constants.paths import BACKEND_LOG
 from src.constants.misc import ENCODING
 from src.constants.backend import LYRIC_FETCH_MAX_WORKERS
 from src.sentinels import SENTINELS
@@ -11,7 +11,7 @@ from src.utils.misc import get_song_display_name
 from src.utils.lyric import parse_lyric
 from .helpers import get_song, fetch_lyric
 
-logger = setup_logger(__name__, BACKEND_LOG_PATH)
+logger = setup_logger(__name__, BACKEND_LOG)
 
 def set_(ctx, request):
     song = request['song']

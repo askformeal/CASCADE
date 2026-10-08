@@ -11,7 +11,7 @@ if sys.platform == 'win32':
 from PIL import Image, ImageTk
 
 from .logger import logger
-from src.constants.paths import ICON_PATH
+from src.constants.paths import ICON
 from src.constants.gui import (
     UPDATE_INTERVAL,
     FAMILY_FALLBACK,
@@ -75,7 +75,7 @@ class GUI(tk.Tk, MainWinMixin, PlaybackMixin, PlaylistMixin, LyricMixin, Lifecyc
         self.font = self.get_font(size=FONT_SIZE)
 
         self.title('C.A.S.C.A.D.E')
-        self.iconbitmap(ICON_PATH)
+        self.iconbitmap(ICON)
         self.protocol("WM_DELETE_WINDOW", self._exit)
 
         self._build_window()

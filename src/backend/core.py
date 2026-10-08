@@ -11,9 +11,9 @@ from src.log import setup_logger
 from src.constants.log import SILENT_LOG_LEVEL
 from src.constants.backend import LOOP_INTERVAL, PLAY_DEAD_TIME, REQUEST_COUNT_BUFFER
 from src.constants.paths import (
-    BACKEND_LOG_PATH,
-    DATABASE_PATH,
-    DATABASE_DEV_PATH,
+    BACKEND_LOG,
+    DATABASE,
+    DATABASE_DEV,
 )
 from src.constants.network import (
     BACKLOG,
@@ -35,7 +35,7 @@ from src.backend.context import Context
 from src.backend.handlers import ROUTER
 from src.pid import add_pid, remove_pid
 
-logger = setup_logger(__name__, BACKEND_LOG_PATH)
+logger = setup_logger(__name__, BACKEND_LOG)
 
 class Backend:
     def __init__(self):
@@ -47,9 +47,9 @@ class Backend:
 
         if self.dev:
             logger.info('DEVELOPMENT MODE ON')
-            database_path = DATABASE_DEV_PATH
+            database_path = DATABASE_DEV
         else:
-            database_path = DATABASE_PATH
+            database_path = DATABASE
 
         self.exit_code = 0
         self.running = True

@@ -2,9 +2,9 @@ import tkinter as tk
 
 from .logger import logger
 from src.constants.paths import (
-    ONLINE_LYRIC_ICON_PATH,
-    LOCAL_LYRIC_ICON_PATH,
-    RESET_OFFSET_ICON_PATH
+    ONLINE_LYRIC_ICON,
+    LOCAL_LYRIC_ICON,
+    RESET_OFFSET_ICON
 )
 from src.constants.gui import (
     LYRIC_BG,
@@ -32,9 +32,9 @@ class LyricMixin:
 
         self.offset_dragging = False
 
-        self.online_lyric_icon = self.get_icon(ONLINE_LYRIC_ICON_PATH)
-        self.local_lyric_icon = self.get_icon(LOCAL_LYRIC_ICON_PATH)
-        self.reset_offset_icon = self.get_icon(RESET_OFFSET_ICON_PATH)
+        self.online_lyric_icon = self.get_icon(ONLINE_LYRIC_ICON)
+        self.local_lyric_icon = self.get_icon(LOCAL_LYRIC_ICON)
+        self.reset_offset_icon = self.get_icon(RESET_OFFSET_ICON)
 
     def build_lyric(self, lyric_frame):
         self.hotkey(self, '<backslash>', self._reset_offset)

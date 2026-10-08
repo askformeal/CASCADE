@@ -4,11 +4,11 @@ import tomli_w
 from src.log import setup_logger
 
 from src.constants.config import CONFIG_SCHEME
-from src.constants.paths import CONFIG_PATH, CONFIG_LOG_PATH
+from src.constants.paths import CONFIG_PATH, CONFIG_LOG
 from src.sentinels import SENTINELS
 from src.types import get_type_name
 
-logger = setup_logger(__name__, CONFIG_LOG_PATH)
+logger = setup_logger(__name__, CONFIG_LOG)
 
 class Config:
     def load_file(self):

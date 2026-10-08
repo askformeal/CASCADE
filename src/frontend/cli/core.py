@@ -7,7 +7,7 @@ from src.log import setup_logger
 from src.sentinels import SENTINELS
 from src.frontend.client import send_request
 from src.process import ProcessManager
-from src.constants.paths import CLI_LOG_PATH
+from src.constants.paths import CLI_LOG
 from src.constants.frontend import ATTACHMENT_REQUIRED_ACTIONS
 from src.constants.cli import FAIL_TAG, OK_TAG, NON_REQUEST_KEYS
 from src.config_manager import CONFIG_MANAGER
@@ -31,7 +31,7 @@ def main():
 
     logger = setup_logger(
         __name__, 
-        CLI_LOG_PATH, 
+        CLI_LOG, 
         add_console=args['verbose']
         )
     logger.debug(f'Arguments ready: {args}')

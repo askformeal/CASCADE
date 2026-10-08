@@ -1,13 +1,13 @@
 from src.log import setup_logger
 
-from src.constants.paths import BACKEND_LOG_PATH
+from src.constants.paths import BACKEND_LOG
 from src.constants.backend import METADATA
 from src.sentinels import SENTINELS
 from src import gen_response
 from src.utils.file_extract import extract_file_meta
 from .helpers import get_song
 
-logger = setup_logger(__name__, BACKEND_LOG_PATH)
+logger = setup_logger(__name__, BACKEND_LOG)
 
 def set_(ctx, request):
     cwd = request.get('cwd', None)

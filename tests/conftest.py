@@ -38,7 +38,7 @@ def database(tmp_path):
 @pytest.fixture
 def backend(tmp_path, monkeypatch):
     """Full backend with temp DB; player state must be cleaned up after."""
-    monkeypatch.setattr('src.backend.core.DATABASE_PATH', tmp_path / 'test.db')
+    monkeypatch.setattr('src.backend.core.DATABASE', tmp_path / 'test.db')
     monkeypatch.setattr('src.pid.PID_PATH', tmp_path / 'PID.json')
     from src.backend.core import Backend
 

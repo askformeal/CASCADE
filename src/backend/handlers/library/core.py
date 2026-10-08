@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from src.log import setup_logger
-from src.constants.paths import BACKEND_LOG_PATH
+from src.constants.paths import BACKEND_LOG
 from src.constants.backend import SEARCH_META
 from src import gen_response
 from src.sentinels import SENTINELS
@@ -14,7 +14,7 @@ from .helpers import (
     add_song
     )
 
-logger = setup_logger(__name__, BACKEND_LOG_PATH)
+logger = setup_logger(__name__, BACKEND_LOG)
 
 def info(ctx, request):
     songs = request['songs']

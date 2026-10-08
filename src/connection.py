@@ -1,12 +1,12 @@
 import json
 
 from src.log import setup_logger
-from src.constants.paths import SOCKET_LOG_PATH
+from src.constants.paths import SOCKET_LOG
 from src.constants.network import HEADER_LEN, CONNECTION_ENCODING, MAX_JSON_SIZE
 from src.sentinels import SENTINELS
 from src.gen_response import Response
 
-logger = setup_logger(__name__, SOCKET_LOG_PATH)
+logger = setup_logger(__name__, SOCKET_LOG)
 
 def _json_response_default(value):
     if isinstance(value, Response):

@@ -1,7 +1,7 @@
 import tkinter as tk
 
 from .logger import logger
-from src.constants.paths import ICON_PATH
+from src.constants.paths import ICON
 from src.constants.config_gui import (
     POP_UP_POS_X, 
     POP_UP_POS_Y, 
@@ -38,7 +38,7 @@ class Popup(tk.Toplevel, EditorMixin):
         y = master.winfo_y() + POP_UP_POS_Y
         self.geometry(f'+{x}+{y}')
         self.resizable(False, False)
-        self.iconbitmap(ICON_PATH)
+        self.iconbitmap(ICON)
         self.bind('<Escape>', lambda *_: self.destroy())
         self.bind('<Return>', lambda *_: self._on_confirm(force=False))
         self.bind('<Delete>', self._unset)

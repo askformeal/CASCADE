@@ -9,7 +9,7 @@ from threading import Thread
 from src import __version__
 
 from .logger import logger
-from src.constants.paths import NO_COVER_PATH
+from src.constants.paths import NO_COVER
 from src.constants.misc import ENCODING, BOX_STYLES
 from src.constants.frontend import HEARTBEAT_POLL_INTERVAL
 from src.constants.dash import (
@@ -47,7 +47,7 @@ class Dash(HotkeyMixin, MainMixin, PlaylistMixin, InfoMixin):
         os.system('')
         self.running = True
 
-        with open(NO_COVER_PATH, 'r', encoding=ENCODING) as f:
+        with open(NO_COVER, 'r', encoding=ENCODING) as f:
             no_cover_raw = f.read()
         self.no_cover = base642bytes(no_cover_raw)
 

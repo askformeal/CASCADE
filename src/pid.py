@@ -1,10 +1,10 @@
 import json
 
 from src.constants.misc import ENCODING
-from src.constants.paths import PID_PATH, PID_LOG_PATH
+from src.constants.paths import PID_PATH, PID_LOG
 from src.log import setup_logger
 
-logger = setup_logger(__name__, PID_LOG_PATH)
+logger = setup_logger(__name__, PID_LOG)
 
 def get_pid():
     try:

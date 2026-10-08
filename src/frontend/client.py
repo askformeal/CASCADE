@@ -2,12 +2,12 @@ import socket
 from time import sleep
 
 from src.log import setup_logger
-from src.constants.paths import SOCKET_LOG_PATH
+from src.constants.paths import SOCKET_LOG
 from src.constants.frontend import DEATH_CONFIRM_INTERVAL, DEATH_CONFIRM_NUMBER
 from src.config import CONFIG
 from src.connection import send_json, recv_json
 
-logger = setup_logger(__name__, SOCKET_LOG_PATH)
+logger = setup_logger(__name__, SOCKET_LOG)
 
 def send_request(expect_reset=False, **kwargs):
     try:

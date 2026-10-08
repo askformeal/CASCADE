@@ -1,11 +1,11 @@
 from src.log import setup_logger
 
-from src.constants.paths import BACKEND_LOG_PATH
+from src.constants.paths import BACKEND_LOG
 from src.sentinels import SENTINELS
 from src import gen_response
 from .helpers import get_song
 
-logger = setup_logger(__name__, BACKEND_LOG_PATH)
+logger = setup_logger(__name__, BACKEND_LOG)
 
 def list_(ctx, request):
     song = request['song']

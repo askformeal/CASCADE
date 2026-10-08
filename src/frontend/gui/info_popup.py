@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 
-from src.constants.paths import GUI_COPY_PATH
+from src.constants.paths import GUI_COPY
 from src.constants.gui import FONT_SIZE
 from src.utils.time_ import format_time
 from .empty import GUI_EMPTY as EMPTY
@@ -13,7 +13,7 @@ class InfoPopUp(PopUp):
         
         self.config(padx=15, pady=5)
 
-        self.copy_icon = self.master.get_icon(GUI_COPY_PATH)
+        self.copy_icon = self.master.get_icon(GUI_COPY)
 
         tk.Label(
             self,

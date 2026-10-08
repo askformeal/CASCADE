@@ -5,10 +5,10 @@ from tkinter import messagebox
 
 from src import __version__
 from src.constants.paths import (
-    LICENSE_PATH,
-    ONLINE_ICON_PATH,
-    OFFLINE_ICON_PATH,
-    START_ICON_PATH
+    LICENSE,
+    ONLINE_ICON,
+    OFFLINE_ICON,
+    START_ICON
     )
 from src.constants.gui import DEV_COLOR, FONT_SIZE
 from src.constants.misc import ENCODING, REPO_LINK
@@ -45,9 +45,9 @@ class MainWinMixin(MenubarMixin):
     
         self.hotkey(self, '<Shift-F1>', self._show_about)
     
-        self.online_icon = self.get_icon(ONLINE_ICON_PATH, (32, 23))
-        self.offline_icon = self.get_icon(OFFLINE_ICON_PATH, (32, 23))
-        self.start_icon = self.get_icon(START_ICON_PATH)
+        self.online_icon = self.get_icon(ONLINE_ICON, (32, 23))
+        self.offline_icon = self.get_icon(OFFLINE_ICON, (32, 23))
+        self.start_icon = self.get_icon(START_ICON)
     
         menubar = tk.Menu(self)
         self.config(menu=menubar)
@@ -223,7 +223,7 @@ class MainWinMixin(MenubarMixin):
         self.process.spawn('src.frontend.config_gui')
 
     def _show_license(self):
-        with open(LICENSE_PATH, 'r', encoding=ENCODING) as f:
+        with open(LICENSE, 'r', encoding=ENCODING) as f:
             license_text = f.read()
         messagebox.showinfo('License', 'MIT License', detail=license_text)
 

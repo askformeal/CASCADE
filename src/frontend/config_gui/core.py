@@ -5,14 +5,14 @@ from PIL import Image, ImageTk
 
 from .logger import logger
 from src.constants.paths import (
-    ICON_PATH, 
-    REMOTE_ICON_PATH,
-    REFRESH_ICON_PATH,
-    EDIT_ICON_PATH,
-    OPEN_FILE_ICON_PATH,
-    COPY_PATH_ICON_PATH,
-    COLOR_BLACK_ICON_PATH,
-    COLOR_WHITE_ICON_PATH,
+    ICON, 
+    REMOTE_ICON,
+    REFRESH_ICON,
+    EDIT_ICON,
+    OPEN_FILE_ICON,
+    COPY_PATH_ICON,
+    COLOR_BLACK_ICON,
+    COLOR_WHITE_ICON,
     )
 from src.constants.config_gui import (
     TITLE,
@@ -55,7 +55,7 @@ class ConfigGUI(tk.Tk, HandlerMixin):
         self.withdraw()
 
         self.title(TITLE)
-        self.iconbitmap(ICON_PATH)
+        self.iconbitmap(ICON)
         self.geometry(f'{WIDTH}x{HEIGHT}+{POS_X}+{POS_Y}')
         self.resizable(*RESIZE)
 
@@ -104,13 +104,13 @@ class ConfigGUI(tk.Tk, HandlerMixin):
         button_frame = tk.Frame(self)
         button_frame.pack(side='top', fill='x')
 
-        self.remote_image = self._get_icon(REMOTE_ICON_PATH)
-        self.refresh_image = self._get_icon(REFRESH_ICON_PATH)
-        self.edit_image = self._get_icon(EDIT_ICON_PATH)
-        self.open_image = self._get_icon(OPEN_FILE_ICON_PATH)
-        self.copy_image = self._get_icon(COPY_PATH_ICON_PATH)
-        self.color_black_image = self._get_icon(COLOR_BLACK_ICON_PATH)
-        self.color_white_image = self._get_icon(COLOR_WHITE_ICON_PATH)
+        self.remote_image = self._get_icon(REMOTE_ICON)
+        self.refresh_image = self._get_icon(REFRESH_ICON)
+        self.edit_image = self._get_icon(EDIT_ICON)
+        self.open_image = self._get_icon(OPEN_FILE_ICON)
+        self.copy_image = self._get_icon(COPY_PATH_ICON)
+        self.color_black_image = self._get_icon(COLOR_BLACK_ICON)
+        self.color_white_image = self._get_icon(COLOR_WHITE_ICON)
 
         self.remote_button = tk.Button(
             button_frame,

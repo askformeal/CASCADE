@@ -1,11 +1,11 @@
 from src.log import setup_logger
-from src.constants.paths import BACKEND_LOG_PATH
+from src.constants.paths import BACKEND_LOG
 from src.sentinels import SENTINELS
 from src import gen_response
 from src.utils.misc import bytes2base64
 from .helpers import get_status, open_song, open_type, play_all_songs, stop_player
 
-logger = setup_logger(__name__, BACKEND_LOG_PATH)
+logger = setup_logger(__name__, BACKEND_LOG)
 
 def status(ctx, request):
     return gen_response.Success('status obtained', get_status(ctx))

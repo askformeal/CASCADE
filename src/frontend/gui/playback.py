@@ -8,21 +8,21 @@ from PIL import Image, ImageTk
 
 from .logger import logger
 from src.constants.paths import (
-    GUI_NO_COVER_PATH,
-    SAVE_COVER_ICON_PATH,
-    INFO_ICON_PATH,
-    RELOAD_ICON_PATH,
-    PREV_SONG_ICON_PATH,
-    NEXT_SONG_ICON_PATH,
-    PLAY_ICON_PATH,
-    PAUSE_ICON_PATH,
-    STOP_ICON_PATH,
-    UNMUTE_ICON_PATH,
-    MUTE_ICON_PATH,
-    LOOP_ICON_PATH,
-    SHUFFLE_ICON_PATH,
-    REVERSE_ICON_PATH,
-    DICE_ICON_PATH
+    GUI_NO_COVER,
+    SAVE_COVER_ICON,
+    INFO_ICON,
+    RELOAD_ICON,
+    PREV_SONG_ICON,
+    NEXT_SONG_ICON,
+    PLAY_ICON,
+    PAUSE_ICON,
+    STOP_ICON,
+    UNMUTE_ICON,
+    MUTE_ICON,
+    LOOP_ICON,
+    SHUFFLE_ICON,
+    REVERSE_ICON,
+    DICE_ICON
 )
 from src.constants.gui import FONT_SIZE, INIT_COVER_SIZE
 from src.constants.misc import IMAGE_FILE_TYPES
@@ -36,7 +36,7 @@ from .info_popup import InfoPopUp
 
 class PlaybackMixin:
     def __init__(self):
-        image = Image.open(GUI_NO_COVER_PATH)
+        image = Image.open(GUI_NO_COVER)
         buffer = BytesIO()
         image.save(buffer, format='PNG')
         self.no_cover = buffer.getvalue()
@@ -52,23 +52,23 @@ class PlaybackMixin:
         self.progress_dragging = False
         self.volume_dragging = False
         
-        self.info_icon = self.get_icon(INFO_ICON_PATH)
-        self.save_cover_icon = self.get_icon(SAVE_COVER_ICON_PATH)
-        self.reload_icon = self.get_icon(RELOAD_ICON_PATH)
+        self.info_icon = self.get_icon(INFO_ICON)
+        self.save_cover_icon = self.get_icon(SAVE_COVER_ICON)
+        self.reload_icon = self.get_icon(RELOAD_ICON)
 
-        self.unmute_icon = self.get_icon(UNMUTE_ICON_PATH, 18)
-        self.mute_icon = self.get_icon(MUTE_ICON_PATH, 18)
+        self.unmute_icon = self.get_icon(UNMUTE_ICON, 18)
+        self.mute_icon = self.get_icon(MUTE_ICON, 18)
 
-        self.prev_icon = self.get_icon(PREV_SONG_ICON_PATH)
-        self.next_icon = self.get_icon(NEXT_SONG_ICON_PATH)
-        self.play_icon = self.get_icon(PLAY_ICON_PATH)
-        self.pause_icon = self.get_icon(PAUSE_ICON_PATH)
-        self.stop_icon = self.get_icon(STOP_ICON_PATH)
+        self.prev_icon = self.get_icon(PREV_SONG_ICON)
+        self.next_icon = self.get_icon(NEXT_SONG_ICON)
+        self.play_icon = self.get_icon(PLAY_ICON)
+        self.pause_icon = self.get_icon(PAUSE_ICON)
+        self.stop_icon = self.get_icon(STOP_ICON)
 
-        self.loop_icon = self.get_icon(LOOP_ICON_PATH)
-        self.shuffle_icon = self.get_icon(SHUFFLE_ICON_PATH)
-        self.reverse_icon = self.get_icon(REVERSE_ICON_PATH)
-        self.dice_icon = self.get_icon(DICE_ICON_PATH)
+        self.loop_icon = self.get_icon(LOOP_ICON)
+        self.shuffle_icon = self.get_icon(SHUFFLE_ICON)
+        self.reverse_icon = self.get_icon(REVERSE_ICON)
+        self.dice_icon = self.get_icon(DICE_ICON)
         
     def build_playback(self, playback_frame):
         self.hotkey(self, '<i>', self._open_info)

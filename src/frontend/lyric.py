@@ -9,7 +9,7 @@ from PIL import Image
 
 from src.frontend.client import handle_code, send_request, test_heartbeat
 from src.config import CONFIG
-from src.constants.paths import LYRIC_LOG_PATH, LYRIC_ICON_PATH
+from src.constants.paths import LYRIC_LOG, LYRIC_ICON
 from src.constants.frontend import HEARTBEAT_POLL_INTERVAL
 from src.constants.lyric import LYRIC_POLL_INTERVAL, LYRIC_HOVER_EXTENSION as HOVER_EXT
 from src.log import setup_logger
@@ -20,7 +20,7 @@ from src.utils.misc import squeeze
 from src.utils.tray import Label
 from src.utils.misc import hex_color_to_dec as dec_hex
 
-logger = setup_logger(__name__, LYRIC_LOG_PATH)
+logger = setup_logger(__name__, LYRIC_LOG)
 
 class Lyric(tk.Tk):
     def __init__(self):
@@ -95,7 +95,7 @@ class Lyric(tk.Tk):
 
         self.icon = Icon(
             'cascade_lyric', 
-            Image.open(LYRIC_ICON_PATH),
+            Image.open(LYRIC_ICON),
             'CASCADE Lyric Board',
             menu=menu
             )
