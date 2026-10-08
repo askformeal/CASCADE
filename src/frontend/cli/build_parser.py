@@ -19,9 +19,11 @@ class Builder:
             else:
                 return val
 
-    def _add_parser(self, parser, *args, **kwargs):
+    def _add_parser(self, parser, action, *args, **kwargs):
         kwargs['parents'] = kwargs.get('parents', []) + [self.base]
-        return parser.add_parser(*args, **kwargs)
+        result = parser.add_parser(action, *args, **kwargs)
+        result.set_defaults(**{parser.dest: action})
+        return result
 
     def build_parser(self):
         self.base = argparse.ArgumentParser(add_help=False)
@@ -43,7 +45,7 @@ class Builder:
         
         gui_parser = self._add_parser(command_sub, 'gui', help='Open GUI')
 
-        status_parser = self._add_parser(command_sub, 'status', help='Show CASCADE status')
+        status_parser = self._add_parser(command_sub, 'status', aliases=['st'], help='Show CASCADE status')
         status_parser.add_argument('-d', '--dev', action='store_true', help='Show dev info')
 
         open_epilog = 'You can open a song in library, a playlist or a file on disk, and you can specify it with the --type option.'
@@ -76,7 +78,7 @@ class Builder:
         switch_parser = self._add_parser(command_sub, 'switch', help='Switch to a song in current playlist via number')
         switch_parser.add_argument('number', type=int, help='Number in playlist of song to switch. Negative number means count from the last')
 
-        prev_parser = self._add_parser(command_sub, 'prev', help='Switch to the previous song in current playlist')
+        prev_parser = self._add_parser(command_sub, 'prev', aliases=['previous'], help='Switch to the previous song in current playlist')
 
         next_parser = self._add_parser(command_sub, 'next', help='Switch to the next song in current playlist')
 
@@ -95,7 +97,7 @@ class Builder:
 
         lyric_parser = self._add_parser(command_sub, 'lyric', help='Switch between lyric sources [local/online]')
 
-        lib_parser = self._add_parser(command_sub, 'lib', help='Manage library')
+        lib_parser = self._add_parser(command_sub, 'lib', aliases=['library'], help='Manage library')
 
         lib_sub = lib_parser.add_subparsers(dest='lib_action', required=True)
 
@@ -143,7 +145,7 @@ class Builder:
                                 '  name: The name of the song. Can not be used to reference the song like alias',
                                 '  artist: The artist of the song',
                                 '  album: The album of the song'))
-        meta_parser = self._add_parser(lib_sub, 'meta', help='Manage metadata of songs in library', epilog=meta_epilog)
+        meta_parser = self._add_parser(lib_sub, 'meta', aliases=['metadata'], help='Manage metadata of songs in library', epilog=meta_epilog)
         meta_sub = meta_parser.add_subparsers(dest='meta_action', required=True)
 
         meta_set_parser = self._add_parser(meta_sub, 'set', help='Set the value of metadata of a song in library')
@@ -190,7 +192,7 @@ class Builder:
         lyric_offset_parser.add_argument('offset', type=int, help='Offset to set (ms)')
 
 
-        playlist_parser = self._add_parser(lib_sub, 'playlist', help='Manage playlists')
+        playlist_parser = self._add_parser(lib_sub, 'playlist', aliases=['pl'], help='Manage playlists')
         playlist_sub = playlist_parser.add_subparsers(dest='playlist_action', required=True)
 
         playlist_list_parser = self._add_parser(playlist_sub, 'list', help='Show all songs in a playlist. Show names of all playlists in library if no playlists are provided')
@@ -213,7 +215,7 @@ class Builder:
         playlist_del_parser = self._add_parser(playlist_sub, 'del', help='Delete a playlist')
         playlist_del_parser.add_argument('playlist', type=str, help='Playlist to delete')
 
-        config_parser = self._add_parser(command_sub, 'config', help='Manage configuration')
+        config_parser = self._add_parser(command_sub, 'config', aliases=['configure'], help='Manage configuration')
         config_sub = config_parser.add_subparsers(dest='config_action', required=True)
         config_parent = argparse.ArgumentParser(add_help=False)
         config_parent.add_argument(
@@ -242,7 +244,7 @@ class Builder:
 
         config_path_parser = self._add_parser(config_sub, 'path', parents=[config_parent], help='Show path of configure file')
 
-        exit_parser = self._add_parser(command_sub, 'exit', help='Exit CASCADE backend')
+        exit_parser = self._add_parser(command_sub, 'exit', aliases=['quit'], help='Exit CASCADE backend')
 
         kill_parser = self._add_parser(command_sub, 'kill', help='Kill all CASCADE backend processes. May cause unpredictable error')
 
