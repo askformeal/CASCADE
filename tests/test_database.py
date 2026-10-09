@@ -213,6 +213,65 @@ def test_del_playlist_not_found(database):
     assert database.del_playlist(9999) is SENTINELS.PLAYLIST_NOT_FOUND
 
 
+def _playlist_song_numbers(database, playlist_id):
+    """Numbers ordered as the playlist is read, so 0..N-1 when nothing is wrong."""
+    rows = database.execute('SELECT number FROM playlist_songs WHERE playlist_id = ? ORDER BY number, rowid', playlist_id).fetchall()
+    numbers = []
+    for row in rows:
+        numbers.append(row['number'])
+    return numbers
+
+
+def _fill_playlist(database, playlist_id, names):
+    """Add one song per name to the playlist and return their ids in that order."""
+    song_ids = []
+    for name in names:
+        song_id, _ = database.add_song(fr'C:\music\{name}')
+        database.add_song_to_playlist(playlist_id, song_id)
+        song_ids.append(song_id)
+    return song_ids
+
+
+def test_add_song_to_playlist_numbers(database):
+    # numbers start at 0 and increase by one for every appended song
+    playlist_id, _ = database.create_playlist('work')
+    song_ids = _fill_playlist(database, playlist_id, ['a.flac', 'b.flac', 'c.flac'])
+    assert _playlist_song_numbers(database, playlist_id) == [0, 1, 2]
+
+
+def test_add_song_to_playlist_after_removal_keeps_order(database):
+    # removing the middle song leaves a gap, the next song is still appended last
+    playlist_id, _ = database.create_playlist('work')
+    song_ids = _fill_playlist(database, playlist_id, ['a.flac', 'b.flac', 'c.flac'])
+    database.del_song_from_playlist(playlist_id, song_ids[1])
+    new_song_id, _ = database.add_song(r'C:\music\d.flac')
+    database.add_song_to_playlist(playlist_id, new_song_id)
+    assert _playlist_song_ids(database, playlist_id) == [song_ids[0], song_ids[2], new_song_id]
+
+
+def test_reorder_playlist(database):
+    playlist_id, _ = database.create_playlist('work')
+    song_ids = _fill_playlist(database, playlist_id, ['a.flac', 'b.flac', 'c.flac'])
+    result = database.reorder_playlist(playlist_id, [song_ids[2], song_ids[0], song_ids[1]])
+    assert result is SENTINELS.SUCCESS
+    assert _playlist_song_ids(database, playlist_id) == [song_ids[2], song_ids[0], song_ids[1]]
+    assert _playlist_song_numbers(database, playlist_id) == [0, 1, 2]
+
+
+def test_reorder_playlist_twice_is_stable(database):
+    playlist_id, _ = database.create_playlist('work')
+    song_ids = _fill_playlist(database, playlist_id, ['a.flac', 'b.flac', 'c.flac'])
+    order = [song_ids[1], song_ids[2], song_ids[0]]
+    database.reorder_playlist(playlist_id, order)
+    database.reorder_playlist(playlist_id, order)
+    assert _playlist_song_ids(database, playlist_id) == order
+    assert _playlist_song_numbers(database, playlist_id) == [0, 1, 2]
+
+
+def test_reorder_playlist_not_found(database):
+    assert database.reorder_playlist(9999, [1]) is SENTINELS.PLAYLIST_NOT_FOUND
+
+
 def test_get_song_meta_none_by_default(database):
     song_id, _ = database.add_song(r'C:\music\song.flac')
     assert database.get_song_meta(song_id, 'name') is None

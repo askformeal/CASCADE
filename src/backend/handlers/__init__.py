@@ -60,6 +60,7 @@ ROUTER = {
     'lib.playlist.add': playlist.add,
     'lib.playlist.kick': playlist.kick,
     'lib.playlist.del': playlist.del_,
+    'lib.playlist.swap': playlist.swap,
 
     'config.list': config.list_,
     'config.show': config.show,

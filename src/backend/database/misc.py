@@ -52,6 +52,11 @@ class MiscMixin:
             'ALTER TABLE songs ADD COLUMN lyric TEXT',
             'ALTER TABLE songs ADD COLUMN offset INTEGER',
             'ALTER TABLE playlist_songs ADD COLUMN number INTEGER',
+            '''UPDATE playlist_songs SET number = (
+                SELECT COUNT(*) - 1 FROM playlist_songs AS p
+                WHERE p.playlist_id = playlist_songs.playlist_id
+                AND p.rowid <= playlist_songs.rowid
+            )'''
         ]
         version = self.execute('PRAGMA user_version').fetchone()[0]
         for i, sql in enumerate(INIT_DATABASE):

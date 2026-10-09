@@ -779,6 +779,102 @@ def test_lib_playlist_kick_playlist_not_found(backend, audio_file):
     assert 'does not exist' in response['msg']
 
 
+def _playlist_song_numbers(database, playlist_id):
+    """Numbers ordered as the playlist is read, so 0..N-1 when nothing is wrong."""
+    rows = database.execute('SELECT number FROM playlist_songs WHERE playlist_id = ? ORDER BY number, rowid', playlist_id).fetchall()
+    numbers = []
+    for row in rows:
+        numbers.append(row['number'])
+    return numbers
+
+
+def _make_playlist_with_songs(backend, tmp_path, playlist_name='workout'):
+    """Seed a playlist with three songs and return (paths, song_ids, playlist_id)."""
+    database = backend.database
+    paths = []
+    song_ids = []
+    for name in ('a.wav', 'b.wav', 'c.wav'):
+        path = tmp_path / name
+        _make_wav(path)
+        paths.append(str(path))
+        song_id, _ = database.add_song(str(path))
+        song_ids.append(song_id)
+    playlist_id = database.create_playlist(playlist_name)[0]
+    for song_id in song_ids:
+        database.add_song_to_playlist(playlist_id, song_id)
+    return paths, song_ids, playlist_id
+
+
+def test_lib_playlist_swap(backend, tmp_path):
+    paths, song_ids, playlist_id = _make_playlist_with_songs(backend, tmp_path)
+    response = _request(backend, 'lib.playlist.swap', playlist='workout', song1=paths[0], song2=paths[2])
+    assert response['code'] == 0
+    assert 'swapped' in response['msg']
+    assert _playlist_song_ids(backend.database, playlist_id) == [song_ids[2], song_ids[1], song_ids[0]]
+
+
+def test_lib_playlist_swap_numbers_stay_dense(backend, tmp_path):
+    paths, song_ids, playlist_id = _make_playlist_with_songs(backend, tmp_path)
+    _request(backend, 'lib.playlist.swap', playlist='workout', song1=paths[0], song2=paths[2])
+    assert _playlist_song_numbers(backend.database, playlist_id) == [0, 1, 2]
+
+
+def test_lib_playlist_swap_by_alias(backend, tmp_path):
+    paths, song_ids, playlist_id = _make_playlist_with_songs(backend, tmp_path)
+    backend.database.bind_alias(song_ids[1], 'middle_song')
+    response = _request(backend, 'lib.playlist.swap', playlist='workout', song1='middle_song', song2=paths[0])
+    assert response['code'] == 0
+    assert _playlist_song_ids(backend.database, playlist_id) == [song_ids[1], song_ids[0], song_ids[2]]
+
+
+def test_lib_playlist_swap_same_song_twice(backend, tmp_path):
+    paths, song_ids, playlist_id = _make_playlist_with_songs(backend, tmp_path)
+    response = _request(backend, 'lib.playlist.swap', playlist='workout', song1=paths[1], song2=paths[1])
+    assert response['code'] == 0
+    assert _playlist_song_ids(backend.database, playlist_id) == song_ids
+
+
+def test_lib_playlist_swap_song_not_in_playlist(backend, tmp_path):
+    paths, song_ids, playlist_id = _make_playlist_with_songs(backend, tmp_path)
+    _make_wav(tmp_path / 'other.wav')
+    other_id, _ = backend.database.add_song(str(tmp_path / 'other.wav'))
+    response = _request(backend, 'lib.playlist.swap', playlist='workout', song1=str(tmp_path / 'other.wav'), song2=paths[0])
+    assert response['code'] == 1
+    assert 'is not in playlist' in response['msg']
+    assert _playlist_song_ids(backend.database, playlist_id) == song_ids
+    assert backend.database.song_exists(other_id)
+
+
+def test_lib_playlist_swap_song_not_exist(backend, tmp_path):
+    paths, song_ids, playlist_id = _make_playlist_with_songs(backend, tmp_path)
+    response = _request(backend, 'lib.playlist.swap', playlist='workout', song1=str(tmp_path / 'ghost.wav'), song2=paths[0])
+    assert response['code'] == 1
+    assert 'does not exist in library' in response['msg']
+    assert _playlist_song_ids(backend.database, playlist_id) == song_ids
+
+
+def test_lib_playlist_swap_playlist_not_exist(backend, tmp_path):
+    paths, song_ids, playlist_id = _make_playlist_with_songs(backend, tmp_path)
+    response = _request(backend, 'lib.playlist.swap', playlist='ghost', song1=paths[0], song2=paths[1])
+    assert response['code'] == 1
+    assert 'does not exist in library' in response['msg']
+
+
+def test_lib_playlist_swap_missing_key(backend, tmp_path):
+    paths, song_ids, playlist_id = _make_playlist_with_songs(backend, tmp_path)
+    response = _request(backend, 'lib.playlist.swap', playlist='workout', song1=paths[0])
+    assert response['code'] == 1
+    assert 'song2' in response['msg']
+
+
+def test_lib_playlist_swap_database_error(backend, tmp_path, monkeypatch):
+    paths, song_ids, playlist_id = _make_playlist_with_songs(backend, tmp_path)
+    monkeypatch.setattr(backend.database, 'reorder_playlist', lambda playlist_id, song_ids: SENTINELS.DATABASE_ERROR)
+    response = _request(backend, 'lib.playlist.swap', playlist='workout', song1=paths[0], song2=paths[1])
+    assert response['code'] == 1
+    assert 'database error' in response['msg']
+
+
 def test_lib_playlist_add(backend, audio_file):
     song_id, playlist_id = _create_playlist_with_song(backend, audio_file, 'workout')
     # seed another song that is NOT in the playlist yet

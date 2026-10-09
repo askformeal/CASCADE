@@ -169,6 +169,11 @@ ACTION_KEYS = {
     'lib.playlist.del': {
         'playlist': (str, True)
     },
+    'lib.playlist.swap': {
+        'playlist': (str, True),
+        'song1': (str, True),
+        'song2': (str, True)
+    },
     'config.show': {
         'option': (str, True)
     },

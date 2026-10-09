@@ -237,6 +237,11 @@ class Builder:
         playlist_del_parser = self._add_parser(playlist_sub, 'del', help='Delete a playlist')
         playlist_del_parser.add_argument('playlist', type=str, help='Playlist to delete')
 
+        playlist_swap_parser = self._add_parser(playlist_sub, 'swap', help='Swap the position of two songs in a playlist')
+        playlist_swap_parser.add_argument('playlist', type=str, help='Playlist the songs are in')
+        playlist_swap_parser.add_argument('song1', type=str, help='The first song to swap')
+        playlist_swap_parser.add_argument('song2', type=str, help='The second song to swap')
+        
         config_parser = self._add_parser(command_sub, 'config', aliases=['configure'], help='Manage configuration')
         config_sub = config_parser.add_subparsers(dest='config_action', required=True)
         config_parent = argparse.ArgumentParser(add_help=False)

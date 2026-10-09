@@ -1,3 +1,5 @@
+import sqlite3
+
 from .logger import logger
 from src.sentinels import SENTINELS
 
@@ -110,7 +112,10 @@ class PlaylistMixin:
         # add a song to a playlist
         if self.song_exists(song_id):
             if self.playlist_exists(playlist_id):
-                cursor = self.execute('INSERT OR IGNORE INTO playlist_songs (playlist_id, song_id) VALUES (?, ?)', playlist_id, song_id)
+                cursor = self.execute(('INSERT OR IGNORE INTO playlist_songs (playlist_id, song_id, number) '
+                                       +'VALUES (?, ?, (SELECT COALESCE(MAX(number) + 1, 0) FROM playlist_songs WHERE playlist_id = ?))'
+                                       ),
+                                       playlist_id, song_id, playlist_id)
                 ignored = cursor.rowcount != 1
                 logger.debug(f'Tried to add song with id {song_id} to playlist with id {playlist_id}, ignored: {ignored}')
                 return ignored
@@ -138,3 +143,24 @@ class PlaylistMixin:
         else:
             logger.debug(f'Failed to delete song with id {song_id} from playlist with id {playlist_id} because the song does not exist')
             return SENTINELS.SONG_NOT_FOUND
+
+    def reorder_playlist(self, playlist_id, song_ids):
+        if self.playlist_exists(playlist_id):
+            self.execute('BEGIN')
+            try:
+                for i, song_id in enumerate(song_ids):
+                    self.execute('UPDATE playlist_songs SET number = ? WHERE playlist_id = ? AND song_id = ?',
+                                 i, playlist_id, song_id
+                                 )
+            except sqlite3.Error as e:
+                self.execute('ROLLBACK')
+                logger.error(f'An error occurred during reordering playlist: {e}')
+                return SENTINELS.DATABASE_ERROR
+            else:
+                self.execute('COMMIT')
+                logger.debug(f'Reordered playlist with id {playlist_id}:')
+                logger.debug(', '.join(map(str, song_ids)))
+                return SENTINELS.SUCCESS
+        else:
+            logger.debug(f'Failed to reorder playlist with id {playlist_id} because it does not exists')
+            return SENTINELS.PLAYLIST_NOT_FOUND

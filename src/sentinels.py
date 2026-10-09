@@ -45,6 +45,7 @@ class Sentinels:
 
         # Database
 
+        self.DATABASE_ERROR = Sentinel('Database Error')
         self.SONG_NOT_FOUND = Sentinel('Song Not Found')
 
         self.CLEAR_META = Sentinel('Clear This Metadata')

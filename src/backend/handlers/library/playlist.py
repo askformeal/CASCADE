@@ -53,7 +53,7 @@ def add(ctx, request):
             for song in songs:
                 song_id = get_song(ctx, song, cwd)
                 if song_id is SENTINELS.MISSING_CWD:
-                    failed.append(gen_response.MissingKey('lib.playlist.add', 'cwd'))
+                    failed.append(gen_response.MissingCWD('lib.playlist.add'))
                 elif song_id is SENTINELS.NOT_IN_LIB:
                     failed.append(gen_response.SongNotExist(f'add song \"{song}\" to playlist \"{playlist}\"'))
                 else:
@@ -77,7 +77,7 @@ def kick(ctx, request):
             for song in songs:
                 song_id = get_song(ctx, song, cwd)
                 if song_id is SENTINELS.MISSING_CWD:
-                    failed.append(gen_response.MissingKey('lib.playlist.kick', 'cwd'))
+                    failed.append(gen_response.MissingCWD('lib.playlist.kick'))
                 elif song_id is SENTINELS.NOT_IN_LIB:
                     failed.append(gen_response.SongNotExist(f'remove song \"{song}\" from playlist \"{playlist}\"'))
                 else:
@@ -99,3 +99,40 @@ def del_(ctx, request):
     else:
         return gen_response.PlaylistNotExist(f"delete playlist \"{request['playlist']}\"")
 
+def swap(ctx, request):
+    cwd = request.get('cwd', None)
+    playlist = request['playlist']
+    song_1 = request['song1']
+    song_2 = request['song2']
+
+    playlist_id = ctx.database.get_playlist_via_name(playlist)
+    if playlist_id is SENTINELS.PLAYLIST_NOT_FOUND:
+        return gen_response.PlaylistNotExist(f"swap songs of playlist \"{playlist}\"")
+    else:
+        songs = ctx.database.get_playlist_songs(playlist_id)
+        song_ids = list(map(lambda song: song['id'], songs))
+
+        song_1_id = get_song(ctx, song_1, cwd)
+        if song_1_id is SENTINELS.MISSING_CWD:
+            return gen_response.MissingCWD('lib.playlist.swap')
+        elif song_1_id is SENTINELS.NOT_IN_LIB:
+            return gen_response.SongNotExist(f'Swap position of {song_1} and ')
+        elif song_1_id not in song_ids:
+            return gen_response.Failed(f'\"{song_1}\" is not in playlist \"{playlist}\"')
+        else:
+            song_2_id = get_song(ctx, song_2, cwd)
+            if song_2_id is SENTINELS.MISSING_CWD:
+                return gen_response.MissingCWD('lib.playlist.swap')
+            elif song_2_id is SENTINELS.NOT_IN_LIB:
+                return gen_response.SongNotExist(f'Swap position of {song_2} and ')
+            elif song_2_id not in song_ids:
+                return gen_response.Failed(f'\"{song_2}\" is not in playlist \"{playlist}\"')
+            else:
+                index_1 = song_ids.index(song_1_id)
+                index_2 = song_ids.index(song_2_id)
+                song_ids[index_1], song_ids[index_2] = song_ids[index_2], song_ids[index_1]
+                result = ctx.database.reorder_playlist(playlist_id, song_ids)
+                return {
+                    SENTINELS.SUCCESS: gen_response.Success(f'position of {song_1} and {song_2} swapped'),
+                    SENTINELS.DATABASE_ERROR: gen_response.Failed('a database error occurred')
+                }[result]
