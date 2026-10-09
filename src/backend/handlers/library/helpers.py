@@ -7,7 +7,7 @@ from src.constants.paths.log import BACKEND_LOG
 from src import gen_response
 from src.sentinels import SENTINELS
 from src.utils.file_extract import extract_file_meta
-from src.utils.misc import sort_songs, verify_path_format
+from src.utils.misc import verify_path_format
 from src.utils.time_ import format_time
 
 logger = setup_logger(__name__, BACKEND_LOG)
@@ -37,24 +37,6 @@ def get_song_playlist_names(ctx, song_id):
     playlist_ids = ctx.database.get_song_playlists(song_id)
     playlist_info = ctx.database.get_playlists_info(playlist_ids)
     return list(map(lambda pl: pl['name'], playlist_info))
-
-def get_playlist_songs(ctx, name, return_id=False):
-    playlist_id = ctx.database.get_playlist_via_name(name)
-    if playlist_id is not SENTINELS.PLAYLIST_NOT_FOUND:
-        ids = ctx.database.get_playlist_songs(playlist_id)
-        if ids is not SENTINELS.PLAYLIST_EMPTY:
-            info = ctx.database.get_song_info(ids)
-            info = sort_songs(info)
-            result = info
-        else:
-            result = SENTINELS.PLAYLIST_EMPTY
-    else:
-        result = SENTINELS.PLAYLIST_NOT_FOUND
-
-    if return_id:
-        return result, playlist_id
-    else:
-        return result
 
 def insert_songs_aliases(ctx, info):
     for i, song in enumerate(info):

@@ -55,7 +55,6 @@ class Sentinels:
 
         self.PLAYLIST_NOT_FOUND = Sentinel('Playlist Not Found')
         self.PLAYLIST_SONG_NOT_FOUND = Sentinel('Playlist Song Not Found')
-        self.PLAYLIST_EMPTY = Sentinel('Playlist Empty')
 
         self.POS_NOT_FOUND = Sentinel('Position not in memory')
 

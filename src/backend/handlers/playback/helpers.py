@@ -112,12 +112,12 @@ def open_type(ctx, type_, reference):
         paths_to_load = [song_info[0]['path']]
 
     elif type_ == 'playlist':
-        ids = ctx.database.get_playlist_songs(reference)
-        if ids is SENTINELS.PLAYLIST_EMPTY:
+        info = ctx.database.get_playlist_songs(reference)
+        if info is SENTINELS.PLAYLIST_NOT_FOUND:
+            return gen_response.PlaylistNotExist(f'open playlist (id: {reference})')
+        elif len(info) == 0:
             return gen_response.Failed(f'can not open playlist because it is empty')
         else:
-            info = ctx.database.get_song_info(ids)
-            info = sort_songs(info)
             info_to_set = (info,)
             paths_to_load = list(map(lambda i: i['path'], info))
     

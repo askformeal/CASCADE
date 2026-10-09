@@ -1,6 +1,15 @@
 from src.sentinels import SENTINELS
 
 
+def _playlist_song_ids(database, playlist_id):
+    """get_playlist_songs returns song info dicts now; compare ids only."""
+    songs = database.get_playlist_songs(playlist_id)
+    ids = []
+    for song in songs:
+        ids.append(song['id'])
+    return ids
+
+
 def test_add_song_new(database):
     song_id, ignored = database.add_song(r'C:\music\song.flac')
     assert ignored is False
@@ -123,7 +132,7 @@ def test_add_song_to_playlist(database):
     playlist_id, _ = database.create_playlist('work')
     ignored = database.add_song_to_playlist(playlist_id, song_id)
     assert ignored is False
-    assert database.get_playlist_songs(playlist_id) == [song_id]
+    assert _playlist_song_ids(database, playlist_id) == [song_id]
 
 
 def test_add_song_to_playlist_duplicate(database):
@@ -131,7 +140,7 @@ def test_add_song_to_playlist_duplicate(database):
     playlist_id, _ = database.create_playlist('work')
     assert database.add_song_to_playlist(playlist_id, song_id) is False
     assert database.add_song_to_playlist(playlist_id, song_id) is True
-    assert database.get_playlist_songs(playlist_id) == [song_id]
+    assert _playlist_song_ids(database, playlist_id) == [song_id]
 
 
 def test_get_playlist_via_name_missing(database):
@@ -164,7 +173,7 @@ def test_del_song_from_playlist(database):
     playlist_id, _ = database.create_playlist('work')
     database.add_song_to_playlist(playlist_id, song_id)
     assert database.del_song_from_playlist(playlist_id, song_id) is SENTINELS.SUCCESS
-    assert database.get_playlist_songs(playlist_id) is SENTINELS.PLAYLIST_EMPTY
+    assert database.get_playlist_songs(playlist_id) == []
 
 
 def test_del_song_from_playlist_song_not_in_playlist(database):

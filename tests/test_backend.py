@@ -18,6 +18,15 @@ def _run_buffered_request(backend):
     return request, backend.dispatch(request)
 
 
+def _playlist_song_ids(database, playlist_id):
+    """get_playlist_songs returns song info dicts now; compare ids only."""
+    songs = database.get_playlist_songs(playlist_id)
+    ids = []
+    for song in songs:
+        ids.append(song['id'])
+    return ids
+
+
 def test_status_before_open(backend):
     response = _request(backend, 'status')
     assert response['code'] == 0
@@ -707,7 +716,7 @@ def test_lib_playlist_kick(backend, audio_file):
     song_id, playlist_id = _create_playlist_with_song(backend, audio_file, 'workout')
     response = _request(backend, 'lib.playlist.kick', songs=[audio_file], playlist='workout')
     assert response['code'] == 0
-    assert backend.database.get_playlist_songs(playlist_id) is SENTINELS.PLAYLIST_EMPTY
+    assert backend.database.get_playlist_songs(playlist_id) == []
     assert backend.database.song_exists(song_id)
 
 
@@ -717,7 +726,7 @@ def test_lib_playlist_kick_by_alias(backend, audio_file):
     database.bind_alias(song_id, 'workout_song')
     response = _request(backend, 'lib.playlist.kick', songs=['workout_song'], playlist='workout')
     assert response['code'] == 0
-    assert backend.database.get_playlist_songs(playlist_id) is SENTINELS.PLAYLIST_EMPTY
+    assert backend.database.get_playlist_songs(playlist_id) == []
 
 
 def test_lib_playlist_kick_batch_multiple(backend, tmp_path):
@@ -731,7 +740,7 @@ def test_lib_playlist_kick_batch_multiple(backend, tmp_path):
     response = _request(backend, 'lib.playlist.kick', songs=[str(tmp_path / 'a.wav'), str(tmp_path / 'b.wav')], playlist='workout')
     assert response['code'] == 0
     assert '2/2' in response['msg']
-    assert backend.database.get_playlist_songs(playlist_id) is SENTINELS.PLAYLIST_EMPTY
+    assert backend.database.get_playlist_songs(playlist_id) == []
 
 
 def test_lib_playlist_kick_song_not_in_playlist(backend, audio_file):
@@ -778,8 +787,7 @@ def test_lib_playlist_add(backend, audio_file):
     response = _request(backend, 'lib.playlist.add', songs=[other_file], playlist='workout')
     assert response['code'] == 0
     assert '1/1' in response['msg']
-    playlist_songs = backend.database.get_playlist_songs(playlist_id)
-    assert playlist_songs == [song_id, other_id]
+    assert _playlist_song_ids(backend.database, playlist_id) == [song_id, other_id]
 
 
 def test_lib_playlist_add_batch_multiple(backend, tmp_path):
@@ -803,7 +811,7 @@ def test_lib_playlist_add_by_alias(backend, audio_file):
     response = _request(backend, 'lib.playlist.add', songs=['workout_song'], playlist='workout')
     assert response['code'] == 0
     assert '1/1' in response['msg']
-    assert backend.database.get_playlist_songs(playlist_id) == [song_id]
+    assert _playlist_song_ids(backend.database, playlist_id) == [song_id]
 
 
 def test_lib_playlist_add_partial_failure(backend, tmp_path):

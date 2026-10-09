@@ -2,21 +2,19 @@ from src.log import setup_logger
 from src.constants.paths.log import BACKEND_LOG
 from src.sentinels import SENTINELS
 from src import gen_response
-from .helpers import get_song, get_playlist_songs, insert_songs_aliases, insert_songs_playlist_names
+from .helpers import get_song, insert_songs_aliases, insert_songs_playlist_names
 
 logger = setup_logger(__name__, BACKEND_LOG)
 
 def list_(ctx, request):    
     playlist = request['playlist']
     if playlist is not None:
-        response = gen_response.Success(f'obtained song in playlist \"{playlist}\"')
-        info = get_playlist_songs(ctx, playlist)
-
-        if info is SENTINELS.PLAYLIST_NOT_FOUND:
+        playlist_id = ctx.database.get_playlist_via_name(playlist)
+        if playlist_id is SENTINELS.PLAYLIST_NOT_FOUND:
             return gen_response.PlaylistNotExist(f'list songs of playlist \"{playlist}\"')
-        elif info is SENTINELS.PLAYLIST_EMPTY:
-            response.attachment = []
         else:
+            info = ctx.database.get_playlist_songs(playlist_id)
+            response = gen_response.Success(f'obtained song in playlist \"{playlist}\"')
             if request['show_aliases']:
                 info = insert_songs_aliases(ctx, info)
     

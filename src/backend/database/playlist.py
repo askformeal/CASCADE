@@ -58,14 +58,12 @@ class PlaylistMixin:
     def get_playlist_songs(self, id):
         # get all songs in a playlist
         if self.playlist_exists(id):
-            rows = self.execute('SELECT song_id FROM playlist_songs WHERE playlist_id = ?', id).fetchall()
-            if len(rows) > 0:
-                songs = list(map(lambda row: row['song_id'], rows))
-                logger.debug(f'Got songs of playlist with id {id}: {songs}')
-                return songs
-            else:
-                logger.debug(f'Failed to get songs of playlist with id {id} because the playlist is empty')
-                return SENTINELS.PLAYLIST_EMPTY
+            rows = self.execute((
+                'SELECT songs.* FROM playlist_songs JOIN songs ON songs.id = playlist_songs.song_id '
+                +'WHERE playlist_id = ? ORDER BY playlist_songs.number, playlist_songs.rowid'), id).fetchall()
+            songs = list(map(lambda row: dict(row), rows))
+            logger.debug(f'Got songs of playlist with id {id}: {songs}')
+            return songs
         else:
             logger.debug(f'Failed to get songs of playlist with id {id} because the playlist does not exist')
             return SENTINELS.PLAYLIST_NOT_FOUND
