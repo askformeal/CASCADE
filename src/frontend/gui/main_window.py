@@ -41,6 +41,7 @@ class MainWinMixin(MenubarMixin):
         self.hotkey(self, '<v>', self._toggle_lyric_visible)
         self.bind('<F11>', self._toggle_fullscreen)
         self.bind('<Alt-Return>', self._toggle_fullscreen)
+        self.bind('<Escape>', self._disable_fullscreen)
         self.bind('<F12>', self._toggle_dev_bar)
     
         self.hotkey(self, '<Shift-F1>', self._show_about)
@@ -204,6 +205,10 @@ class MainWinMixin(MenubarMixin):
 
     def _toggle_fullscreen(self, *_):
         self.fullscreen.set(not self.fullscreen.get())
+        self._apply_fullscreen()
+    
+    def _disable_fullscreen(self, *_):
+        self.fullscreen.set(False)
         self._apply_fullscreen()
 
     def _apply_fullscreen(self):
