@@ -87,28 +87,28 @@ class UnknownAction(Failed):
         super().__init__(f'unknown action received: \"{action}\"', attachment, failed)
 
 class InvalidPath(Failed):
-    def __init__(self, song, attachment=None, failed=None):
-        super().__init__(f'\"{song}\" can not be parsed as a valid and existing path', attachment, failed)
+    def __init__(self, path, attachment=None, failed=None):
+        super().__init__(f'\"{path}\" can not be parsed as a valid and existing path', attachment, failed)
 
 class SongNotExist(Failed):
-    def __init__(self, action, attachment=None, failed=None):
-        super().__init__(f'can not {action} because it does not exist in library', attachment, failed)
+    def __init__(self, song, attachment=None, failed=None):
+        super().__init__(f'no such song in library: {song}', attachment, failed)
     
 class PlaylistNotExist(Failed):
-    def __init__(self, action, attachment=None, failed=None):
-        super().__init__(f'can not {action} because the playlist does not exist in library', attachment, failed)
+    def __init__(self, playlist, attachment=None, failed=None):
+        super().__init__(f'no such playlist in library: {playlist}', attachment, failed)
 
 class MissingKey(Failed):
-    def __init__(self, action, key, attachment=None, failed=None):
-        super().__init__(f'{action} action(s) requires key \"{key}\" but it is not received', attachment, failed)
+    def __init__(self, key, attachment=None, failed=None):
+        super().__init__(f'key not received: {key}', attachment, failed)
 
 class MissingCWD(Failed):
-    def __init__(self, action, attachment=None, failed=None):
-        super().__init__(f'{action} action requires a missing key of \"cwd\" because one or more paths provided are not absolute paths', attachment, failed)
+    def __init__(self, attachment=None, failed=None):
+        super().__init__(f'one or more paths provided are not absolute paths but the \"cwd\" key is not provided', attachment, failed)
 
 class InvalidKeyType(Failed):
-    def __init__(self, action, key, value, error, attachment=None, failed=None):
-        super().__init__(f'invalid value \"{value}\" of key \"{key}\" of \"{action}\": {error}', attachment, failed)
+    def __init__(self, key, value, error, attachment=None, failed=None):
+        super().__init__(f'invalid value \"{value}\" of key \"{key}\": {error}', attachment, failed)
 
 class EmptyList(Failed):
     def __init__(self, item, attachment=None, failed=None):
@@ -116,50 +116,54 @@ class EmptyList(Failed):
 
 class PercentageTooLow(Failed):
     def __init__(self, value, attachment=None, failed=None):
-        super().__init__(f'{value} is lower than 0 and hence not a valid percentage number', attachment, failed)
+        super().__init__(f'lower than 0 percentage: {value}', attachment, failed)
 
 class PercentageTooHigh(Failed):
     def __init__(self, value, attachment=None, failed=None):
-        super().__init__(f'{value} is higher than 100 and hence not a valid percentage number', attachment, failed)
+        super().__init__(f'higher than 100 percentage: {value}', attachment, failed)
 
 class PlayerEmpty(Failed):
-    def __init__(self, action, attachment=None, failed=None):
-        super().__init__(f'can not {action} because no songs are being played', attachment, failed)
+    def __init__(self, attachment=None, failed=None):
+        super().__init__(f'no songs are being played', attachment, failed)
 
 class NotPlayingPaused(Failed):
-    def __init__(self, action, attachment=None, failed=None):
-        super().__init__(f'can not {action} because the player is neither playing nor paused', attachment, failed)
+    def __init__(self, attachment=None, failed=None):
+        super().__init__(f'the player is neither playing nor paused', attachment, failed)
 
 class InvalidAudioFile(Failed):
-    def __init__(self, action, attachment=None, failed=None):
-        super().__init__(f'can not {action} because the audio file does not exist or is not valid', attachment, failed)
+    def __init__(self, attachment=None, failed=None):
+        super().__init__(f'audio file not exist or invalid', attachment, failed)
 
 class EngineError(Failed):
-    def __init__(self, action, attachment=None, failed=None):
-        super().__init__(f'can not {action} because an internal audio engine error occurred', attachment, failed)
+    def __init__(self, attachment=None, failed=None):
+        super().__init__(f'an internal audio engine error occurred', attachment, failed)
 
 class PlayerTimeout(Failed):
-    def __init__(self, action, attachment=None, failed=None):
-        super().__init__(f'can not {action} because timeout waiting for the action to complete', attachment, failed)
+    def __init__(self, attachment=None, failed=None):
+        super().__init__(f'timed out waiting for player to complete the action', attachment, failed)
 
 class PosTooLate(Failed):
-    def __init__(self, action, attachment=None, failed=None):
-        super().__init__(f'can not {action} because the position to jump to is later than the end of the song', attachment, failed)
+    def __init__(self, pos, attachment=None, failed=None):
+        super().__init__(f'tried to jump to a position later than the end of the song: {pos}', attachment, failed)
 
 class OptionNotExist(Failed):
-    def __init__(self, action, attachment=None, failed=None):
-        super().__init__(f'can not {action} because the option does not exist', attachment, failed)
+    def __init__(self, attachment=None, failed=None):
+        super().__init__(f'option does not exist', attachment, failed)
 
 class LyricNotExist(Failed):
     def __init__(self, attachment=None, failed=None):
-        super().__init__('this song does not have a lyric file set', attachment, failed)
+        super().__init__('no lyric file set for the song', attachment, failed)
 
 class FileIOFailed(Failed):
-    def __init__(self, action, path, error=None, attachment=None, failed=None):
-        msg = f'can not {action} of path \"{path}\"'
+    def __init__(self, path, error=None, attachment=None, failed=None):
+        msg = f'failed to read / write \"{path}\"'
         if error is not None:
             msg += f': {error}'
         super().__init__(msg, attachment, failed)
+
+class DatabaseError(Failed):
+    def __init__(self, attachment=None, failed=None):
+        super().__init__('a database error occurred', attachment, failed)
 
 def merge(*responses: Response, joiner='|', attachment=None, failed=None):
     messages = []

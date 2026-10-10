@@ -13,9 +13,9 @@ def set_(ctx, request):
     cwd = request.get('cwd', None)
     song_id = get_song(ctx, request['song'], cwd)
     if song_id is SENTINELS.MISSING_CWD:
-        return gen_response.MissingCWD('lib.meta.set')
+        return gen_response.MissingCWD()
     elif song_id is SENTINELS.NOT_IN_LIB:
-        return gen_response.SongNotExist(f"set metadata of \"{request['song']}\"")
+        return gen_response.SongNotExist(request['song'])
     else:
         metadata = {}
         for label in METADATA:
@@ -31,7 +31,7 @@ def set_(ctx, request):
             return gen_response.Success('metadata set')
 
         else:
-            return gen_response.Failed(f'can not set metadata because no metadata was provided')
+            return gen_response.Failed(f'no metadata was provided')
 
 def read_file(ctx, request):
     song = request['song']
@@ -40,9 +40,9 @@ def read_file(ctx, request):
     song_id = get_song(ctx, song, cwd)
     set_all = request['all']
     if song_id is SENTINELS.MISSING_CWD:
-        return gen_response.MissingCWD('lib.meta.read-file')
+        return gen_response.MissingCWD()
     elif song_id is SENTINELS.NOT_IN_LIB:
-        return gen_response.SongNotExist(f"set metadata of \"{song}\"")
+        return gen_response.SongNotExist(song)
     else:
         count = 0
         path = ctx.database.get_song_info(song_id)[0]['path']

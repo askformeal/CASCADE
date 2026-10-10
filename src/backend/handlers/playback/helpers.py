@@ -97,7 +97,7 @@ def open_song(ctx, song, type_, cwd=None) -> gen_response.Response:
             type_ = 'a song in library, a playlist or a file'
         else:
             type_ = f'a {type_}'
-        return gen_response.Failed(f'failed to parse \"{song}\" as {type_}')
+        return gen_response.Failed(f'can not parse \"{song}\" as {type_}')
     else:
         type_, reference = result
     
@@ -114,9 +114,9 @@ def open_type(ctx, type_, reference):
     elif type_ == 'playlist':
         info = ctx.database.get_playlist_songs(reference)
         if info is SENTINELS.PLAYLIST_NOT_FOUND:
-            return gen_response.PlaylistNotExist(f'open playlist (id: {reference})')
+            return gen_response.PlaylistNotExist(f'(playlist with id {reference})')
         elif len(info) == 0:
-            return gen_response.Failed(f'can not open playlist because it is empty')
+            return gen_response.Failed(f'playlist empty')
         else:
             info_to_set = (info,)
             paths_to_load = list(map(lambda i: i['path'], info))
@@ -126,7 +126,7 @@ def open_type(ctx, type_, reference):
             info_to_set = ([{'path': reference}], False)
             paths_to_load = [reference]
         else:
-            return gen_response.FileIOFailed(f'open song', reference, "it does not exist")
+            return gen_response.FileIOFailed(reference, "it does not exist")
         
     if ctx.playback.current_song_info is None:
         current_paths = []
@@ -182,16 +182,16 @@ def _resolve_song(ctx, song, cwd):
     from ..library.helpers import get_song
     id_ = get_song(ctx, song, cwd)
     if id_ is SENTINELS.NOT_IN_LIB:
-        return False, gen_response.SongNotExist(f'resolve {song}')
+        return False, gen_response.SongNotExist(song)
     elif id_ is SENTINELS.MISSING_CWD:
-        return False, gen_response.MissingCWD(f'resolve {song}')
+        return False, gen_response.MissingCWD()
     else:
         return True, id_
 
 def _resolve_playlist(ctx, playlist):
     id_ = ctx.database.get_playlist_via_name(playlist)
     if id_ is SENTINELS.PLAYLIST_NOT_FOUND:
-        return False, gen_response.PlaylistNotExist(f'resolve {playlist}')
+        return False, gen_response.PlaylistNotExist(playlist)
     else:
         return True, id_
 
@@ -200,7 +200,7 @@ def _resolve_path(path, cwd):
         path = Path(path)
     else:
         if cwd is None:
-            return False, gen_response.MissingCWD(f'resolve {path}')
+            return False, gen_response.MissingCWD()
         else:
             path = Path(cwd) / path
 
@@ -226,7 +226,7 @@ def play_all_songs(ctx):
             else:
                 ctx.playback.set_current_num(0)
     else:
-        response = gen_response.Failed('can not open all songs because there is none in library')
+        response = gen_response.Failed('no song in library')
     return response
 
 def switch_song(ctx, num) -> gen_response.Response:
@@ -244,10 +244,10 @@ def switch_song(ctx, num) -> gen_response.Response:
 
     response = {
         SENTINELS.SUCCESS: gen_response.Success(f'switched to the {num+1}nd song in current playlist: {ctx.playback.get_current_display_name()}'),
-        SENTINELS.PLAYER_EMPTY: gen_response.PlayerEmpty(f'switch to the {num+1}nd song in current playlist'),
-        SENTINELS.ENGINE_ERROR: gen_response.EngineError(f'switch to the {num+1}nd song in current playlist'),
-        SENTINELS.PLAYER_TIMEOUT: gen_response.PlayerTimeout(f'switch to the {num+1}nd song in current playlist'),
-        SENTINELS.FILE_IO_FAILED: gen_response.InvalidAudioFile(f'switch to the {num+1}nd song in current playlist')
+        SENTINELS.PLAYER_EMPTY: gen_response.PlayerEmpty(),
+        SENTINELS.ENGINE_ERROR: gen_response.EngineError(),
+        SENTINELS.PLAYER_TIMEOUT: gen_response.PlayerTimeout(),
+        SENTINELS.FILE_IO_FAILED: gen_response.InvalidAudioFile()
     }[result]
     if result is SENTINELS.SUCCESS:
         response += _jump_to_memorized_pos(ctx)
@@ -275,26 +275,26 @@ def jump_to_pos(ctx, pos) -> gen_response.Response:
     result = ctx.playback.jump_pos(pos)
     return {
         SENTINELS.SUCCESS: gen_response.Success(f'jumped to {format_time(pos)}'),
-        SENTINELS.POS_TOO_LATE: gen_response.Failed(f'can not jumps to {format_time(pos)} because it is later than the end of the current song'), 
-        SENTINELS.INVALID_PLAYER_STATE: gen_response.NotPlayingPaused('jump to progress')
+        SENTINELS.POS_TOO_LATE: gen_response.PosTooLate(format_time(pos)), 
+        SENTINELS.INVALID_PLAYER_STATE: gen_response.NotPlayingPaused()
     }[result]
 
 def replay_song(ctx) -> gen_response.Response:
     result = ctx.playback.jump_pos(0)
     return {
         SENTINELS.SUCCESS: gen_response.Success('jumped to beginning'),
-        SENTINELS.POS_TOO_LATE: gen_response.PosTooLate('jump to beginning'), # is this even possible?
-        SENTINELS.INVALID_PLAYER_STATE: gen_response.NotPlayingPaused('jump to beginning')
+        SENTINELS.POS_TOO_LATE: gen_response.PosTooLate('00:00:00'), # is this even possible?
+        SENTINELS.INVALID_PLAYER_STATE: gen_response.NotPlayingPaused()
     }[result]
 
 def _load_paths(ctx, paths, jump_to_mem=True) -> gen_response.Response:
     result = ctx.playback.load_paths(paths)
     response = {
-        SENTINELS.SUCCESS: gen_response.Success(f'opened song/playlist'),
-        SENTINELS.PLAYER_LOAD_EMPTY: gen_response.Failed('can not load empty list of songs'),
-        SENTINELS.ENGINE_ERROR: gen_response.EngineError('load path(s)'),
-        SENTINELS.PLAYER_TIMEOUT: gen_response.PlayerTimeout('load path(s)'),
-        SENTINELS.FILE_IO_FAILED: gen_response.InvalidAudioFile('load path(s)')
+        SENTINELS.SUCCESS: gen_response.Success('opened song/playlist'),
+        SENTINELS.PLAYER_LOAD_EMPTY: gen_response.Failed('empty list of songs'),
+        SENTINELS.ENGINE_ERROR: gen_response.EngineError(),
+        SENTINELS.PLAYER_TIMEOUT: gen_response.PlayerTimeout(),
+        SENTINELS.FILE_IO_FAILED: gen_response.InvalidAudioFile()
     }[result]
     if jump_to_mem and result is SENTINELS.SUCCESS:
         response += _jump_to_memorized_pos(ctx)
@@ -304,8 +304,8 @@ def stop_player(ctx) -> gen_response.Response:
     result = ctx.playback.stop()
     return {
         SENTINELS.SUCCESS: gen_response.Success('player stopped'),
-        SENTINELS.ENGINE_ERROR: gen_response.EngineError('stop player'),
-        SENTINELS.PLAYER_TIMEOUT: gen_response.PlayerTimeout('stop player')
+        SENTINELS.ENGINE_ERROR: gen_response.EngineError(),
+        SENTINELS.PLAYER_TIMEOUT: gen_response.PlayerTimeout()
     }[result]
 
 def switch_shuffle(ctx, direction): # direction: 1 / -1
@@ -354,7 +354,7 @@ def loop_play(ctx):
     result = ctx.playback.switch_to(ctx.playback.get_number())
     return {
         SENTINELS.SUCCESS: gen_response.Success('replayed current song'),
-        SENTINELS.ENGINE_ERROR: gen_response.EngineError('replayed current song'),
-        SENTINELS.PLAYER_TIMEOUT: gen_response.PlayerTimeout('replayed current song'),
-        SENTINELS.FILE_IO_FAILED: gen_response.InvalidAudioFile('replayed current song')
+        SENTINELS.ENGINE_ERROR: gen_response.EngineError(),
+        SENTINELS.PLAYER_TIMEOUT: gen_response.PlayerTimeout(),
+        SENTINELS.FILE_IO_FAILED: gen_response.InvalidAudioFile()
     }[result]

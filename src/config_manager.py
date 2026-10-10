@@ -24,7 +24,7 @@ class ConfigManager:
         value, source = CONFIG.get_option(name)
         
         if value is SENTINELS.UNKNOWN_OPTION:
-            response = gen_response.OptionNotExist(f'get value of {name}')
+            response = gen_response.OptionNotExist()
         else:
             source = {
                 SENTINELS.FROM_DEFAULT: 'default value',
@@ -41,7 +41,7 @@ class ConfigManager:
                 choices = []
 
             response = gen_response.Success(
-                f'Got value of {name}', 
+                f'got value of {name}', 
                 {
                     'name': name, 
                     'value': value, 
@@ -59,33 +59,33 @@ class ConfigManager:
     def set_option_value(self, name, value, overwrite_corrupt=False):
         result = CONFIG.set_option(name, value, overwrite_corrupt=overwrite_corrupt)
         return {
-            SENTINELS.SUCCESS: gen_response.Success(f'Set value of {name} to \"{value}\"'),
-            SENTINELS.UNKNOWN_OPTION: gen_response.OptionNotExist(f'set value of {name}'),
-            SENTINELS.INVALID_CONFIG_FILE: gen_response.Failed(f'can not set value of option because configure file is corrupted. You can try again with the --overwrite-corrupt option to overwrite it'),
-            SENTINELS.INVALID_OPTION_VALUE: gen_response.Failed(f'can not set value of option because the provided value is not valid'),
-            SENTINELS.FILE_IO_FAILED: gen_response.Failed(f'can not set value of option because failed to write into configure file')
+            SENTINELS.SUCCESS: gen_response.Success(f'set value of {name} to \"{value}\"'),
+            SENTINELS.UNKNOWN_OPTION: gen_response.OptionNotExist(),
+            SENTINELS.INVALID_CONFIG_FILE: gen_response.Failed('configure file corrupted. --overwrite-corrupt option can overwrite it'),
+            SENTINELS.INVALID_OPTION_VALUE: gen_response.Failed('invalid value'),
+            SENTINELS.FILE_IO_FAILED: gen_response.FileIOFailed(CONFIG_PATH)
         }[result]
 
     def unset_option(self, name):
         result = CONFIG.unset_option(name)
         return {
-            SENTINELS.SUCCESS: gen_response.Success(f'Unset value of {name}'),
-            SENTINELS.UNKNOWN_OPTION: gen_response.OptionNotExist(f'unset value of {name}'),
-            SENTINELS.INVALID_CONFIG_FILE: gen_response.Failed(f'can not unset value of option because configure file is corrupted'),
-            SENTINELS.OPTION_NOT_FOUND: gen_response.Failed(f'can not unset value of option because it is not set in configure file'),
-            SENTINELS.FILE_IO_FAILED: gen_response.Failed(f'can not unset value of option because failed to write into configure file')
+            SENTINELS.SUCCESS: gen_response.Success(f'unset value of {name}'),
+            SENTINELS.UNKNOWN_OPTION: gen_response.OptionNotExist(),
+            SENTINELS.INVALID_CONFIG_FILE: gen_response.Failed('configure file corrupted'),
+            SENTINELS.OPTION_NOT_FOUND: gen_response.Failed('option not set in configure file'),
+            SENTINELS.FILE_IO_FAILED: gen_response.FileIOFailed(CONFIG_PATH)
         }[result]
 
     def open_config_file(self):
         result = open_file(CONFIG_PATH)
         if result is SENTINELS.SUCCESS:
-            response = gen_response.Success(f'file opened')
+            response = gen_response.Success('file opened')
         elif result is SENTINELS.FILE_IO_FAILED:
             result = CONFIG.set_file({})
             if result is SENTINELS.SUCCESS:
                 response = self.open_config_file()
             elif result is SENTINELS.FILE_IO_FAILED:
-                response = gen_response.Failed('failed to created empty configure file')
+                response = gen_response.FileIOFailed(CONFIG_PATH)
 
         elif result is SENTINELS.NO_OPENER:
             response = gen_response.Failed('can not find a method to open file on this platform')
@@ -93,6 +93,6 @@ class ConfigManager:
         return response
 
     def get_path(self):
-        return gen_response.Success('Got configure file path', str(CONFIG_PATH)) # This is absolutely necessary
+        return gen_response.Success('got configure file path', str(CONFIG_PATH)) # This is absolutely necessary
 
 CONFIG_MANAGER = ConfigManager()

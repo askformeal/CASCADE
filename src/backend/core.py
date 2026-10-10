@@ -150,7 +150,7 @@ class Backend:
         
         elif request.get('action', None) == 'heartbeat':
             if connection is not None:
-                send_json(connection, gen_response.Success('alive'))
+                send_json(connection, gen_response.Success('I\'m alive'))
         else:
             source_code = request.get('source', SENTINELS.SOURCE_NOT_PROVIDED)
             source = SOURCES.get(source_code, f'unrecognized source \"{source_code}\"')
@@ -185,9 +185,7 @@ class Backend:
                     response = self.dispatch(request)
                 except Exception as e:
                     logger.exception(f'Exception raised when dispatching request')
-                    response = gen_response.Failed(f'a CASCADE backend error occurred during dispatching of request: \"{e}\"')
-
-
+                    response = gen_response.Failed(f'an internal backend error occurred during dispatching of request: \"{e}\"')
 
                 if connection is not None and request.get('notify_support', False):
                     response.notifies = self.notifies.copy()
@@ -240,7 +238,7 @@ class Backend:
                 action = request.get('action', None)
                 if action is None:
                     logger.error('Not \"action\" key found in request')
-                    return gen_response.MissingKey('all', 'action')
+                    return gen_response.MissingKey('action')
                 
                 else:
                     keys = ACTION_KEYS.get(action, {})
@@ -255,7 +253,7 @@ class Backend:
                         value = request.get(key, SENTINELS.KEY_NOT_PROVIDED)
                         if value in (SENTINELS.KEY_NOT_PROVIDED, None):
                             if is_required:
-                                return gen_response.MissingKey(action, key)
+                                return gen_response.MissingKey(key)
                             else:
                                 try:
                                     default_value = info[2]
@@ -267,7 +265,7 @@ class Backend:
                             try:
                                 value = key_type(value)
                             except ValueError as e: 
-                                return gen_response.InvalidKeyType(action, key, value, str(e))
+                                return gen_response.InvalidKeyType(key, value, str(e))
                             else:
                                 request[key] = value
                                 

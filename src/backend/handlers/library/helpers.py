@@ -55,7 +55,7 @@ def add_song(ctx, path, set_meta=True, bind_alias=True, set_lyric=True, alias=No
     song_id = None
     if not Path(path).is_absolute():
         if cwd is None:
-            response = gen_response.MissingCWD(f'add-path-to-library')
+            response = gen_response.MissingCWD()
             path = None
         else:
             path = str(Path(cwd) / path)
@@ -126,7 +126,7 @@ def add_song(ctx, path, set_meta=True, bind_alias=True, set_lyric=True, alias=No
 
             response = add_response + alias_response + meta_response + auto_alias_response
         else:
-            response = gen_response.Failed(f'can not add \"{path}\" because a song of the same path already exists in library')
+            response = gen_response.Failed(f'a song of the same path already exists in library')
     else:
         response = gen_response.InvalidPath(path)
 

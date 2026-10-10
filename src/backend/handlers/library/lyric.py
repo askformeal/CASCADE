@@ -20,9 +20,9 @@ def set_(ctx, request):
     
     song_id = get_song(ctx, song, cwd)
     if song_id is SENTINELS.MISSING_CWD:
-        return gen_response.MissingCWD('lib.lyric.set')
+        return gen_response.MissingCWD()
     elif song_id is SENTINELS.NOT_IN_LIB:
-        return gen_response.SongNotExist(f'set lyric file of \"{song}\"')
+        return gen_response.SongNotExist(song)
     else:
         if path == '':
             path = SENTINELS.CLEAR_META
@@ -36,9 +36,9 @@ def offset(ctx, request):
     
     song_id = get_song(ctx, song, cwd)
     if song_id is SENTINELS.MISSING_CWD:
-        return gen_response.MissingCWD('lib.lyric.offset')
+        return gen_response.MissingCWD()
     elif song_id is SENTINELS.NOT_IN_LIB:
-        return gen_response.SongNotExist(f'set lyric offset of \"{song}\"')
+        return gen_response.SongNotExist(song)
     else:
         ctx.database.set_song_meta(song_id, 'offset', offset)
         return gen_response.Success(f'set lyric offset of \"{song}\"')
@@ -49,9 +49,9 @@ def show(ctx, request):
 
     song_id = get_song(ctx, song, cwd)
     if song_id is SENTINELS.MISSING_CWD:
-        return gen_response.MissingCWD('lib.lyric.show')
+        return gen_response.MissingCWD()
     elif song_id is SENTINELS.NOT_IN_LIB:
-        return gen_response.SongNotExist(f'show lyric of \"{song}\"')
+        return gen_response.SongNotExist(song)
     else:
         song_info = ctx.database.get_song_info(song_id)[0]
         lyric_path = song_info.get('lyric', None)
@@ -61,7 +61,7 @@ def show(ctx, request):
         else:
             lyric = parse_lyric(lyric_path)
             if lyric is SENTINELS.FILE_IO_FAILED:
-                return gen_response.FileIOFailed('open lyric file', lyric_path)
+                return gen_response.FileIOFailed(lyric_path)
             else:
                 attachment = {'path': lyric_path, 'lyric': lyric}
                 return gen_response.Success('lyric obtained', attachment=attachment)
@@ -81,9 +81,9 @@ def fetch(ctx, request):
         for song in songs:
             song_id = get_song(ctx, song, cwd)
             if song_id is SENTINELS.MISSING_CWD:
-                failed.append(gen_response.MissingCWD('lib.lyric.fetch'))
+                failed.append(gen_response.MissingCWD())
             elif song_id is SENTINELS.NOT_IN_LIB:
-                failed.append(gen_response.SongNotExist(f'fetch lyric of {song}'))
+                failed.append(gen_response.SongNotExist(song))
             else:
                 names[song_id] = song
                 info = ctx.database.get_song_info(song_id)[0]
@@ -110,7 +110,7 @@ def fetch(ctx, request):
                     with open(path, 'w', encoding=ENCODING) as f:
                         f.write(lrc)
                 except OSError as e:
-                    failed.append(gen_response.FileIOFailed('write lyric file', path, e))
+                    failed.append(gen_response.FileIOFailed(path, e))
                 else:
                     ctx.database.set_song_meta(song_id, 'lyric', path)
 

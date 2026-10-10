@@ -30,7 +30,7 @@ def load_last(ctx, request):
         if (last_type in (SENTINELS.SETTING_NOT_FOUND, None)
             or last_reference in (SENTINELS.SETTING_NOT_FOUND, None)
             ):
-            response = gen_response.Failed('No last song to open')
+            response = gen_response.Failed('no last song to open')
         else:
             try:
                 last_reference = int(last_reference)
@@ -49,27 +49,27 @@ def pause(ctx, request):
     result = ctx.playback.pause()
     return {
         SENTINELS.SUCCESS: gen_response.Success('player paused'),
-        SENTINELS.INVALID_PLAYER_STATE: gen_response.Failed('can not pause player because player is not playing'),
-        SENTINELS.ENGINE_ERROR: gen_response.EngineError('pause player'),
-        SENTINELS.PLAYER_TIMEOUT: gen_response.PlayerTimeout('pause player')
+        SENTINELS.INVALID_PLAYER_STATE: gen_response.Failed('player is not playing'),
+        SENTINELS.ENGINE_ERROR: gen_response.EngineError(),
+        SENTINELS.PLAYER_TIMEOUT: gen_response.PlayerTimeout()
     }[result]
 
 def resume(ctx, request):
     result = ctx.playback.resume()
     return {
         SENTINELS.SUCCESS: gen_response.Success('player resumed'),
-        SENTINELS.INVALID_PLAYER_STATE: gen_response.Failed('can not resume player because player is not paused'),
-        SENTINELS.ENGINE_ERROR: gen_response.EngineError('resume player'),
-        SENTINELS.PLAYER_TIMEOUT: gen_response.PlayerTimeout('resume player')
+        SENTINELS.INVALID_PLAYER_STATE: gen_response.Failed('player is not paused'),
+        SENTINELS.ENGINE_ERROR: gen_response.EngineError(),
+        SENTINELS.PLAYER_TIMEOUT: gen_response.PlayerTimeout()
     }[result]
 
 def toggle(ctx, request):
     result = ctx.playback.toggle()
     return {
         SENTINELS.SUCCESS: gen_response.Success('player toggled'),
-        SENTINELS.INVALID_PLAYER_STATE: gen_response.NotPlayingPaused('toggle player'),
-        SENTINELS.ENGINE_ERROR: gen_response.EngineError('toggle player'),
-        SENTINELS.PLAYER_TIMEOUT: gen_response.PlayerTimeout('toggle player')
+        SENTINELS.INVALID_PLAYER_STATE: gen_response.NotPlayingPaused(),
+        SENTINELS.ENGINE_ERROR: gen_response.EngineError(),
+        SENTINELS.PLAYER_TIMEOUT: gen_response.PlayerTimeout()
     }[result]
 
 def volume(ctx, request):
@@ -78,7 +78,7 @@ def volume(ctx, request):
         try:
             step = int(volume[1:])
         except ValueError:
-            return gen_response.Failed(f'invalid increase/decrease volume: {volume}')
+            return gen_response.Failed(f'invalid volume increase/decrease: {volume}')
         else:
             if volume.startswith('-'):
                 step = -step
@@ -123,9 +123,9 @@ def set_offset_overlay(ctx, request):
 
 def get_cover(ctx, request):
     if ctx.playback.cover is None:
-        return gen_response.Failed('Cover unavailable')
+        return gen_response.Failed('cover unavailable')
     else:
         return gen_response.Success(
-            'Cover obtain', 
+            'cover obtain', 
             attachment={'cover': bytes2base64(ctx.playback.cover)}
             )

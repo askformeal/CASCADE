@@ -20,7 +20,7 @@ def seek(ctx, request):
         else:
             step = parse_time(raw_time[1:])
         if step is SENTINELS.INVALID_TIME:
-            return gen_response.Failed(f'invalid forward/backward time: {raw_time}')
+            return gen_response.Failed(f'invalid time forward/backward: {raw_time}')
         else:
             if raw_time.startswith('-'):
                 step = -step
@@ -56,7 +56,7 @@ def jump(ctx, request):
     else:
         length = ctx.playback.get_progress()['length']
         if length == -1:
-            return gen_response.NotPlayingPaused('jump to progress')
+            return gen_response.NotPlayingPaused()
         else:
             pos = length * (percent / 100)
             return jump_to_pos(ctx, pos)

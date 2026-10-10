@@ -32,13 +32,13 @@ def info(ctx, request):
             if song.isdecimal() and ctx.database.song_exists(int(song)):
                 song_id = int(song)
             else:
-                failed.append(gen_response.SongNotExist(f'get information of song \"{song}\"'))
+                failed.append(gen_response.SongNotExist(song))
         else:
             get_song_result = get_song(ctx, song, cwd)
             if get_song_result is SENTINELS.MISSING_CWD:
-                failed.append(gen_response.MissingCWD('lib.info'))
+                failed.append(gen_response.MissingCWD())
             elif get_song_result is SENTINELS.NOT_IN_LIB:
-                failed.append(gen_response.SongNotExist(f'get information of song \"{song}\"'))
+                failed.append(gen_response.SongNotExist(song))
             else:
                 song_id = get_song_result
         if song_id is not None:
@@ -121,7 +121,7 @@ def add(ctx, request):
     if len(paths) == 0:
         return gen_response.EmptyList('paths')
     elif len(paths) != len(aliases) and len(aliases) > 0:
-        return gen_response.Failed('can not add song(s) because the provided number of paths and aliases are not the same')
+        return gen_response.Failed('provided paths and aliases are not of the same number')
     else:
         if len(aliases) == 0:
             aliases = [None] * len(paths)
@@ -148,9 +148,9 @@ def del_(ctx, request):
         for song in songs:
             id = get_song(ctx, song, cwd)
             if id is SENTINELS.MISSING_CWD:
-                failed.append(gen_response.MissingCWD('lib.del'))
+                failed.append(gen_response.MissingCWD())
             elif id is SENTINELS.NOT_IN_LIB:
-                failed.append(gen_response.SongNotExist(f'delete {song}'))
+                failed.append(gen_response.SongNotExist(song))
             else:
                 path = ctx.database.get_song_info(id)[0]['path']
                 if ctx.playback.current_song_info is not None and ctx.playback.get_playing_info().get('id', None) == id:
@@ -188,7 +188,7 @@ def scan(ctx, request):
     directory = request['dir']
     if not Path(directory).is_absolute():
         if cwd is None:
-            response = gen_response.MissingCWD('lib.scan')
+            response = gen_response.MissingCWD()
             missing_cwd = True
         else:
             directory = str(Path(cwd) / directory)
@@ -212,7 +212,7 @@ def scan(ctx, request):
                 paths = shallow_scan(directory)
     
             if len(paths) == 0:
-                return gen_response.Success(f'No supported audio file found under {directory}', attachment=[])
+                return gen_response.Success(f'no supported audio file found under {directory}', attachment=[])
             else:
                 if dry_run:
                     return gen_response.Success(f'{len(paths)} supported audio files found under {directory}', paths)

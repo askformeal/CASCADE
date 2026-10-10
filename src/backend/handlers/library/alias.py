@@ -13,12 +13,12 @@ def list_(ctx, request):
     
     id = get_song(ctx, song, cwd)
     if id is SENTINELS.MISSING_CWD:
-        return gen_response.MissingCWD('lib.alias.list')
+        return gen_response.MissingCWD()
     elif id is not SENTINELS.NOT_IN_LIB:
         aliases = ctx.database.get_song_aliases(id)
         return gen_response.Success('obtained all aliases in library', aliases)
     else:
-        return gen_response.SongNotExist(f'show aliases of {song}')
+        return gen_response.SongNotExist(song)
 
 def bind(ctx, request):
     song = request['song']
@@ -30,17 +30,17 @@ def bind(ctx, request):
         id = get_song(ctx, song, cwd)
     
         if id is SENTINELS.MISSING_CWD:
-            return gen_response.MissingCWD('lib.alias.bind')
+            return gen_response.MissingCWD()
         elif id is SENTINELS.NOT_IN_LIB:
-            return gen_response.SongNotExist(f'bind alias to {song}')
+            return gen_response.SongNotExist(song)
         else:
             failed = []
             for alias in aliases:
                 result = ctx.database.bind_alias(id, alias)
                 bind_response = {
                     SENTINELS.SUCCESS: gen_response.Success(f"bound alias \"{alias}\" to song \"{song}\""),
-                    SENTINELS.ALIAS_EXISTS: gen_response.Failed(f'can not bind alias \"{alias}\" because it is already bound to another song in library'),
-                    SENTINELS.SONG_NOT_FOUND: gen_response.SongNotExist(f'bind alias to \"{song}\"') # not really necessary, but Monica insists
+                    SENTINELS.ALIAS_EXISTS: gen_response.Failed('alias already bound to another song in library'),
+                    SENTINELS.SONG_NOT_FOUND: gen_response.SongNotExist(song) # not really necessary, but Monica insists
                 }[result]
                 if not bind_response.ok():
                     failed.append(bind_response)
@@ -58,6 +58,6 @@ def unbind(ctx, request):
         for alias in aliases:
             result = ctx.database.unbind_alias(alias)
             if result is SENTINELS.ALIAS_NOT_FOUND:
-                failed.append(gen_response.Failed(f'can not unbind {alias} because it does not exist in library'))
+                failed.append(gen_response.Failed(f'alias not exist: {alias}'))
     
         return gen_response.BatchAuto('aliases unbound', len(failed), len(aliases), failed=failed)

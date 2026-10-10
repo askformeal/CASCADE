@@ -4,7 +4,7 @@ def test_alive(ctx, request):
     return gen_response.Success('CASCADE backend is running')
 
 def get_notifies(ctx, request):
-    return gen_response.Success('Notifies got')
+    return gen_response.Success('notifies obtained')
 
 def exit_(ctx, request):
     ctx.exit_()
