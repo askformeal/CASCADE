@@ -242,6 +242,11 @@ class Builder:
         playlist_swap_parser.add_argument('song1', type=str, help='The first song to swap')
         playlist_swap_parser.add_argument('song2', type=str, help='The second song to swap')
         
+        playlist_move_parser = self._add_parser(playlist_sub, 'move', help='Move the position of a song in a playlist')
+        playlist_move_parser.add_argument('playlist', type=str, help='Playlist the songs are in')
+        playlist_move_parser.add_argument('song', type=str, help='The song to move')
+        playlist_move_parser.add_argument('position', type=str, help='Position to move to (negative means counting backward)')
+        
         config_parser = self._add_parser(command_sub, 'config', aliases=['configure'], help='Manage configuration')
         config_sub = config_parser.add_subparsers(dest='config_action', required=True)
         config_parent = argparse.ArgumentParser(add_help=False)

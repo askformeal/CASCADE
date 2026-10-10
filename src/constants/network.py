@@ -174,6 +174,11 @@ ACTION_KEYS = {
         'song1': (str, True),
         'song2': (str, True)
     },
+    'lib.playlist.move': {
+        'playlist': (str, True),
+        'song': (str, True),
+        'position': (int, True)
+    },
     'config.show': {
         'option': (str, True)
     },

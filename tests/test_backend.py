@@ -875,6 +875,122 @@ def test_lib_playlist_swap_database_error(backend, tmp_path, monkeypatch):
     assert 'database error' in response['msg']
 
 
+def test_lib_playlist_move_to_first(backend, tmp_path):
+    paths, song_ids, playlist_id = _make_playlist_with_songs(backend, tmp_path)
+    response = _request(backend, 'lib.playlist.move', playlist='workout', song=paths[2], position=1)
+    assert response['code'] == 0
+    assert 'is now the 1nd song' in response['msg']
+    assert _playlist_song_ids(backend.database, playlist_id) == [song_ids[2], song_ids[0], song_ids[1]]
+
+
+def test_lib_playlist_move_position_zero_is_first(backend, tmp_path):
+    paths, song_ids, playlist_id = _make_playlist_with_songs(backend, tmp_path)
+    response = _request(backend, 'lib.playlist.move', playlist='workout', song=paths[2], position=0)
+    assert response['code'] == 0
+    assert _playlist_song_ids(backend.database, playlist_id) == [song_ids[2], song_ids[0], song_ids[1]]
+
+
+def test_lib_playlist_move_to_last(backend, tmp_path):
+    paths, song_ids, playlist_id = _make_playlist_with_songs(backend, tmp_path)
+    response = _request(backend, 'lib.playlist.move', playlist='workout', song=paths[0], position=3)
+    assert response['code'] == 0
+    assert 'is now the 3nd song' in response['msg']
+    assert _playlist_song_ids(backend.database, playlist_id) == [song_ids[1], song_ids[2], song_ids[0]]
+
+
+def test_lib_playlist_move_negative_position(backend, tmp_path):
+    paths, song_ids, playlist_id = _make_playlist_with_songs(backend, tmp_path)
+    response = _request(backend, 'lib.playlist.move', playlist='workout', song=paths[0], position=-1)
+    assert response['code'] == 0
+    assert _playlist_song_ids(backend.database, playlist_id) == [song_ids[1], song_ids[2], song_ids[0]]
+
+
+def test_lib_playlist_move_negative_position_from_start(backend, tmp_path):
+    paths, song_ids, playlist_id = _make_playlist_with_songs(backend, tmp_path)
+    response = _request(backend, 'lib.playlist.move', playlist='workout', song=paths[1], position=-3)
+    assert response['code'] == 0
+    assert _playlist_song_ids(backend.database, playlist_id) == [song_ids[1], song_ids[0], song_ids[2]]
+
+
+def test_lib_playlist_move_numbers_stay_dense(backend, tmp_path):
+    paths, song_ids, playlist_id = _make_playlist_with_songs(backend, tmp_path)
+    _request(backend, 'lib.playlist.move', playlist='workout', song=paths[2], position=1)
+    assert _playlist_song_numbers(backend.database, playlist_id) == [0, 1, 2]
+
+
+def test_lib_playlist_move_by_alias(backend, tmp_path):
+    paths, song_ids, playlist_id = _make_playlist_with_songs(backend, tmp_path)
+    backend.database.bind_alias(song_ids[1], 'middle_song')
+    response = _request(backend, 'lib.playlist.move', playlist='workout', song='middle_song', position=1)
+    assert response['code'] == 0
+    assert _playlist_song_ids(backend.database, playlist_id) == [song_ids[1], song_ids[0], song_ids[2]]
+
+
+def test_lib_playlist_move_position_out_of_bound(backend, tmp_path):
+    paths, song_ids, playlist_id = _make_playlist_with_songs(backend, tmp_path)
+    response = _request(backend, 'lib.playlist.move', playlist='workout', song=paths[0], position=4)
+    assert response['code'] == 1
+    assert 'out of bound' in response['msg']
+    assert _playlist_song_ids(backend.database, playlist_id) == song_ids
+
+
+def test_lib_playlist_move_negative_position_out_of_bound(backend, tmp_path):
+    paths, song_ids, playlist_id = _make_playlist_with_songs(backend, tmp_path)
+    response = _request(backend, 'lib.playlist.move', playlist='workout', song=paths[0], position=-4)
+    assert response['code'] == 1
+    assert 'out of bound' in response['msg']
+    assert _playlist_song_ids(backend.database, playlist_id) == song_ids
+
+
+def test_lib_playlist_move_song_not_in_playlist(backend, tmp_path):
+    paths, song_ids, playlist_id = _make_playlist_with_songs(backend, tmp_path)
+    _make_wav(tmp_path / 'other.wav')
+    other_id, _ = backend.database.add_song(str(tmp_path / 'other.wav'))
+    response = _request(backend, 'lib.playlist.move', playlist='workout', song=str(tmp_path / 'other.wav'), position=1)
+    assert response['code'] == 1
+    assert 'is not in playlist' in response['msg']
+    assert _playlist_song_ids(backend.database, playlist_id) == song_ids
+    assert backend.database.song_exists(other_id)
+
+
+def test_lib_playlist_move_song_not_exist(backend, tmp_path):
+    paths, song_ids, playlist_id = _make_playlist_with_songs(backend, tmp_path)
+    response = _request(backend, 'lib.playlist.move', playlist='workout', song=str(tmp_path / 'ghost.wav'), position=1)
+    assert response['code'] == 1
+    assert 'does not exist in library' in response['msg']
+    assert _playlist_song_ids(backend.database, playlist_id) == song_ids
+
+
+def test_lib_playlist_move_playlist_not_exist(backend, tmp_path):
+    paths, song_ids, playlist_id = _make_playlist_with_songs(backend, tmp_path)
+    response = _request(backend, 'lib.playlist.move', playlist='ghost', song=paths[0], position=1)
+    assert response['code'] == 1
+    assert 'does not exist in library' in response['msg']
+
+
+def test_lib_playlist_move_missing_key(backend, tmp_path):
+    paths, song_ids, playlist_id = _make_playlist_with_songs(backend, tmp_path)
+    response = _request(backend, 'lib.playlist.move', playlist='workout', song=paths[0])
+    assert response['code'] == 1
+    assert 'position' in response['msg']
+
+
+def test_lib_playlist_move_invalid_position(backend, tmp_path):
+    paths, song_ids, playlist_id = _make_playlist_with_songs(backend, tmp_path)
+    response = _request(backend, 'lib.playlist.move', playlist='workout', song=paths[0], position='first')
+    assert response['code'] == 1
+    assert 'position' in response['msg']
+    assert _playlist_song_ids(backend.database, playlist_id) == song_ids
+
+
+def test_lib_playlist_move_database_error(backend, tmp_path, monkeypatch):
+    paths, song_ids, playlist_id = _make_playlist_with_songs(backend, tmp_path)
+    monkeypatch.setattr(backend.database, 'reorder_playlist', lambda playlist_id, song_ids: SENTINELS.DATABASE_ERROR)
+    response = _request(backend, 'lib.playlist.move', playlist='workout', song=paths[0], position=1)
+    assert response['code'] == 1
+    assert 'database error' in response['msg']
+
+
 def test_lib_playlist_add(backend, audio_file):
     song_id, playlist_id = _create_playlist_with_song(backend, audio_file, 'workout')
     # seed another song that is NOT in the playlist yet

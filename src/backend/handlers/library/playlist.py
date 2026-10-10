@@ -136,3 +136,41 @@ def swap(ctx, request):
                     SENTINELS.SUCCESS: gen_response.Success(f'position of {song_1} and {song_2} swapped'),
                     SENTINELS.DATABASE_ERROR: gen_response.Failed('a database error occurred')
                 }[result]
+
+def move(ctx, request):
+    cwd = request.get('cwd', None)
+    playlist = request['playlist']
+    song = request['song']
+    position = request['position']
+    playlist_id = ctx.database.get_playlist_via_name(playlist)
+    if playlist_id is SENTINELS.PLAYLIST_NOT_FOUND:
+        return gen_response.PlaylistNotExist(f"reorder playlist \"{playlist}\"")
+    else:
+        songs = ctx.database.get_playlist_songs(playlist_id)
+        song_ids = list(map(lambda song: song['id'], songs))
+        if position > 0:
+            if position > len(song_ids):
+                return gen_response.Failed('position out of bound')
+            else:
+                position -= 1
+        elif position < 0: 
+            if position < -len(song_ids):
+                return gen_response.Failed('position out of bound')
+            else:
+                position = len(song_ids) + position
+
+        song_id = get_song(ctx, song, cwd)
+        if song_id is SENTINELS.MISSING_CWD:
+            return gen_response.MissingCWD('lib.playlist.move')
+        elif song_id is SENTINELS.NOT_IN_LIB:
+            return gen_response.SongNotExist(f'move position of {song}')
+        elif song_id not in song_ids:
+            return gen_response.Failed(f'\"{song}\" is not in playlist \"{playlist}\"')
+        else:
+            song_ids.remove(song_id)
+            song_ids.insert(position, song_id)
+            result = ctx.database.reorder_playlist(playlist_id, song_ids)
+            return {
+                SENTINELS.SUCCESS: gen_response.Success(f'\"{song}\" is now the {position+1}nd song in playlist'),
+                SENTINELS.DATABASE_ERROR: gen_response.Failed('a database error occurred')
+            }[result]
