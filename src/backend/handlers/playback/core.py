@@ -126,6 +126,6 @@ def get_cover(ctx, request):
         return gen_response.Failed('cover unavailable')
     else:
         return gen_response.Success(
-            'cover obtain', 
+            'cover obtained',
             attachment={'cover': bytes2base64(ctx.playback.cover)}
             )
