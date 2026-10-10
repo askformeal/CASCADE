@@ -187,7 +187,7 @@ def test_get_cover_without_cover(backend, bare_wav):
 
     response = _request(backend, 'get_cover')
     assert response['code'] == 1
-    assert 'Cover unavailable' in response['msg']
+    assert 'cover unavailable' in response['msg']
 
 
 def _folder_cover_song(tmp_path, name, cover_bytes):
@@ -208,7 +208,7 @@ def test_undecodable_cover_falls_back_to_placeholder(backend, tmp_path):
     assert attachment['cover_hash'] is None
     response = _request(backend, 'get_cover')
     assert response['code'] == 1
-    assert 'Cover unavailable' in response['msg']
+    assert 'cover unavailable' in response['msg']
 
 
 def test_truncated_cover_falls_back_to_placeholder(backend, tmp_path):
