@@ -991,6 +991,91 @@ def test_lib_playlist_move_database_error(backend, tmp_path, monkeypatch):
     assert 'database error' in response['msg']
 
 
+def test_lib_playlist_reorder(backend, tmp_path):
+    paths, song_ids, playlist_id = _make_playlist_with_songs(backend, tmp_path)
+    target = [song_ids[2], song_ids[1], song_ids[0]]
+    response = _request(backend, 'lib.playlist.reorder', playlist='workout', song_ids=target)
+    assert response['code'] == 0
+    assert 'reordered' in response['msg']
+    assert _playlist_song_ids(backend.database, playlist_id) == target
+
+
+def test_lib_playlist_reorder_numbers_stay_dense(backend, tmp_path):
+    paths, song_ids, playlist_id = _make_playlist_with_songs(backend, tmp_path)
+    _request(backend, 'lib.playlist.reorder', playlist='workout', song_ids=[song_ids[1], song_ids[2], song_ids[0]])
+    assert _playlist_song_numbers(backend.database, playlist_id) == [0, 1, 2]
+
+
+def test_lib_playlist_reorder_song_ids_mismatch(backend, tmp_path):
+    paths, song_ids, playlist_id = _make_playlist_with_songs(backend, tmp_path)
+    response = _request(backend, 'lib.playlist.reorder', playlist='workout', song_ids=[song_ids[2], song_ids[1]])
+    assert response['code'] == 1
+    assert 'do not match' in response['msg']
+    assert _playlist_song_ids(backend.database, playlist_id) == song_ids
+
+
+def test_lib_playlist_reorder_duplicate_song_id(backend, tmp_path):
+    paths, song_ids, playlist_id = _make_playlist_with_songs(backend, tmp_path)
+    response = _request(backend, 'lib.playlist.reorder', playlist='workout', song_ids=[song_ids[0], song_ids[0], song_ids[1]])
+    assert response['code'] == 1
+    assert 'do not match' in response['msg']
+    assert _playlist_song_ids(backend.database, playlist_id) == song_ids
+
+
+def test_lib_playlist_reorder_song_id_not_in_library(backend, tmp_path):
+    paths, song_ids, playlist_id = _make_playlist_with_songs(backend, tmp_path)
+    response = _request(backend, 'lib.playlist.reorder', playlist='workout', song_ids=[song_ids[0], song_ids[1], 999])
+    assert response['code'] == 1
+    assert 'do not match' in response['msg']
+    assert _playlist_song_ids(backend.database, playlist_id) == song_ids
+
+
+def test_lib_playlist_reorder_empty_playlist(backend, tmp_path):
+    paths, song_ids, playlist_id = _make_playlist_with_songs(backend, tmp_path)
+    _request(backend, 'lib.playlist.kick', songs=paths, playlist='workout')
+    response = _request(backend, 'lib.playlist.reorder', playlist='workout', song_ids=[])
+    assert response['code'] == 0
+    assert _playlist_song_ids(backend.database, playlist_id) == []
+
+
+def test_lib_playlist_reorder_playlist_not_exist(backend, tmp_path):
+    paths, song_ids, playlist_id = _make_playlist_with_songs(backend, tmp_path)
+    response = _request(backend, 'lib.playlist.reorder', playlist='ghost', song_ids=song_ids)
+    assert response['code'] == 1
+    assert 'does not exist in library' in response['msg']
+
+
+def test_lib_playlist_reorder_missing_key(backend, tmp_path):
+    paths, song_ids, playlist_id = _make_playlist_with_songs(backend, tmp_path)
+    response = _request(backend, 'lib.playlist.reorder', playlist='workout')
+    assert response['code'] == 1
+    assert 'song_ids' in response['msg']
+
+
+def test_lib_playlist_reorder_invalid_song_id(backend, tmp_path):
+    paths, song_ids, playlist_id = _make_playlist_with_songs(backend, tmp_path)
+    response = _request(backend, 'lib.playlist.reorder', playlist='workout', song_ids=[song_ids[0], 'not_a_number', song_ids[2]])
+    assert response['code'] == 1
+    assert 'song_ids' in response['msg']
+    assert _playlist_song_ids(backend.database, playlist_id) == song_ids
+
+
+def test_lib_playlist_reorder_song_ids_not_a_list(backend, tmp_path):
+    paths, song_ids, playlist_id = _make_playlist_with_songs(backend, tmp_path)
+    response = _request(backend, 'lib.playlist.reorder', playlist='workout', song_ids=song_ids[0])
+    assert response['code'] == 1
+    assert 'song_ids' in response['msg']
+    assert _playlist_song_ids(backend.database, playlist_id) == song_ids
+
+
+def test_lib_playlist_reorder_database_error(backend, tmp_path, monkeypatch):
+    paths, song_ids, playlist_id = _make_playlist_with_songs(backend, tmp_path)
+    monkeypatch.setattr(backend.database, 'reorder_playlist', lambda playlist_id, song_ids: SENTINELS.DATABASE_ERROR)
+    response = _request(backend, 'lib.playlist.reorder', playlist='workout', song_ids=[song_ids[2], song_ids[1], song_ids[0]])
+    assert response['code'] == 1
+    assert 'database error' in response['msg']
+
+
 def test_lib_playlist_add(backend, audio_file):
     song_id, playlist_id = _create_playlist_with_song(backend, audio_file, 'workout')
     # seed another song that is NOT in the playlist yet

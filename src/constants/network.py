@@ -179,6 +179,10 @@ ACTION_KEYS = {
         'song': (str, True),
         'position': (int, True)
     },
+    'lib.playlist.reorder': {
+        'playlist': (str, True),
+        'song_ids': (IterType(int), True)
+    },
     'config.show': {
         'option': (str, True)
     },

@@ -174,3 +174,21 @@ def move(ctx, request):
                 SENTINELS.SUCCESS: gen_response.Success(f'\"{song}\" is now the {position+1}nd song in playlist'),
                 SENTINELS.DATABASE_ERROR: gen_response.Failed('a database error occurred')
             }[result]
+
+def reorder(ctx, request):
+    playlist = request['playlist']
+    target_song_ids = request['song_ids']
+    playlist_id = ctx.database.get_playlist_via_name(playlist)
+    if playlist_id is SENTINELS.PLAYLIST_NOT_FOUND:
+        return gen_response.PlaylistNotExist(f"reorder playlist \"{playlist}\"")
+    else:
+        songs = ctx.database.get_playlist_songs(playlist_id)
+        song_ids = list(map(lambda song: song['id'], songs))
+        if sorted(target_song_ids) == sorted(song_ids):
+            result = ctx.database.reorder_playlist(playlist_id, target_song_ids)
+            return {
+                SENTINELS.SUCCESS: gen_response.Success(f'{playlist} reordered'),
+                SENTINELS.DATABASE_ERROR: gen_response.Failed('a database error occurred')
+            }[result]
+        else:
+            return gen_response.Failed(f'song ids provided do not match the songs in playlist \"{playlist}\"')
