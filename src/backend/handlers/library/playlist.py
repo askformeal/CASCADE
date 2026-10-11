@@ -2,6 +2,7 @@ from src.log import setup_logger
 from src.constants.paths.log import BACKEND_LOG
 from src.sentinels import SENTINELS
 from src import gen_response
+from src.utils.misc import sort_songs
 from .helpers import get_song, insert_songs_aliases, insert_songs_playlist_names
 
 logger = setup_logger(__name__, BACKEND_LOG)
@@ -192,3 +193,18 @@ def reorder(ctx, request):
             }[result]
         else:
             return gen_response.Failed(f'song ids provided do not match the songs in playlist \"{playlist}\"')
+
+def sort(ctx, request):
+    playlist = request['playlist']
+    playlist_id = ctx.database.get_playlist_via_name(playlist)
+    if playlist_id is SENTINELS.PLAYLIST_NOT_FOUND:
+        return gen_response.PlaylistNotExist(playlist)
+    else:
+        info = ctx.database.get_playlist_songs(playlist_id)
+        info = sort_songs(info)
+        sorted_ids = list(map(lambda x: x['id'], info))
+        result = ctx.database.reorder_playlist(playlist_id, sorted_ids)
+        return {
+            SENTINELS.SUCCESS: gen_response.Success(f'{playlist} sorted'),
+            SENTINELS.DATABASE_ERROR: gen_response.DatabaseError()
+        }[result]

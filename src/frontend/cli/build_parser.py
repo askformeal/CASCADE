@@ -246,6 +246,9 @@ class Builder:
         playlist_move_parser.add_argument('playlist', type=str, help='Playlist the songs are in')
         playlist_move_parser.add_argument('song', type=str, help='The song to move')
         playlist_move_parser.add_argument('position', type=str, help='Position to move to (negative means counting backward)')
+
+        playlist_sort_parser = self._add_parser(playlist_sub, 'sort', help='Sort a playlist by each song\'s filename')
+        playlist_sort_parser.add_argument('playlist', type=str, help='Playlist to sort')
         
         config_parser = self._add_parser(command_sub, 'config', aliases=['configure'], help='Manage configuration')
         config_sub = config_parser.add_subparsers(dest='config_action', required=True)

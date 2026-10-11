@@ -63,6 +63,7 @@ ROUTER = {
     'lib.playlist.reorder': playlist.reorder,
     'lib.playlist.swap': playlist.swap,
     'lib.playlist.move': playlist.move,
+    'lib.playlist.sort': playlist.sort,
 
     'config.list': config.list_,
     'config.show': config.show,
