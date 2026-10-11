@@ -1,5 +1,84 @@
 # CHANGELOG
 
+## [0.57.0] - 2026-10-11
+
+### Added
+
+#### Overall
+
+- Type annotation added to **every** function and method. A hell of an experience.
+
+#### Backend
+
+- **Sortable playlist** - now you can manage the order of your playlists.
+- Request rate - number of requests received per second.
+
+#### CLI
+
+- `lib playlist move` command - move the position of a song in playlist.
+- `lib playlist swap` command - swap two songs' positions in a playlist.
+- `lib playlist sort` command - sort a playlist by filename.
+- `-s/--short` option to display list of songs concisely.
+- Print list of songs one by one - use `-f/--full` to print all at once.
+- `-v` aliases for `--verbose`.
+- Aliases:
+  - `status` / `st`
+  - `prev` / `previous`
+  - `lib` / `library`
+  - `lib meta` / `lib metadata`
+  - `lib playlist` / `lib pl`
+  - `config` / `configure`
+  - `exit` / `quit`
+- `-V`/`--version` to show version information.
+- Some color.
+
+#### GUI
+
+- Current playlist name shown in playlist area.
+- A start / reboot pop-up with continue and development option.
+- Customizable font (configure by the `gui_font` option).
+- Reverse playback button.
+- Reload button.
+- Double-clicking a lyric to jump to its position.
+- Artist shown in playlist section.
+- Request rate display.
+- Backend notify support.
+- Accelerator of "Open all" in menubar.
+- Ctrl+R as the secondary hotkey for reloading.
+- Escape hotkey to exit fullscreen.
+
+#### Config GUI
+
+- Customizable font (configure by the `config_gui_font` option).
+
+#### Tray icon
+
+- `Open GUI` option.
+
+### Changed
+
+#### Backend
+
+- Simplified response messages.
+
+#### CLI
+
+- Backend run time, along with the new request rate, will only be shown in `status` if `-d`/`--dev` is given.
+
+#### GUI
+
+- Lyric wrap at 50 characters (customizable by `gui_lyric_wrap`)
+- Playlist section clear selection when lose focus.
+- Filter by artist.
+- Prettified interface.
+
+### Fixed
+
+- Opening a one-song playlist whose song is already in the current playlist switched to the song without actually switching the playlist.
+- Playback hotkey cannot be triggered because playback section does not have focus.
+- Some internal CLI keys leak into requests and cause annoying warnings in log.
+- Misleading prog in CLI help message.
+
 ## [0.56.1] - 2026-10-04
 
 - Completed `pyproject.toml`.
