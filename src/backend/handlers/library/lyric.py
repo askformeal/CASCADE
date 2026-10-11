@@ -7,13 +7,15 @@ from src.constants.misc import ENCODING
 from src.constants.backend import LYRIC_FETCH_MAX_WORKERS
 from src.sentinels import SENTINELS
 from src import gen_response
+from src.gen_response import Response
+from src.backend.context import Context
 from src.utils.misc import get_song_display_name
 from src.utils.lyric import parse_lyric
 from .helpers import get_song, fetch_lyric
 
 logger = setup_logger(__name__, BACKEND_LOG)
 
-def set_(ctx, request):
+def set_(ctx: Context, request: dict) -> Response:
     song = request['song']
     path = request['path']
     cwd = request.get('cwd', None)
@@ -29,7 +31,7 @@ def set_(ctx, request):
         ctx.database.set_song_meta(song_id, 'lyric', path)
         return gen_response.Success(f'set lyric file of \"{song}\"')
 
-def offset(ctx, request):
+def offset(ctx: Context, request: dict) -> Response:
     song = request['song']
     offset = request['offset']
     cwd = request.get('cwd', None)
@@ -43,7 +45,7 @@ def offset(ctx, request):
         ctx.database.set_song_meta(song_id, 'offset', offset)
         return gen_response.Success(f'set lyric offset of \"{song}\"')
 
-def show(ctx, request):
+def show(ctx: Context, request: dict) -> Response:
     song = request['song']
     cwd = request.get('cwd', None)
 
@@ -66,7 +68,7 @@ def show(ctx, request):
                 attachment = {'path': lyric_path, 'lyric': lyric}
                 return gen_response.Success('lyric obtained', attachment=attachment)
 
-def fetch(ctx, request):
+def fetch(ctx: Context, request: dict) -> Response:
     songs = request['songs']
     cwd = request.get('cwd', None)
 

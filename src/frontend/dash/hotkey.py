@@ -8,9 +8,12 @@ from src.constants.dash import (
     DASH_KEY_MAP as KEY_MAP
     )
 from src.config import CONFIG
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .core import Dash
 
 class HotkeyMixin:
-    def _listen_hotkey(self):
+    def _listen_hotkey(self: 'Dash'):
         while self.running:
             try:
                 key = readchar.readkey()

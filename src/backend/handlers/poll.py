@@ -1,8 +1,10 @@
 from src import gen_response
+from src.gen_response import Response
+from src.backend.context import Context
 from .playback.helpers import get_status, get_current_songs, get_current_lyric
 from .library.helpers import get_song_playlist_names
 
-def poll(ctx, request):
+def poll(ctx: Context, request: dict) -> Response:
     snapshot = get_status(ctx)
     song_id = snapshot.get('id', None)
     if song_id is not None:

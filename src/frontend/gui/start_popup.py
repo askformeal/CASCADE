@@ -1,9 +1,12 @@
 import tkinter as tk
 
 from .pop_up import PopUp
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .core import GUI
 
 class StartPopUp(PopUp):
-    def __init__(self, master, *args, **kwargs):
+    def __init__(self, master: 'GUI', *args, **kwargs):
         super().__init__(master, *args, title='Start / Reboot', **kwargs)
         self.config(padx=15, pady=10)
 

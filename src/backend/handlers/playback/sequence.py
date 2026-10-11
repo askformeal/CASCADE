@@ -4,6 +4,8 @@ from src.log import setup_logger
 from src.constants.paths.log import BACKEND_LOG
 from src.sentinels import SENTINELS
 from src import gen_response
+from src.gen_response import Response
+from src.backend.context import Context
 from .helpers import (
     get_current_songs, 
     switch_song, 
@@ -15,10 +17,10 @@ from .helpers import (
 
 logger = setup_logger(__name__, BACKEND_LOG)
 
-def list_(ctx, request):
+def list_(ctx: Context, request: dict) -> Response:
     return gen_response.Success('obtained current playlist', get_current_songs(ctx))    
 
-def shuffle(ctx, request):
+def shuffle(ctx: Context, request: dict) -> Response:
     ctx.playback.shuffle = not ctx.playback.shuffle
     logger.info(f'Shuffle set to {ctx.playback.shuffle}')
     if ctx.playback.shuffle and ctx.playback.current_song_info is not None:
@@ -27,17 +29,17 @@ def shuffle(ctx, request):
     mode = {True: 'on', False: 'off'}[ctx.playback.shuffle]
     return gen_response.Success(f'shuffle mode turned {mode}')
 
-def loop(ctx, request):
+def loop(ctx: Context, request: dict) -> Response:
     ctx.playback.loop = not ctx.playback.loop
     mode = {True: 'on', False: 'off'}[ctx.playback.loop]
     return gen_response.Success(f'loop mode turned {mode}')
 
-def reverse(ctx, request):
+def reverse(ctx: Context, request: dict) -> Response:
     ctx.playback.reverse = not ctx.playback.reverse
     mode = {True: 'on', False: 'off'}[ctx.playback.reverse]
     return gen_response.Success(f'reverse mode turned {mode}')
 
-def dice(ctx, request):
+def dice(ctx: Context, request: dict) -> Response:
     if ctx.playback.current_song_info is None:
         return gen_response.PlayerEmpty()
     elif len(ctx.playback.current_song_info) == 1:
@@ -59,7 +61,7 @@ def dice(ctx, request):
             SENTINELS.FILE_IO_FAILED: gen_response.InvalidAudioFile()
         }[result]
 
-def switch(ctx, request):
+def switch(ctx: Context, request: dict) -> Response:
     num = request['number']
     if num == 0:
         return switch_song(ctx, 0)
@@ -68,7 +70,7 @@ def switch(ctx, request):
     else:
         return switch_song(ctx, num-1)
 
-def prev(ctx, request):
+def prev(ctx: Context, request: dict) -> Response:
     on_end = request['on_end']
     if on_end:
         del_current_pos(ctx)
@@ -96,7 +98,7 @@ def prev(ctx, request):
 
         return response
 
-def next_(ctx, request):
+def next_(ctx: Context, request: dict) -> Response:
     on_end = request['on_end']
     if on_end:
         del_current_pos(ctx)

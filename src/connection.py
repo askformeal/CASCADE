@@ -1,4 +1,5 @@
 import json
+import socket
 
 from src.log import setup_logger
 from src.constants.paths.log import SOCKET_LOG
@@ -8,13 +9,13 @@ from src.gen_response import Response
 
 logger = setup_logger(__name__, SOCKET_LOG)
 
-def _json_response_default(value):
+def _json_response_default(value: dict | Response) -> dict:
     if isinstance(value, Response):
         return dict(value)
     else:
         raise TypeError(f'Object of type {type(value).__name__} is not JSON serializable')
 
-def send_json(connection, data, expect_reset=False):
+def send_json(connection: socket.socket, data: dict | Response, expect_reset: bool = False) -> bool:
     if isinstance(data, Response):
         data = dict(data)
         
@@ -32,7 +33,7 @@ def send_json(connection, data, expect_reset=False):
         logger.error(f'A socket error occurred during sending: {e}')
         return False
 
-def recv_json(connection, expect_reset=False):
+def recv_json(connection: socket.socket, expect_reset: bool = False):
     raw_len = _recv_exact(connection, HEADER_LEN, expect_reset=expect_reset)
     if raw_len is SENTINELS.LOST:
         return None
@@ -62,7 +63,7 @@ def recv_json(connection, expect_reset=False):
                 else:
                     return json_data
 
-def _recv_exact(connection, length, expect_reset=False):
+def _recv_exact(connection: socket.socket, length: int, expect_reset: bool = False):
     data = b''
     while len(data) < length:
         try:
@@ -76,16 +77,3 @@ def _recv_exact(connection, length, expect_reset=False):
                 return SENTINELS.LOST
             data += chunk
     return data
-
-'''
-Protocols
-
-response:
-
-{
-    'code': 0,
-    'msg': 'success',
-    'attachment': {}
-}
-
-'''

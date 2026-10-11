@@ -18,7 +18,7 @@ for key, value in vars(readchar.key).items():
         CHAR_TO_NAME[value] = key
 
 class Bind:
-    def __init__(self, *keys, name=None):
+    def __init__(self, *keys: str, name: str|None =None):
         self.chars = []
         self.key_names = []
         for key in keys:
@@ -30,10 +30,10 @@ class Bind:
         else:
             self.name = name
 
-    def __call__(self, key):
+    def __call__(self, key: str) -> bool:
         return key in self.chars
 
-    def __contains__(self, item):
+    def __contains__(self, item: str) -> bool:
         return item in self.chars
 
 class DashKeyMap: # why not a dict? because this works better with my IDE's suggestions

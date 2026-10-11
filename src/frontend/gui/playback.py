@@ -33,9 +33,12 @@ from src.sentinels import SENTINELS
 from src.frontend.cover import Cover
 from .empty import GUI_EMPTY as EMPTY
 from .info_popup import InfoPopUp
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .core import GUI
 
 class PlaybackMixin:
-    def __init__(self):
+    def __init__(self: 'GUI'):
         image = Image.open(GUI_NO_COVER)
         buffer = BytesIO()
         image.save(buffer, format='PNG')
@@ -70,7 +73,7 @@ class PlaybackMixin:
         self.reverse_icon = self.get_icon(REVERSE_ICON)
         self.dice_icon = self.get_icon(DICE_ICON)
         
-    def build_playback(self, playback_frame):
+    def build_playback(self: 'GUI', playback_frame: tk.Frame):
         self.hotkey(self, '<i>', self._open_info)
         self.hotkey(self, '<space>', self._toggle)
         self.hotkey(self, '<p>', self._prev)
@@ -176,10 +179,10 @@ class PlaybackMixin:
         self.cover_label.pack(pady=(0,10), fill='both', expand=True)
         self.tag_children(playback_frame)
 
-    def _open_info(self, *_):
+    def _open_info(self: 'GUI', *_):
         InfoPopUp(self, self.snapshot.freeze())
 
-    def _save_cover(self, *_):
+    def _save_cover(self: 'GUI', *_):
         if self.have_cover:
             if self.snapshot.display_name is EMPTY:
                 filename = 'cover.png'
@@ -206,7 +209,7 @@ class PlaybackMixin:
         else:
             messagebox.showerror('Error', 'No cover available')
 
-    def _build_bottom_bar(self, bottom_bar):
+    def _build_bottom_bar(self: 'GUI', bottom_bar: tk.Frame):
         
         prev_button = tk.Button(
             bottom_bar, 
@@ -277,15 +280,15 @@ class PlaybackMixin:
             )
         self.progress_label.pack(side='right', padx=(20, 0))
 
-    def _set_time(self, time_):
+    def _set_time(self: 'GUI', time_: int):
         if self.progress_dragging:
             self.send_command('seek', time=str(time_), ms=True, silent=True)
 
-    def _set_volume(self, volume):
+    def _set_volume(self: 'GUI', volume: int):
         if self.volume_dragging:
             self.send_command('volume', volume=str(volume), silent=True)
 
-    def update_playback(self):
+    def update_playback(self: 'GUI'):
         self.name_label.config(text=self.snapshot.display_name)
         self.artist_label.config(text=self.snapshot.artist)
 
@@ -378,34 +381,34 @@ class PlaybackMixin:
             self.reverse_button.config(relief='raised')
             self.balloon.bind_widget(self.reverse_button, 'Turn on reverse playback (B)')
 
-    def _toggle(self, *_):
+    def _toggle(self: 'GUI', *_):
         self.send_command('toggle')
 
-    def _prev(self, *_):
+    def _prev(self: 'GUI', *_):
         self.send_command('prev')
 
-    def _next(self, *_):
+    def _next(self: 'GUI', *_):
         self.send_command('next')
 
-    def _stop(self, *_):
+    def _stop(self: 'GUI', *_):
         self.send_command('stop')        
 
-    def _mute(self, *_):
+    def _mute(self: 'GUI', *_):
         self.send_command('mute')
     
-    def _loop(self, *_):
+    def _loop(self: 'GUI', *_):
         self.send_command('loop')
 
-    def _shuffle(self, *_):
+    def _shuffle(self: 'GUI', *_):
         self.send_command('shuffle')
     
-    def _reverse(self, *_):
+    def _reverse(self: 'GUI', *_):
         self.send_command('reverse')
 
-    def _dice(self, *_):
+    def _dice(self: 'GUI', *_):
         self.send_command('dice')
 
-    def _move_volume(self, increase):
+    def _move_volume(self: 'GUI', increase: bool):
         if increase:
             prefix = '+'
         else:
@@ -413,7 +416,7 @@ class PlaybackMixin:
         step = f'{prefix}{CONFIG.gui_volume_step}'
         self.send_command('volume', volume=step, silent=True)
 
-    def _move_pos(self, forward, long=False):
+    def _move_pos(self: 'GUI', forward: bool, long: bool = False):
         if forward:
             prefix = '+'
         else:

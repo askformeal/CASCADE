@@ -5,14 +5,15 @@ import syncedlyrics
 from src.log import setup_logger
 from src.constants.paths.log import BACKEND_LOG
 from src import gen_response
-from src.sentinels import SENTINELS
+from src.backend.context import Context
+from src.sentinels import SENTINELS, Sentinel
 from src.utils.file_extract import extract_file_meta
 from src.utils.misc import verify_path_format
 from src.utils.time_ import format_time
 
 logger = setup_logger(__name__, BACKEND_LOG)
 
-def get_song(ctx, song, cwd): # try to get song id from database
+def get_song(ctx: Context, song: str, cwd: str | None) -> int | Sentinel: # try to get song id from database
     id = ctx.database.get_song_via_alias(song)
     if id is not SENTINELS.ALIAS_NOT_FOUND:
         logger.debug(f'Got song ID {id} via alias {song}')
@@ -33,25 +34,35 @@ def get_song(ctx, song, cwd): # try to get song id from database
     else:
         return SENTINELS.MISSING_CWD
 
-def get_song_playlist_names(ctx, song_id):
+def get_song_playlist_names(ctx: Context, song_id: int) -> list[str]:
     playlist_ids = ctx.database.get_song_playlists(song_id)
     playlist_info = ctx.database.get_playlists_info(playlist_ids)
     return list(map(lambda pl: pl['name'], playlist_info))
 
-def insert_songs_aliases(ctx, info):
+def insert_songs_aliases(ctx: Context, info: list[dict]) -> list[dict]:
     for i, song in enumerate(info):
         aliases = ctx.database.get_song_aliases(song['id'])
         info[i]['aliases'] = aliases
     return info
 
-def insert_songs_playlist_names(ctx, info):
+def insert_songs_playlist_names(ctx: Context, info: list[dict]) -> list[dict]:
     for i, song in enumerate(info):
         playlists_id = ctx.database.get_song_playlists(song['id'])
         playlists_info = ctx.database.get_playlists_info(playlists_id)
         info[i]['playlists'] = list(map(lambda pl: pl['name'], playlists_info))
     return info
 
-def add_song(ctx, path, set_meta=True, bind_alias=True, set_lyric=True, alias=None, cwd=None, loose_path=False, return_id=False) -> tuple[int, gen_response.Response] | gen_response.Response:
+def add_song(
+        ctx: Context,
+        path: str, 
+        set_meta: bool = True,
+        bind_alias: bool = True, 
+        set_lyric: bool = True,
+        alias: str | None = None,
+        cwd: str | None = None,
+        loose_path: bool = False,
+        return_id: bool = False
+        ) -> tuple[int, gen_response.Response] | gen_response.Response:
     song_id = None
     if not Path(path).is_absolute():
         if cwd is None:
@@ -135,7 +146,7 @@ def add_song(ctx, path, set_meta=True, bind_alias=True, set_lyric=True, alias=No
     else:
         return response
 
-def fetch_lyric(song):
+def fetch_lyric(song: tuple[int, str]) -> tuple[int, str | None]:
     song_id, search_term = song
     lrc = syncedlyrics.search(
         search_term,

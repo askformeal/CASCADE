@@ -1,18 +1,20 @@
 import time
 import random
 from pathlib import Path
+from typing import Literal
 
 from src.log import setup_logger
 from src.constants.paths.log import BACKEND_LOG
-
-from src.sentinels import SENTINELS
+from src.sentinels import SENTINELS, Sentinel
 from src import gen_response
+from src.gen_response import Response
+from src.backend.context import Context
 from src.utils.misc import sort_songs
 from src.utils.time_ import format_time
 
 logger = setup_logger(__name__, BACKEND_LOG)
 
-def get_status(ctx):
+def get_status(ctx: Context):
     player_status = {
         SENTINELS.PLAYING: 'playing',
         SENTINELS.PAUSED: 'paused',
@@ -77,20 +79,20 @@ def get_status(ctx):
 
     return status
 
-def get_current_songs(ctx):
+def get_current_songs(ctx: Context):
     if ctx.playback.current_song_info is not None:
         return ctx.playback.current_song_info.copy()
     else:
         return []
 
-def get_current_lyric(ctx):
+def get_current_lyric(ctx: Context):
     ctx.playback.update_lyric()
     lyric = ctx.playback.lyric
     lyric['offset_overlay'] = ctx.playback.offset_overlay
 
     return lyric
 
-def open_song(ctx, song, type_, cwd=None) -> gen_response.Response:
+def open_song(ctx: Context, song: str, type_: str, cwd: str | None = None) -> Response:
     result = _resolve_open(ctx, song, type_, cwd)
     if result is SENTINELS.INVALID_OPEN:
         if type_ == 'auto':
@@ -105,7 +107,7 @@ def open_song(ctx, song, type_, cwd=None) -> gen_response.Response:
     
     return open_type(ctx, type_, reference)
 
-def open_type(ctx, type_, reference):
+def open_type(ctx: Context, type_: str, reference: int | str) -> Response:
     if type_ == 'song':
         song_info = ctx.database.get_song_info(reference)
         info_to_set = (song_info,)
@@ -160,7 +162,7 @@ def open_type(ctx, type_, reference):
 
     return response
 
-def _resolve_open(ctx, song, type_, cwd):
+def _resolve_open(ctx: Context, song: str, type_: str, cwd: str | None) -> tuple[str, int | str] | Sentinel:
     if type_ in ('song', 'auto'):
         ok, result = _resolve_song(ctx, song, cwd)
         if ok:
@@ -178,7 +180,7 @@ def _resolve_open(ctx, song, type_, cwd):
     
     return SENTINELS.INVALID_OPEN
 
-def _resolve_song(ctx, song, cwd):
+def _resolve_song(ctx: Context, song: str, cwd: str | None) -> tuple[bool, int | Response]:
     from ..library.helpers import get_song
     id_ = get_song(ctx, song, cwd)
     if id_ is SENTINELS.NOT_IN_LIB:
@@ -188,14 +190,14 @@ def _resolve_song(ctx, song, cwd):
     else:
         return True, id_
 
-def _resolve_playlist(ctx, playlist):
+def _resolve_playlist(ctx: Context, playlist: str) -> tuple[bool, int | Response]:
     id_ = ctx.database.get_playlist_via_name(playlist)
     if id_ is SENTINELS.PLAYLIST_NOT_FOUND:
         return False, gen_response.PlaylistNotExist(playlist)
     else:
         return True, id_
 
-def _resolve_path(path, cwd):
+def _resolve_path(path: str, cwd: str | None) -> tuple[bool, str | Response]:
     if Path(path).is_absolute():
         path = Path(path)
     else:
@@ -207,7 +209,7 @@ def _resolve_path(path, cwd):
     return True, str(path)
 
 
-def play_all_songs(ctx):
+def play_all_songs(ctx: Context) -> Response:
     info = ctx.database.get_all_song_info()
     if len(info) > 0:
         info = sort_songs(info)
@@ -229,7 +231,7 @@ def play_all_songs(ctx):
         response = gen_response.Failed('no song in library')
     return response
 
-def switch_song(ctx, num) -> gen_response.Response:
+def switch_song(ctx: Context, num: int) -> Response:
     max_num = ctx.playback.get_media_len()
     if num >= max_num:
         num_to_load = max_num - 1 # 9999999999 will switch the last song
@@ -254,14 +256,14 @@ def switch_song(ctx, num) -> gen_response.Response:
 
     return response
 
-def del_current_pos(ctx):
+def del_current_pos(ctx: Context):
     if ctx.playback.current_song_info is not None:
         path = ctx.playback.get_playing_info()['path']
         ctx.database.del_pos(path)
     else:
         logger.warning('backend:del_current_pos is triggered before any song is loaded')
 
-def _jump_to_memorized_pos(ctx) -> gen_response.Response:
+def _jump_to_memorized_pos(ctx: Context) -> Response:
     path = ctx.playback.get_playing_info()['path']
     pos = ctx.database.get_pos(path)
     if pos is not SENTINELS.POS_NOT_FOUND:
@@ -271,7 +273,7 @@ def _jump_to_memorized_pos(ctx) -> gen_response.Response:
     else:
         return gen_response.Success(f'no memorized position')
 
-def jump_to_pos(ctx, pos) -> gen_response.Response:
+def jump_to_pos(ctx: Context, pos: int) -> Response:
     result = ctx.playback.jump_pos(pos)
     return {
         SENTINELS.SUCCESS: gen_response.Success(f'jumped to {format_time(pos)}'),
@@ -279,7 +281,7 @@ def jump_to_pos(ctx, pos) -> gen_response.Response:
         SENTINELS.INVALID_PLAYER_STATE: gen_response.NotPlayingPaused()
     }[result]
 
-def replay_song(ctx) -> gen_response.Response:
+def replay_song(ctx: Context) -> Response:
     result = ctx.playback.jump_pos(0)
     return {
         SENTINELS.SUCCESS: gen_response.Success('jumped to beginning'),
@@ -287,7 +289,7 @@ def replay_song(ctx) -> gen_response.Response:
         SENTINELS.INVALID_PLAYER_STATE: gen_response.NotPlayingPaused()
     }[result]
 
-def _load_paths(ctx, paths, jump_to_mem=True) -> gen_response.Response:
+def _load_paths(ctx: Context, paths: str, jump_to_mem: bool = True) -> Response:
     result = ctx.playback.load_paths(paths)
     response = {
         SENTINELS.SUCCESS: gen_response.Success('opened song/playlist'),
@@ -300,7 +302,7 @@ def _load_paths(ctx, paths, jump_to_mem=True) -> gen_response.Response:
         response += _jump_to_memorized_pos(ctx)
     return response
 
-def stop_player(ctx) -> gen_response.Response:
+def stop_player(ctx: Context) -> Response:
     result = ctx.playback.stop()
     return {
         SENTINELS.SUCCESS: gen_response.Success('player stopped'),
@@ -308,7 +310,7 @@ def stop_player(ctx) -> gen_response.Response:
         SENTINELS.PLAYER_TIMEOUT: gen_response.PlayerTimeout()
     }[result]
 
-def switch_shuffle(ctx, direction): # direction: 1 / -1
+def switch_shuffle(ctx: Context, direction: Literal[1, -1]) -> int | Sentinel: # direction: 1 / -1
     if len(ctx.playback.shuffle_order) > 0:
         shuffle_num = ctx.playback.shuffle_order.index(ctx.playback.current_song_num)
         shuffle_num += direction
@@ -321,7 +323,7 @@ def switch_shuffle(ctx, direction): # direction: 1 / -1
     else:
         return SENTINELS.PLAYER_EMPTY
 
-def remove_from_current(ctx, path) -> gen_response.Response:
+def remove_from_current(ctx: Context, path: str) -> Response:
     if ctx.playback.current_song_info is not None:
         paths = list(map(lambda s: s['path'], ctx.playback.current_song_info))
         if path in paths:
@@ -350,7 +352,7 @@ def remove_from_current(ctx, path) -> gen_response.Response:
     else:
         return gen_response.Success('current playlist empty') # same as above
 
-def loop_play(ctx):
+def loop_play(ctx: Context):
     result = ctx.playback.switch_to(ctx.playback.get_number())
     return {
         SENTINELS.SUCCESS: gen_response.Success('replayed current song'),

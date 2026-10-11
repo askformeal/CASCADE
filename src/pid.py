@@ -7,7 +7,7 @@ from src.log import setup_logger
 
 logger = setup_logger(__name__, PID_LOG)
 
-def get_pid():
+def get_pid() -> list:
     try:
         with open(PID_PATH, 'r', encoding=ENCODING) as f:
             result = json.load(f)
@@ -21,7 +21,7 @@ def get_pid():
         logger.debug(f'PID found in file: {result}')
         return result
 
-def add_pid(pid):
+def add_pid(pid: str):
     all_pid = get_pid()
     if pid not in all_pid:
         all_pid.append(pid)
@@ -31,7 +31,7 @@ def add_pid(pid):
     else:
         logger.debug(f'PID not added: {pid} - already exists')
 
-def remove_pid(pid):
+def remove_pid(pid: str):
     pid = str(pid)
     all_pid = get_pid()
     if pid in all_pid:

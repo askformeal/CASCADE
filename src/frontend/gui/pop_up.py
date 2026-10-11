@@ -2,9 +2,12 @@ import tkinter as tk
 
 from src.constants.paths.res import ICON
 from src.frontend.tkinter_tools.to_center import to_center
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .core import GUI
 
 class PopUp(tk.Toplevel):
-    def __init__(self, master, *args, title='C.A.S.C.A.D.E', **kwargs):
+    def __init__(self, master: 'GUI', *args, title: str = 'C.A.S.C.A.D.E', **kwargs):
         super().__init__(master, *args, **kwargs)
         self.withdraw()
 

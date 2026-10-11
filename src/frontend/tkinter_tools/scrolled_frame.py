@@ -29,7 +29,7 @@ class ScrolledFrame(tk.Frame):
     def yview(self):
         return self.canvas.yview()
 
-    def yview_moveto(self, fraction):
+    def yview_moveto(self, fraction: float):
         self.canvas.yview_moveto(fraction)
         self._on_frame_config()
 
@@ -44,7 +44,7 @@ class ScrolledFrame(tk.Frame):
     def _on_canvas_config(self, event):
         self.canvas.itemconfig(self.window, width=event.width)
 
-    def _on_scroll(self, event):
+    def _on_scroll(self, event: tk.Event):
         if not self.lock_scroll:
             x_left = self.winfo_rootx()
             x_right = x_left + self.winfo_width()

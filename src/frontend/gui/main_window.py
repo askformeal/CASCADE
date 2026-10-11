@@ -17,9 +17,12 @@ from .empty import GUI_EMPTY as EMPTY
 from .menubar import MenubarMixin
 from .open_dialogue import OpenDialogue
 from .start_popup import StartPopUp
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .core import GUI
 
 class MainWinMixin(MenubarMixin):
-    def __init__(self):
+    def __init__(self: 'GUI'):
         self.running = True
         self.dev_bar_on = tk.BooleanVar(value=False)
         self.backend_online = True
@@ -27,7 +30,7 @@ class MainWinMixin(MenubarMixin):
         self.dev_label_shown = False
         self.old_playlists = []
 
-    def _build_window(self):
+    def _build_window(self: 'GUI'):
         self.hotkey(self, '<Control-q>', self._exit)
         self.hotkey(self, '<Control-w>', self._exit)
         self.hotkey(self, '<Control-o>', self._on_open)
@@ -142,7 +145,7 @@ class MainWinMixin(MenubarMixin):
         self.balloon.bind_widget(self.request_rate_label, 'Request received per second')
 
 
-    def _update_main_window(self):
+    def _update_main_window(self: 'GUI'):
         if self.snapshot.playlists is EMPTY:
             current_playlists = []
         else:
@@ -181,58 +184,58 @@ class MainWinMixin(MenubarMixin):
 
         self.request_rate_label.config(text=f'Request rate: {request_rate}')
 
-    def _toggle_dev_bar(self, *_):
+    def _toggle_dev_bar(self: 'GUI', *_):
         self.dev_bar_on.set(not self.dev_bar_on.get())
         self._apply_dev_bar()
 
-    def _apply_dev_bar(self, *_):
+    def _apply_dev_bar(self: 'GUI', *_):
         if self.dev_bar_on.get():
             self.pack_dev_bar()
         else:
             self.dev_bar.pack_forget()
 
-    def _reload(self, *_):
+    def _reload(self: 'GUI', *_):
         self.send_command(action='load_last')
 
-    def _on_open(self, *_):
+    def _on_open(self: 'GUI', *_):
         OpenDialogue(self)
 
-    def _open_all(self, *_):
+    def _open_all(self: 'GUI', *_):
         self.send_command('play-all')
 
-    def _open_start(self, *_):
+    def _open_start(self: 'GUI', *_):
         StartPopUp(self)
 
-    def _toggle_fullscreen(self, *_):
+    def _toggle_fullscreen(self: 'GUI', *_):
         self.fullscreen.set(not self.fullscreen.get())
         self._apply_fullscreen()
     
-    def _disable_fullscreen(self, *_):
+    def _disable_fullscreen(self: 'GUI', *_):
         self.fullscreen.set(False)
         self._apply_fullscreen()
 
-    def _apply_fullscreen(self):
+    def _apply_fullscreen(self: 'GUI'):
         self.attributes('-fullscreen', self.fullscreen.get())
 
-    def _toggle_lyric_visible(self, *_):
+    def _toggle_lyric_visible(self: 'GUI', *_):
         self.lyric_visible.set(not self.lyric_visible.get())
         self._apply_lyric_visible()
 
-    def _apply_lyric_visible(self):
+    def _apply_lyric_visible(self: 'GUI'):
         if self.lyric_visible.get():
             self.lyric_pack()
         else:
             self.lyric_unpack()
 
-    def _open_config(self, *_):
+    def _open_config(self: 'GUI', *_):
         self.process.spawn('src.frontend.config_gui')
 
-    def _show_license(self):
+    def _show_license(self: 'GUI'):
         with open(LICENSE, 'r', encoding=ENCODING) as f:
             license_text = f.read()
         messagebox.showinfo('License', 'MIT License', detail=license_text)
 
-    def _show_about(self, *_):
+    def _show_about(self: 'GUI', *_):
         app_name = 'Command-Line Audio Stream Capture And Decoding Engine'
         detail = (
             f'Version: {__version__}\n'

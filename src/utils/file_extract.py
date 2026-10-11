@@ -11,7 +11,7 @@ from .logger import logger
 
 from src.constants.backend import FILE_META, COVER_NAMES, COVER_EXTENSIONS
 
-def extract_file_meta(path):
+def extract_file_meta(path: str) -> dict:
     try:
         file = mutagen.File(path, easy=True)
     except (OSError, mutagen.MutagenError):
@@ -39,7 +39,7 @@ def extract_file_meta(path):
             logger.debug(f'Failed to extract metadata from {path} because there is no metadata in the file')
             return {}
 
-def _pick_front(pictures):
+def _pick_front(pictures: mutagen.flac.Picture | mutagen.id3.APIC) -> bytes:
     if len(pictures) == 0:
         return None
     else:
@@ -50,7 +50,7 @@ def _pick_front(pictures):
         return pictures[0].data
 
 
-def extract_cover(path):
+def extract_cover(path: str) -> bytes | None:
     path = Path(path)
     try:
         file = mutagen.File(path)

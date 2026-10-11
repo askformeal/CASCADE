@@ -4,7 +4,7 @@ from wcwidth import wcswidth
 
 ESCAPE_PATTERN = re.compile(r'\x1b\[[0-?]*[ -/]*[@-~]')
 
-def strlen(text):
+def strlen(text: str) -> int:
     text = ESCAPE_PATTERN.sub('', text)
     visible_text = ''
     for char in text:
@@ -12,7 +12,7 @@ def strlen(text):
             visible_text += char
     return wcswidth(visible_text)
 
-def wrap_text(text, max_len):
+def wrap_text(text: str, max_len: int) -> str:
     lines = []
     line = ''
     words = text.split(' ')

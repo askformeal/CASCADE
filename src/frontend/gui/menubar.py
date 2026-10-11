@@ -2,9 +2,12 @@ import webbrowser
 import tkinter as tk
 
 from src.constants.misc import REPO_LINK
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .core import GUI
 
 class MenubarMixin:
-    def build_menubar(self, menubar):
+    def build_menubar(self: 'GUI', menubar: tk.Menu):
         file_menu = tk.Menu(menubar, tearoff=False)
         file_menu.add_command(
             label='Open...', 

@@ -157,7 +157,7 @@ class Tray(Icon):
         if path != '':
             self._send_tray_request('open', song=path, )
 
-    def _send_tray_request(self, action, silent=False, **kwargs):
+    def _send_tray_request(self, action: str, silent: bool = False, **kwargs) -> dict | None:
         request = {'action': action, 'source': 'tray', 'notify_support': False, 'silent': silent, **kwargs}
         response = send_request(**request)
         if response.get('code', None) != 0:

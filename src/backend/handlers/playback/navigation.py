@@ -2,12 +2,14 @@ from src.log import setup_logger
 from src.constants.paths.log import BACKEND_LOG
 from src.sentinels import SENTINELS
 from src import gen_response
+from src.gen_response import Response
+from src.backend.context import Context
 from src.utils.time_ import parse_time
 from .helpers import jump_to_pos, replay_song, del_current_pos
 
 logger = setup_logger(__name__, BACKEND_LOG)
 
-def seek(ctx, request):
+def seek(ctx: Context, request: dict) -> Response:
     raw_time = request['time']
     is_ms = request['ms']
 
@@ -47,7 +49,7 @@ def seek(ctx, request):
         else:
             return jump_to_pos(ctx, pos)
 
-def jump(ctx, request):
+def jump(ctx: Context, request: dict) -> Response:
     percent = request['progress']
     if percent < 0:
         return gen_response.PercentageTooLow(percent)
@@ -61,7 +63,7 @@ def jump(ctx, request):
             pos = length * (percent / 100)
             return jump_to_pos(ctx, pos)
 
-def replay(ctx, request):
+def replay(ctx: Context, request: dict) -> Response:
     response = replay_song(ctx)
     if response.ok():
         del_current_pos(ctx)

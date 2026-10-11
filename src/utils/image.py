@@ -1,6 +1,6 @@
 import tempfile
 
-def test_save(image, suffix):
+def test_save(image, suffix: str) -> bool:
     with tempfile.NamedTemporaryFile(mode='w+b', suffix=suffix) as f:
         try:
             image.save(f)

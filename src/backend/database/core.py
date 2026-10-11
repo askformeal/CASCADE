@@ -13,7 +13,7 @@ from .settings import SettingsMixin
 
 
 class Database(MiscMixin, SongMixin, AliasMixin, PlaylistMixin, PosMixin, SettingsMixin):
-    def __init__(self, database_path):
+    def __init__(self, database_path: str):
         self.database_path = database_path
         self.old_level = logger.level
         self._local = threading.local()
@@ -25,7 +25,7 @@ class Database(MiscMixin, SongMixin, AliasMixin, PlaylistMixin, PosMixin, Settin
         else:
             logger.debug(f'{__name__} initiated')
 
-    def _new_connection(self):
+    def _new_connection(self) -> sqlite3.Connection:
         connection = sqlite3.connect(self.database_path, isolation_level=None)
         connection.row_factory = sqlite3.Row
         connection.execute("PRAGMA journal_mode = WAL").fetchone()
@@ -33,7 +33,7 @@ class Database(MiscMixin, SongMixin, AliasMixin, PlaylistMixin, PosMixin, Settin
         logger.debug(f'New connection opened for thread \"{threading.get_ident()}\"')
         return connection
 
-    def _get_connection(self):
+    def _get_connection(self) -> sqlite3.Connection:
         connection = getattr(self._local, 'connection', None)
         if connection is None:
             connection = self._new_connection()
@@ -47,7 +47,7 @@ class Database(MiscMixin, SongMixin, AliasMixin, PlaylistMixin, PosMixin, Settin
     def silence_off(self):
         logger.setLevel(self.old_level)
         
-    def execute(self, sql, *parameters):
+    def execute(self, sql, *parameters) -> sqlite3.Cursor:
         parameters = tuple(parameters)
 
         if not sql.strip():

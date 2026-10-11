@@ -1,15 +1,17 @@
 import random
+from typing import Callable
+from src.backend.database.core import Database
 
 from .logger import logger
 from src.config import CONFIG
-from src.sentinels import SENTINELS
+from src.sentinels import SENTINELS, Sentinel
 from src.utils.misc import get_song_display_name
 from .engine_mixin import EngineMixin
 from .lyric import LyricMixin
 from .cover import CoverMixin
 
 class Playback(EngineMixin, LyricMixin, CoverMixin):
-    def __init__(self, buffer_func, database):
+    def __init__(self, buffer_func: Callable, database: Database):
         EngineMixin.__init__(self)
         LyricMixin.__init__(self)
         CoverMixin.__init__(self)
@@ -28,10 +30,10 @@ class Playback(EngineMixin, LyricMixin, CoverMixin):
         self.current_song_in_lib = False
         self.current_playlist = None
         
-    def get_playing_info(self):
+    def get_playing_info(self) -> dict:
         return self.current_song_info[self.current_song_num]
 
-    def set_current_num(self, num, update_database=True):
+    def set_current_num(self, num: int, update_database: bool = True):
         self.current_song_num = num
 
         if update_database and self.current_playlist is not None:
@@ -42,7 +44,7 @@ class Playback(EngineMixin, LyricMixin, CoverMixin):
 
         logger.info(f'Updated current playlist number to {num}')
 
-    def set_current_song(self, info, in_lib=True):
+    def set_current_song(self, info: dict | list[dict], in_lib: bool = True):
         if not isinstance(info, list):
             info = [info]
         self.current_song_info = info
@@ -53,11 +55,11 @@ class Playback(EngineMixin, LyricMixin, CoverMixin):
             random.shuffle(self.shuffle_order)
         logger.info(f'Set current info of current songs to {info}, in library {in_lib}')
 
-    def get_current_display_name(self):
+    def get_current_display_name(self) -> str:
         if self.current_song_info is None or self.current_song_num >= len(self.current_song_info):
             return 'no song playing'
         else:
             return get_song_display_name(self.get_playing_info())
         
-    def on_exit(self):
+    def on_exit(self) -> Sentinel:
         return self.engine.on_exit()

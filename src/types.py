@@ -1,9 +1,11 @@
+from typing import Callable
+
 class IterType:
     # can be list or tuple
-    def __init__(self, element_type):
+    def __init__(self, element_type: Callable):
         self.element_type = element_type
 
-    def __call__(self, obj):
+    def __call__(self, obj) -> list:
         if isinstance(obj, (list, tuple)):
             result = []
             for element in obj:
@@ -19,10 +21,10 @@ class IterType:
             raise ValueError('not a list or tuple')
 
 class StrChoiceList:
-    def __init__(self, choices):
+    def __init__(self, choices: list[str]):
         self.choices = tuple(map(lambda x: x.lower(), choices))
 
-    def __call__(self, value):
+    def __call__(self, value: str) -> str:
         value = str(value).lower()
         if value in self.choices:
             return value
@@ -30,7 +32,7 @@ class StrChoiceList:
             raise ValueError(f"element value is not one of {', '.join(self.choices)}")
 
 class Converter:
-    def boolean(self, value):
+    def boolean(self, value) -> bool:
         value = str(value)
         value = {
             'true': True,
@@ -43,28 +45,28 @@ class Converter:
         else:
             return value
 
-    def port(self, value):
+    def port(self, value) -> int:
         value = int(value) # if it's not a number, will raise ValueError as it should
         if value <= 0:
             raise ValueError
         else:
             return value
 
-    def pos_int(self, value):
+    def pos_int(self, value) -> int:
         value = int(value)
         if value <= 0:
             raise ValueError
         else:
             return value
 
-    def non_neg_int(self, value):
+    def non_neg_int(self, value) -> int:
         value = int(value)
         if value < 0:
             raise ValueError
         else:
             return value
         
-    def timeout(self, value):
+    def timeout(self, value) -> float:
         value = float(value)
         from src.constants.misc import MIN_TIMEOUT
         if value < MIN_TIMEOUT:
@@ -72,7 +74,7 @@ class Converter:
         else:
             return value
 
-    def percentage(self, value):
+    def percentage(self, value) -> int:
         value = int(value)
 
         if value not in range(0, 101):
@@ -80,7 +82,7 @@ class Converter:
         else:
             return value
 
-    def hex_color(self, value):
+    def hex_color(self, value) -> str:
         value = str(value).upper()
         if value.startswith('#') and len(value) == 7:
             for digit in value[1:]:
@@ -92,7 +94,7 @@ class Converter:
         else:
             raise ValueError
 
-def get_type_name(obj):
+def get_type_name(obj) -> str:
     if isinstance(obj, IterType):
         return f'list or tuple completely with elements of instances of {get_type_name(obj.element_type)}'
     elif isinstance(obj, StrChoiceList):
@@ -101,7 +103,7 @@ def get_type_name(obj):
         from src.constants.misc import READABLE_TYPE_NAMES
         return READABLE_TYPE_NAMES.get(obj, getattr(obj, '__name__', str(obj)))
 
-def get_type_codename(obj):
+def get_type_codename(obj) -> str:
     if isinstance(obj, IterType):
         return 'iter'
     elif isinstance(obj, StrChoiceList):

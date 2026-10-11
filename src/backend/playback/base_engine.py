@@ -1,10 +1,12 @@
+from logging import Logger
+from typing import Callable
 from abc import ABC, abstractmethod
 
 from src.sentinels import Sentinel
 from src.config import CONFIG
 
 class BaseEngine(ABC):
-    def __init__(self, logger, name, on_end_func):
+    def __init__(self, logger: Logger, name: str, on_end_func: Callable):
         self.logger = logger
         self.name = name
         self.on_end = on_end_func
@@ -26,7 +28,7 @@ class BaseEngine(ABC):
         ...
 
     @abstractmethod
-    def load_paths(self, paths) -> Sentinel:
+    def load_paths(self, paths: list[str]) -> Sentinel:
         ...
 
     @abstractmethod
@@ -34,7 +36,7 @@ class BaseEngine(ABC):
         ...
 
     @abstractmethod
-    def jump_pos(self, pos) -> Sentinel:
+    def jump_pos(self, pos: int) -> Sentinel:
         ...
 
     @abstractmethod

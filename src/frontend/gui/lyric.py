@@ -19,9 +19,12 @@ from src.sentinels import SENTINELS
 from src.utils.lyric import get_lyric_line
 from src.utils.text import wrap_text
 from .empty import GUI_EMPTY as EMPTY
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .core import GUI
 
 class LyricMixin:
-    def __init__(self):
+    def __init__(self: 'GUI'):
         self.old_lyric = []
         self.old_lyric_num = None
         self.scroll_on = True
@@ -36,7 +39,7 @@ class LyricMixin:
         self.local_lyric_icon = self.get_icon(LOCAL_LYRIC_ICON)
         self.reset_offset_icon = self.get_icon(RESET_OFFSET_ICON)
 
-    def build_lyric(self, lyric_frame):
+    def build_lyric(self: 'GUI', lyric_frame: tk.Frame):
         self.hotkey(self, '<backslash>', self._reset_offset)
         self.hotkey(self, '<[>', lambda *_: self._move_offset(False))
         self.hotkey(self, '<]>', lambda *_: self._move_offset(True))
@@ -91,7 +94,7 @@ class LyricMixin:
         offset_reset_button.pack(side='left', padx=(0, 10))
         self.balloon.bind_widget(offset_reset_button, 'Reset offset (\\)')
 
-    def _on_lyric_jump(self, event):
+    def _on_lyric_jump(self: 'GUI', event: tk.Event):
         index = self.lyric_box.nearest(event.y)
         lyric_num = self.lyric_index_to_num.get(index, None)
         time_ = self.lyric_times.get(lyric_num, None)
@@ -100,13 +103,13 @@ class LyricMixin:
             self.send_command('seek', time=str(time_), ms=True)
             self.lyric_box.select_clear(0, tk.END)
 
-    def _toggle_online_lyric(self, *_):
+    def _toggle_online_lyric(self: 'GUI', *_):
         self.send_command('lyric')
 
-    def _reset_offset(self, *_):
+    def _reset_offset(self: 'GUI', *_):
         self.send_command('set_offset_overlay', offset=0)
 
-    def _set_offset(self, *_):
+    def _set_offset(self: 'GUI', *_):
         if self.offset_dragging:
             self.send_command(
                 'set_offset_overlay',
@@ -114,7 +117,7 @@ class LyricMixin:
                 silent=True
                 )
 
-    def _move_offset(self, increase, *_):
+    def _move_offset(self: 'GUI', increase: int, *_):
         if increase:
             step = CONFIG.gui_offset_step
         else:
@@ -127,7 +130,7 @@ class LyricMixin:
 
         self.send_command('set_offset_overlay', offset=step, autoincrement=True)
 
-    def update_lyric(self):
+    def update_lyric(self: 'GUI'):
         self._update_lyric_box()
 
         if self.snapshot.online_lyric is not EMPTY and self.snapshot.online_lyric:
@@ -140,7 +143,7 @@ class LyricMixin:
         if self.snapshot.offset_overlay is not EMPTY and not self.offset_dragging:
             self.offset_scale.set(self.snapshot.offset_overlay)
 
-    def _update_lyric_box(self):
+    def _update_lyric_box(self: 'GUI'):
         if self.snapshot.lyric_offset is not EMPTY:
             self.base_offset_label.config(text=f'Base: {self.snapshot.lyric_offset}ms')
         if self.snapshot.offset_overlay is not EMPTY:
@@ -215,7 +218,7 @@ class LyricMixin:
         else:
             self._enable_scroll()
 
-    def _mark_line(self, lyric_num):
+    def _mark_line(self: 'GUI', lyric_num: int):
         if self.lyric_box.size() > 0:
             for line_index in self.lyric_index[lyric_num]:
                 self.lyric_box.itemconfig(line_index, 
@@ -231,13 +234,13 @@ class LyricMixin:
                                         )
         self.old_lyric_num = lyric_num
 
-    def _disable_scroll(self):
+    def _disable_scroll(self: 'GUI'):
         if self.scroll_on:
             self.scroll_on = False
             for event in SCROLL_EVENTS:
                 self.bound_scroll[event] = self.lyric_box.bind(event, lambda *_: 'break', add='+')
 
-    def _enable_scroll(self):
+    def _enable_scroll(self: 'GUI'):
         if not self.scroll_on:
             self.scroll_on = True
             for event, func in self.bound_scroll.items():

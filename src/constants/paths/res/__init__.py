@@ -1,6 +1,6 @@
 from importlib.resources import files
 
-def get_res(filename):
+def get_res(filename: str) -> str:
     return str(files('res') / filename)
 
 LICENSE = get_res('license.txt')

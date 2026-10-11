@@ -28,10 +28,10 @@ class Hotkey:
         except KeyboardInterrupt:
             ...
 
-    def _get_vk(self, key):
+    def _get_vk(self, key: keyboard.Key | keyboard.KeyCode | None) -> int | None:
         return getattr(getattr(key, 'value', key), 'vk', None)
 
-    def _on_press(self, key):
+    def _on_press(self, key: keyboard.Key | keyboard.KeyCode | None):
         try:
             vk = self._get_vk(key)
             if vk in MEDIA_KEY_TO_ACTION.keys():
@@ -46,7 +46,7 @@ class Hotkey:
         except Exception as e:
             logger.exception('An error occurred during handling a key press')
 
-    def _on_release(self, key):
+    def _on_release(self, key: keyboard.Key | keyboard.KeyCode | None):
         vk = self._get_vk(key)
         if vk in MEDIA_KEY_TO_ACTION.keys():
             self.cool_down[vk] = 0

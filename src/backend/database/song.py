@@ -1,9 +1,12 @@
 from .logger import logger
 from src.constants.backend import METADATA
-from src.sentinels import SENTINELS
+from src.sentinels import SENTINELS, Sentinel
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .core import Database
 
 class SongMixin:
-    def song_exists(self, id):
+    def song_exists(self: 'Database', id: int) -> bool:
         # if a song exists
         row = self.execute('SELECT 1 FROM songs WHERE id = ?', id).fetchone()
         if row is not None:
@@ -13,7 +16,7 @@ class SongMixin:
         logger.debug(f'Checked the existence of song with id {id}, result: {result}')
         return result
     
-    def get_all_song_info(self):
+    def get_all_song_info(self: 'Database') -> list[dict]:
         # info of all songs (playlist and aliases not included)
         info = []
         rows = self.execute('SELECT * from songs').fetchall()
@@ -22,7 +25,7 @@ class SongMixin:
         logger.debug(f'Got information of {len(info)} songs')
         return info
     
-    def get_song_info(self, ids):
+    def get_song_info(self: 'Database', ids: list[int]) -> list[dict]:
         # info of songs
         if not isinstance(ids, list):
             ids = [ids]
@@ -31,7 +34,7 @@ class SongMixin:
         logger.debug(f'Got information of songs {ids}: {info}')
         return info
     
-    def get_song_aliases(self, id):
+    def get_song_aliases(self: 'Database', id: int) -> list[str]:
         # all aliases bound to a song
         if self.song_exists(id):
             aliases = []
@@ -44,11 +47,11 @@ class SongMixin:
             logger.warning(f'Tried to get aliases of song with id {id} but it does not exist')
             return SENTINELS.SONG_NOT_FOUND
     
-    def get_multi_song_aliases(self, ids):
+    def get_multi_song_aliases(self: 'Database', ids: list[int]) -> list[tuple[int, str]]:
         rows = self.execute(f'SELECT name, song_id FROM aliases WHERE song_id IN ({', '.join('?'*len(ids))})', *ids).fetchall()
         return list(map(lambda row: (row['song_id'], row['name']), rows))
     
-    def get_song_via_alias(self, alias):
+    def get_song_via_alias(self: 'Database', alias: str) -> int | Sentinel:
         # get the song an alias was bound to
         row = self.execute('SELECT song_id FROM aliases JOIN songs ON aliases.song_id = songs.id WHERE aliases.name = ?', alias).fetchone()
         if row is not None:
@@ -59,7 +62,7 @@ class SongMixin:
             logger.debug(f'Failed to get song with alias {alias} because the alias does not exist')
             return SENTINELS.ALIAS_NOT_FOUND
     
-    def get_song_via_path(self, path):
+    def get_song_via_path(self: 'Database', path: str) -> int | Sentinel:
         # get a song by its path
         row = self.execute('SELECT id FROM songs WHERE path = ?', path).fetchone()
         if row is not None:
@@ -70,7 +73,7 @@ class SongMixin:
             logger.debug(f'Failed to get song with path {path} because no song in library possesses the path')
             return SENTINELS.SONG_NOT_FOUND
     
-    def add_song(self, path) -> tuple[int, bool]: # return id of the song + whether it already exists and is ignored.
+    def add_song(self: 'Database', path: str) -> tuple[int, bool]: # return id of the song + whether it already exists and is ignored.
         # add a new song
         cursor = self.execute('INSERT OR IGNORE INTO songs(path) VALUES (?)', path)
         ignored = cursor.rowcount != 1
@@ -81,7 +84,7 @@ class SongMixin:
         logger.debug(f'Tried to add song to library, path: {path}, ignored: {ignored}')
         return song_id, ignored
     
-    def delete_song(self, id):
+    def delete_song(self: 'Database', id: int) -> Sentinel:
         # delete a song
         if self.song_exists(id):
             self.execute('DELETE FROM songs WHERE id = ?', id)
@@ -92,7 +95,7 @@ class SongMixin:
             logger.debug(f'Failed to delete song with id {id} because it does not exist')
             return SENTINELS.SONG_NOT_FOUND
     
-    def get_song_meta(self, song_id, meta):
+    def get_song_meta(self: 'Database', song_id: int, meta: str) -> Sentinel:
         # get a metadata of a song
         if meta in METADATA: # Seems odd if I put this in set_song_meta but no here
             if self.song_exists(song_id):
@@ -107,7 +110,7 @@ class SongMixin:
             return SENTINELS.INVALID_META
     
     
-    def set_song_meta(self, song_id, meta, value): # pass SENTINEL.CLEAR_META to value to delete metadata
+    def set_song_meta(self: 'Database', song_id: int, meta: str, value) -> Sentinel: # pass SENTINEL.CLEAR_META to value to delete metadata
         # set a metadata of a song
         if meta in METADATA: # To prevent SQL injection. Probably useless
             if self.song_exists(song_id):

@@ -2,10 +2,10 @@ from src.config import CONFIG
 from .song_output import SongOutput
 from src.utils.tui import box
 
-def cli_box(*args, **kwargs):
+def cli_box(*args, **kwargs) -> str:
     return box(*args, style=CONFIG.cli_box_style, **kwargs)
 
-def show_notifies(notifies=None):
+def show_notifies(notifies: list[str] | None = None):
     if notifies is None:
         notifies = []
 
@@ -16,7 +16,7 @@ def show_notifies(notifies=None):
         lines += list(map(lambda x: f'  {x}', notifies))
         print(cli_box('\n'.join(lines)))
 
-def show_option_info(info):
+def show_option_info(info: dict):
     name = info.get('name', 'N/A')
     type_ = info.get('type', 'N/A')
     value = info.get('value', 'N/A')
@@ -34,7 +34,14 @@ def show_option_info(info):
         ]
     print(cli_box('\n'.join(lines)))
 
-def show_song_info(info, empty_msg='No information to be shown', show_aliases=False, show_playlists=False, show_num=False, show_tech=False):
+def show_song_info(
+        info: list[dict] | dict,
+        empty_msg: str = 'No information to be shown',
+        show_aliases: bool = False,
+        show_playlists: bool = False,
+        show_num: bool = False,
+        show_tech: bool = False
+        ):
     if not isinstance(info, (list, tuple)):
         info = (info,)
     if len(info) > 0:

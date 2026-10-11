@@ -1,7 +1,7 @@
 import tkinter as tk
 
 class Balloon(tk.Toplevel):
-    def __init__(self, *args, wrap_len=0, offset_x=0, offset_y=0, windup=0, **kwargs):
+    def __init__(self, *args, wrap_len: int = 0, offset_x: int = 0, offset_y: int = 0, windup: int = 0, **kwargs):
         super().__init__(*args, **kwargs)
         self.offset_x = offset_x
         self.offset_y = offset_y
@@ -24,7 +24,7 @@ class Balloon(tk.Toplevel):
 
         self.job = None
 
-    def _on_enter(self, widget):
+    def _on_enter(self, widget: tk.Misc):
         self.current_widget = widget
         self.job = self.after(self.windup, lambda: self._show(widget=widget))
 
@@ -39,7 +39,7 @@ class Balloon(tk.Toplevel):
             text = self.texts[self.current_widget]
             self.label.config(text=text)
 
-    def _show(self, widget):
+    def _show(self, widget: tk.Misc):
         try:
             x = widget.winfo_rootx() + widget.winfo_width() + self.offset_x
             y = widget.winfo_rooty() + widget.winfo_height() + self.offset_y
@@ -60,7 +60,7 @@ class Balloon(tk.Toplevel):
             self.geometry(f'+{x}+{y}')
             self.deiconify()
 
-    def bind_widget(self, widget, text):
+    def bind_widget(self, widget: tk.Misc, text: str):
         self.texts[widget] = text
         widget.bind('<Enter>', lambda *_: self._on_enter(widget))
         widget.bind('<Leave>', lambda *_: self._on_leave())

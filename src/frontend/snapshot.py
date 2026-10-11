@@ -1,7 +1,8 @@
 from pathlib import Path
+from typing import Callable
 
 class Snapshot:
-    def __init__(self, requester=None, empty=None):
+    def __init__(self, requester: Callable = None, empty=None):
         self.request = requester
         self.empty=empty
         self.snapshot = {}
@@ -65,7 +66,7 @@ class Snapshot:
         if snapshot is not None:
             self.parse_snapshot(snapshot)
 
-    def parse_snapshot(self, snapshot):
+    def parse_snapshot(self, snapshot: Snapshot):
         self.snapshot = snapshot
         self.path = self.get('path')
 
@@ -119,13 +120,13 @@ class Snapshot:
 
         self.request_rate = self.get('request_rate')
 
-    def get(self, name):
+    def get(self, name: str):
         value = self.snapshot.get(name, self.empty)
         if value is None:
             value = self.empty
         return value
 
-    def freeze(self):
+    def freeze(self) -> Snapshot:
         frozen = Snapshot(requester=self.request, empty=self.empty)
         frozen.parse_snapshot(self.snapshot)
         return frozen

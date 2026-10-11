@@ -1,8 +1,11 @@
 from src.utils.time_ import format_time
 from .empty import DASH_EMPTY as EMPTY
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .core import Dash
 
 class InfoMixin:
-    def gen_info_text(self):
+    def gen_info_text(self: 'Dash') -> str:
         if self.snapshot.bitrate is EMPTY:
             bitrate = EMPTY
         else:

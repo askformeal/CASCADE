@@ -13,7 +13,7 @@ class LyricMixin:
         self.lyric = {}
         self.offset_overlay = 0
 
-    def update_lyric(self, force=False):
+    def update_lyric(self, force: bool = False):
         if self.current_song_info is not None:
             info = self.get_playing_info()
             song_path = info.get('path', None)
@@ -42,7 +42,7 @@ class LyricMixin:
                             self.lyric['lyric'] = lyric
                     
 
-    def _fetch_lyric(self, song_path, search_term):
+    def _fetch_lyric(self, song_path: str, search_term: str):
         try:
             result = syncedlyrics.search(
                 search_term,

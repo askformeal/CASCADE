@@ -19,9 +19,12 @@ from src.utils.tui import (
     window_list
     )
 from .empty import DASH_EMPTY as EMPTY
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .core import Dash
 
 class MainMixin:
-    def gen_main_text(self):
+    def gen_main_text(self: 'Dash') -> str:
         lyric_lines = ['No Lyric']
 
         if self.snapshot.lyric_loading is not EMPTY and self.snapshot.lyric_loading:

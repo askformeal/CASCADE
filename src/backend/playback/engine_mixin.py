@@ -1,6 +1,6 @@
 from .logger import logger
 from src.config import CONFIG
-from src.sentinels import SENTINELS
+from src.sentinels import SENTINELS, Sentinel
 from .base_engine import BaseEngine
 from .vlc_engine import VLCEngine
 from .mini_engine import MiniEngine
@@ -14,22 +14,22 @@ class EngineMixin:
         }[CONFIG.engine]
         self.engine: BaseEngine = engine(logger, self.on_end) # PRIVATE PROPERTY. No underscore prefix because I'm lazy
 
-    def get_engine_name(self):
+    def get_engine_name(self) -> str:
         return self.engine.name
     
-    def get_volume(self):
+    def get_volume(self) -> int:
         return self.engine.volume
     
-    def get_mute(self):
+    def get_mute(self) -> bool:
         return self.engine.mute
     
-    def get_number(self):
+    def get_number(self) -> int:
         return self.engine.number
     
-    def get_status(self):
+    def get_status(self) -> Sentinel:
         return self.engine.get_status()
     
-    def get_progress(self):
+    def get_progress(self) -> {str, int}:
         time_, length = self.engine.get_progress()
         if time_ < 0:
             time_ = -1
@@ -41,10 +41,10 @@ class EngineMixin:
     
         return {'time': time_, 'length': length}
     
-    def get_media_len(self):
+    def get_media_len(self) -> int:
         return len(self.engine.medias)
     
-    def load_paths(self, paths):
+    def load_paths(self, paths) -> Sentinel:
         if not isinstance(paths, (list, tuple)):
             paths = [paths]
     
@@ -59,7 +59,7 @@ class EngineMixin:
             else:
                 return result
     
-    def switch_to(self, num):
+    def switch_to(self, num: int) -> Sentinel:
         media_len = len(self.engine.medias)
         if media_len > 0:
             if num < 0:
@@ -76,27 +76,27 @@ class EngineMixin:
         else:
             return SENTINELS.PLAYER_EMPTY
     
-    def switch_prev(self):
+    def switch_prev(self) -> Sentinel:
         return self.switch_to(self.engine.number - 1)
     
-    def switch_next(self):
+    def switch_next(self) -> Sentinel:
         return self.switch_to(self.engine.number + 1)
     
-    def pause(self):
+    def pause(self) -> Sentinel:
         if self.engine.get_status() is SENTINELS.PLAYING:
             return self.engine.pause()
         else:
             logger.error('Failed to pause because player is not playing')
             return SENTINELS.INVALID_PLAYER_STATE
     
-    def resume(self):
+    def resume(self) -> Sentinel:
         if self.engine.get_status() is SENTINELS.PAUSED:
             return self.engine.resume()
         else:
             logger.error('Failed to resume because player is not paused')
             return SENTINELS.INVALID_PLAYER_STATE
     
-    def toggle(self):
+    def toggle(self) -> Sentinel:
         status = self.engine.get_status()
         if status is SENTINELS.PLAYING:
             return self.pause()
@@ -106,7 +106,7 @@ class EngineMixin:
             logger.error('Invalid player state, can not toggle')
             return SENTINELS.INVALID_PLAYER_STATE
     
-    def jump_pos(self, pos):
+    def jump_pos(self, pos: int) -> Sentinel:
         if self.engine.get_status() in (SENTINELS.PLAYING, SENTINELS.PAUSED):
             length = self.engine.get_progress()[1]
             pos = int(pos)
@@ -117,15 +117,15 @@ class EngineMixin:
         else:
             return SENTINELS.INVALID_PLAYER_STATE
     
-    def stop(self):
+    def stop(self) -> Sentinel:
         return self.engine.stop()
     
-    def set_volume(self, volume):
+    def set_volume(self, volume: int) -> Sentinel:
         self.engine.volume = volume
         logger.debug(f'Set target volume to {self.engine.volume}')
         return self.engine.apply_volume()
     
-    def set_mute(self, mute):
+    def set_mute(self, mute: bool) -> Sentinel:
         self.engine.mute = mute
         logger.debug(f'Set target mute mode to {self.engine.mute}')
         return self.engine.apply_volume()

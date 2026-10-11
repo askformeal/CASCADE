@@ -2,12 +2,14 @@ from src.log import setup_logger
 from src.constants.paths.log import BACKEND_LOG
 from src.sentinels import SENTINELS
 from src import gen_response
+from src.gen_response import Response
+from src.backend.context import Context
 from src.utils.misc import sort_songs
 from .helpers import get_song, insert_songs_aliases, insert_songs_playlist_names
 
 logger = setup_logger(__name__, BACKEND_LOG)
 
-def list_(ctx, request):    
+def list_(ctx: Context, request: dict) -> Response:
     playlist = request['playlist']
     if playlist is not None:
         playlist_id = ctx.database.get_playlist_via_name(playlist)
@@ -29,7 +31,7 @@ def list_(ctx, request):
         playlists = ctx.database.get_all_playlists()
         return gen_response.Success('obtained list of playlist in library', attachment=playlists)
 
-def create(ctx, request):
+def create(ctx: Context, request: dict) -> Response:
     name = request['name']
     ignored = ctx.database.create_playlist(name)[1]
     if not ignored:
@@ -37,7 +39,7 @@ def create(ctx, request):
     else:
         return gen_response.Failed(f'a playlist of the same name already exists')
 
-def add(ctx, request):
+def add(ctx: Context, request: dict) -> Response:
     playlist = request['playlist']
     songs = request['songs']
     cwd = request.get('cwd', None)
@@ -64,7 +66,7 @@ def add(ctx, request):
     
             return gen_response.BatchAuto('songs added to playlist', len(failed), len(songs), failed=failed)                                            
 
-def kick(ctx, request):
+def kick(ctx: Context, request: dict) -> Response:
     playlist = request['playlist']
     songs = request['songs']
     cwd = request.get('cwd', None)
@@ -90,7 +92,7 @@ def kick(ctx, request):
         else:
             return gen_response.PlaylistNotExist(playlist)
 
-def del_(ctx, request):
+def del_(ctx: Context, request: dict) -> Response:
     playlist_id = ctx.database.get_playlist_via_name(request['playlist'])
     if playlist_id is not SENTINELS.PLAYLIST_NOT_FOUND:
         ctx.database.del_playlist(playlist_id)
@@ -100,7 +102,7 @@ def del_(ctx, request):
     else:
         return gen_response.PlaylistNotExist(request['playlist'])
 
-def swap(ctx, request):
+def swap(ctx: Context, request: dict) -> Response:
     cwd = request.get('cwd', None)
     playlist = request['playlist']
     song_1 = request['song1']
@@ -138,7 +140,7 @@ def swap(ctx, request):
                     SENTINELS.DATABASE_ERROR: gen_response.DatabaseError()
                 }[result]
 
-def move(ctx, request):
+def move(ctx: Context, request: dict) -> Response:
     cwd = request.get('cwd', None)
     playlist = request['playlist']
     song = request['song']
@@ -176,7 +178,7 @@ def move(ctx, request):
                 SENTINELS.DATABASE_ERROR: gen_response.DatabaseError()
             }[result]
 
-def reorder(ctx, request):
+def reorder(ctx: Context, request: dict) -> Response:
     playlist = request['playlist']
     target_song_ids = request['song_ids']
     playlist_id = ctx.database.get_playlist_via_name(playlist)
@@ -194,7 +196,7 @@ def reorder(ctx, request):
         else:
             return gen_response.Failed(f'song ids provided do not match the songs in playlist \"{playlist}\"')
 
-def sort(ctx, request):
+def sort(ctx: Context, request: dict) -> Response:
     playlist = request['playlist']
     playlist_id = ctx.database.get_playlist_via_name(playlist)
     if playlist_id is SENTINELS.PLAYLIST_NOT_FOUND:

@@ -96,7 +96,7 @@ class Dash(HotkeyMixin, MainMixin, PlaylistMixin, InfoMixin):
         self._cursor_off()
         logger.debug(f'{__name__} initiated')
 
-    def _get_input(self, msg=''):
+    def _get_input(self, msg: str = '') -> str:
         self.paused = True
         self._cursor_on()
         result = input(msg)
@@ -237,7 +237,7 @@ class Dash(HotkeyMixin, MainMixin, PlaylistMixin, InfoMixin):
                 logger.exception('An error occurred during updating dashboard')
                 self.exit()
 
-    def _send_dash_request(self, action, silent=False, expect_fail=False, **kwargs):
+    def _send_dash_request(self, action: str, silent: bool = False, expect_fail: bool = False, **kwargs) -> dict | None:
         request = {'action': action, 'source': 'dash', 'notify_support': False, 'silent': silent, **kwargs}
         response = send_request(**request)
         if response.get('code', None) != 0 and not expect_fail:
@@ -247,7 +247,7 @@ class Dash(HotkeyMixin, MainMixin, PlaylistMixin, InfoMixin):
         handle_code(response.get('code', None), self.exit)
         return response.get('attachment', None)
 
-    def gen_cover_text(self, cover_bytes, cover_hash):
+    def gen_cover_text(self, cover_bytes: bytes, cover_hash: str) -> str:
         cover_width, cover_height = self._cover_size()
         state = (cover_width, cover_height, cover_hash)
         if state != self.old_cover_state:
@@ -260,7 +260,7 @@ class Dash(HotkeyMixin, MainMixin, PlaylistMixin, InfoMixin):
                 )
         return ('\n' * POSTER_TOP_PAD) + self.cover_text
 
-    def _cover_size(self):
+    def _cover_size(self) -> tuple[int, int]:
         width = CONFIG.dash_poster_width
         height = CONFIG.dash_poster_height
         terminal_size = shutil.get_terminal_size((0, 0))
@@ -279,11 +279,11 @@ class Dash(HotkeyMixin, MainMixin, PlaylistMixin, InfoMixin):
         
         return width, height
 
-    def _toast(self, text):
+    def _toast(self, text: str):
         self.toast_text = text
         self.toast_time = time.time()
 
-    def _dash_box(self, *args, **kwargs):
+    def _dash_box(self, *args, **kwargs) -> str:
         return box(*args, style=self.box_styles[self.box_style_num], **kwargs)
 
     def _cursor_on(self):

@@ -6,10 +6,10 @@ from src.constants.cli import HELP_DESCRIPTION
 from src.utils.text import strlen
 
 class Builder:
-    def _path(self, val):
+    def _path(self, val) -> str:
         return str(Path(val).absolute())
 
-    def _percent(self, val):
+    def _percent(self, val) -> int:
         try:
             val = int(val)
         except ValueError:
@@ -20,13 +20,13 @@ class Builder:
             else:
                 return val
 
-    def _add_parser(self, parser, action, *args, **kwargs):
+    def _add_parser(self, parser: argparse._SubParsersAction, action: str, *args, **kwargs) -> argparse.ArgumentParser:
         kwargs['parents'] = kwargs.get('parents', []) + [self.base]
         result = parser.add_parser(action, *args, **kwargs)
         result.set_defaults(**{parser.dest: action})
         return result
 
-    def _get_description(self):
+    def _get_description(self) -> str:
         description = ''
         lines = HELP_DESCRIPTION.splitlines()
         max_len = max(map(strlen, lines))
@@ -41,7 +41,7 @@ class Builder:
         
         return description
 
-    def build_parser(self):
+    def build_parser(self) -> argparse.ArgumentParser:
         self.base = argparse.ArgumentParser(add_help=False)
         self.base.add_argument('-v', '--verbose', action='store_true', help='Print log to console')
 

@@ -15,9 +15,12 @@ from src.constants.gui import (
 from src.utils.misc import get_song_display_name
 from src.utils.text import strlen
 from .empty import GUI_EMPTY as EMPTY
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .core import GUI
 
 class PlaylistMixin:
-    def __init__(self):
+    def __init__(self: 'GUI'):
         self.old_playlist = []
         self.old_current = None
         self.song_indexes = []
@@ -27,7 +30,7 @@ class PlaylistMixin:
         self.select_current_icon = self.get_icon(SELECT_CURRENT_ICON, 20)
         self.switch_selected_icon = self.get_icon(SWITCH_SELECTED_ICON, 20)
 
-    def build_playlist(self, playlist_frame):
+    def build_playlist(self: 'GUI', playlist_frame: tk.Frame):
         self.hotkey(self, '<c>', self._select_current)
 
         self.playlist_label = tk.Label(playlist_frame)
@@ -103,7 +106,7 @@ class PlaylistMixin:
         switch_button.pack(side='right')
         self.balloon.bind_widget(switch_button, 'Switch to selected song (Enter)')
 
-    def _select_current(self, *_):
+    def _select_current(self: 'GUI', *_):
         if self.snapshot.current_num is not EMPTY:
             try:
                 index = self.song_indexes.index(self.snapshot.current_num)
@@ -115,7 +118,7 @@ class PlaylistMixin:
                 self.playlist_box.activate(index)
                 self.playlist_box.see(index)
 
-    def _on_switch(self, *_):
+    def _on_switch(self: 'GUI', *_):
         if not self.playlist_empty:
             selected = self.playlist_box.curselection()
             if len(selected) > 0:
@@ -123,7 +126,7 @@ class PlaylistMixin:
                 index = self.song_indexes[index]
                 self.send_command('switch', number=index + 1)
 
-    def update_playlist(self):
+    def update_playlist(self: 'GUI'):
         if self.snapshot.playing_all is not EMPTY and self.snapshot.playing_all:
             self.playlist_label.config(
                 text='Library',
@@ -216,12 +219,12 @@ class PlaylistMixin:
 
         self.song_num_label.config(text=f'[{filtered}/{total}]')
 
-    def _mark_item(self, index):
+    def _mark_item(self: 'GUI', index: int):
         text = self.playlist_box.get(index)
         self.playlist_box.delete(index)
         self.playlist_box.insert(index, f' [{text.strip()}] ')
     
-    def _unmark_item(self, index):
+    def _unmark_item(self: 'GUI', index: int):
         text = self.playlist_box.get(index)
         self.playlist_box.delete(index)
         self.playlist_box.insert(index, f' {text[2:-2]} ')

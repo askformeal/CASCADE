@@ -4,7 +4,7 @@ import readchar
 import json
 
 from src.log import setup_logger
-from src.sentinels import SENTINELS
+from src.sentinels import SENTINELS, Sentinel
 from src.frontend.client import send_request
 from src.process import ProcessManager
 from src.constants.paths.log import CLI_LOG
@@ -23,7 +23,7 @@ from .show_info import (
     show_song_info
     )
 
-def main():
+def main() -> int:
     parser = Builder().build_parser()
     args = vars(parser.parse_args())
     args = process_request(args)
@@ -294,16 +294,16 @@ def main():
         print()
         return code
 
-def _wrap_request(args):
+def _wrap_request(args: dict) -> dict:
     args['source'] = 'cli'
     args['cwd'] = str(Path.cwd())
     args['notify_support'] = True
     return args
 
-def get_notifies():
+def get_notifies() -> dict:
     return send_request(**_wrap_request({'action':'get_notifies'})).get('notifies', [])
 
-def _start_backend(process, **kwargs):
+def _start_backend(process: ProcessManager, **kwargs) -> Sentinel:
     print(f'Starting backend...')
     for name, value in kwargs.items():
         print(f'  {EC.dim}{name}={value}{EC.reset}')
@@ -317,7 +317,7 @@ def _start_backend(process, **kwargs):
         print(f'{FAIL_TAG} Failed to start CASCADE backend. Examine log files for more information')
     return result
 
-def _reboot_backend(process, **kwargs):
+def _reboot_backend(process: ProcessManager, **kwargs) -> Sentinel:
     print(f'Rebooting backend...')
     for name, value in kwargs.items():
         print(f'  {EC.dim}{name}={value}{EC.reset}')
@@ -332,7 +332,7 @@ def _reboot_backend(process, **kwargs):
     elif result is SENTINELS.FAILED_START_BACKEND:
         print(f'{FAIL_TAG} Backend is exited but failed to start. Examine log files for more information')
 
-def _filter_args(args):
+def _filter_args(args: dict) -> dict:
     for key in NON_REQUEST_KEYS:
         if key in args.keys():
             del args[key]

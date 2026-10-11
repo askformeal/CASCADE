@@ -4,11 +4,15 @@ from tkinter import ttk
 from src.constants.paths.res.gui import GUI_COPY
 from src.constants.gui import FONT_SIZE
 from src.utils.time_ import format_time
+from src.frontend.snapshot import  Snapshot
 from .empty import GUI_EMPTY as EMPTY
 from .pop_up import PopUp
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .core import GUI
 
 class InfoPopUp(PopUp):
-    def __init__(self, master, snapshot, *args, **kwargs):
+    def __init__(self, master: 'GUI', snapshot: Snapshot, *args, **kwargs):
         super().__init__(master, *args, title='Song information', **kwargs)
         
         self.config(padx=15, pady=5)
@@ -66,11 +70,11 @@ class InfoPopUp(PopUp):
 
         self.show_window()
 
-    def _copy_text(self, text):
+    def _copy_text(self, text: str):
         self.clipboard_clear()
         self.clipboard_append(text)
 
-    def _build_section(self, name, is_end=False):
+    def _build_section(self, name: str, is_end: bool = False):
         if is_end:
             pady = 0
         else:
@@ -86,7 +90,17 @@ class InfoPopUp(PopUp):
         frame.pack(pady=pady, fill='x')
         return frame
     
-    def _build_field(self, master, name, values, copy_button=False, copy_text='', tooltip='', is_end=False):
+    def _build_field(
+        self,
+        master: tk.Frame,
+        name: str,
+        values: list,
+        copy_button: bool = False,
+        copy_text: str = '',
+        tooltip: str = '',
+        is_end: bool = False
+        ) -> tk.Frame:
+        
         if not isinstance(values, (tuple, list)):
             values = (values,)
         if is_end:

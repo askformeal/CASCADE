@@ -11,11 +11,11 @@ from src.constants.log import (
     )
 
 class TruncateFilter(logging.Filter):
-    def __init__(self, max_len):
+    def __init__(self, max_len: int):
         super().__init__()
         self.max_len = max_len
 
-    def filter(self, record):
+    def filter(self, record: logging.LogRecord) -> bool:
         message = record.getMessage()
         if len(message) > self.max_len:
             record.msg = f'{message[:self.max_len]}... (truncated, {len(message)} chars in total)'
@@ -23,12 +23,21 @@ class TruncateFilter(logging.Filter):
         return True
 
 class RotatingFlushFileHandler(logging.FileHandler):
-    def __init__(self, filename, max_bytes, mode = "a", encoding = None, delay = False, errors = None):
+    def __init__(
+        self,
+        filename: str,
+        max_bytes: int,
+        mode: str = "a",
+        encoding: str | None = None,
+        delay: bool = False,
+        errors = None
+        ):
+        
         super().__init__(filename, mode, encoding, delay, errors)
         self.path = Path(self.baseFilename)
         self.max_bytes = max_bytes
 
-    def emit(self, record):
+    def emit(self, record: logging.LogRecord):
         try:
             if self.path.stat().st_size > self.max_bytes:
                 self.stream.seek(0)
@@ -38,7 +47,7 @@ class RotatingFlushFileHandler(logging.FileHandler):
         super().emit(record)
         self.flush()
 
-def setup_logger(name, path, add_console=True) -> logging.Logger:
+def setup_logger(name: str, path: str, add_console: bool = True) -> logging.Logger:
     logger = logging.getLogger(name)
     if len(logger.handlers) == 0:
         format=logging.Formatter("%(asctime)s [%(levelname)s] [%(name)s] %(message)s")

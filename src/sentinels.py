@@ -1,17 +1,19 @@
+from types import NotImplementedType
+
 class Sentinel:
-    def __init__(self, msg):
+    def __init__(self, msg: str):
         self.msg = msg
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.msg
 
-    def __eq__(self, value):
+    def __eq__(self, value) -> bool | NotImplementedType:
         if not isinstance(value, Sentinel):
             return NotImplemented
         else:
             return self is value
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return id(self)
     
 class Sentinels:

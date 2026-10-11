@@ -1,8 +1,11 @@
 from src.utils.tui import window_list
 from .empty import DASH_EMPTY as EMPTY
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .core import Dash
 
 class PlaylistMixin:
-    def gen_playlist_text(self):
+    def gen_playlist_text(self: 'Dash') -> str:
         current = None
         if self.snapshot.current_num is not EMPTY:
             try:

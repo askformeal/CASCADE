@@ -6,7 +6,7 @@ from PIL import Image, ImageOps
 from src.constants.misc import BOX_STYLES
 from .text import strlen
 
-def box(*texts: str, l_pad=2, r_pad=2, style='ascii'):
+def box(*texts: str, l_pad: int = 2, r_pad: int = 2, style: str = 'ascii') -> str:
     style = str(style)
 
     upper_left, upper_right, lower_left, lower_right, vertical, horizontal, t_down, t_up = BOX_STYLES[style]
@@ -49,7 +49,7 @@ def box(*texts: str, l_pad=2, r_pad=2, style='ascii'):
     return '\n'.join((top_line, *middle_lines, bottom_line))
 
 
-def center(text, width):
+def center(text: str, width: int) -> str:
     result = []
     for line in text.splitlines():
         l_pad = ' ' * math.ceil((width - strlen(line)) / 2)
@@ -57,7 +57,7 @@ def center(text, width):
         result.append(f'{l_pad}{line}{r_pad}')
     return '\n'.join(result)
 
-def align(width, left='', right=''):
+def align(width: int, left: str = '', right: str = '') -> str:
     l_len = strlen(left)
     r_len = strlen(right)
     if l_len + r_len > width:
@@ -65,11 +65,22 @@ def align(width, left='', right=''):
     else:
         return f'{left}{' '*(width-l_len-r_len)}{right}'
     
-def progress_bar(progress, length):
+def progress_bar(progress: int, length: int) -> str:
     progress = min(max(round(progress), 0), length)
     return f"{'█'*progress}{'░'*(length-progress)}"
 
-def window_list(lines, window_len, selected, current=None, filter='', newline_selected=False, mark_unshown=True, left_align=True, end_of_line_char=''):
+def window_list(
+    lines: list[str],
+    window_len: int,
+    selected: int,
+    current: int | None = None,
+    filter: str = '',
+    newline_selected: bool = False,
+    mark_unshown: bool = True,
+    left_align: bool = True,
+    end_of_line_char: str = ''
+    ) -> str:
+
     from .misc import squeeze
     result = []
 
@@ -124,7 +135,7 @@ def window_list(lines, window_len, selected, current=None, filter='', newline_se
 
     return result
 
-def render_tui_cover(data, width, height):
+def render_tui_cover(data: bytes, width: int, height: int) -> str:
     height = height // 2 * 2
     image = Image.open(BytesIO(data)).convert('RGBA')
     image = ImageOps.pad(

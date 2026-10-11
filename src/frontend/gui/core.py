@@ -7,6 +7,7 @@ from tkinter import messagebox
 if sys.platform == 'win32':
     import ctypes
     from ctypes import wintypes
+from typing import Callable
 
 from PIL import Image, ImageTk
 
@@ -99,7 +100,7 @@ class GUI(tk.Tk, MainWinMixin, PlaybackMixin, PlaylistMixin, LyricMixin, Lifecyc
 
         logger.debug(f'{__name__} initialized')
 
-    def get_font(self, *args, family=None, **kwargs):
+    def get_font(self, *args, family: str | None = None, **kwargs) -> tkfont.Font:
         if family is None:
             family = self.font_family
         return tkfont.Font(*args, family=family, **kwargs)
@@ -116,31 +117,31 @@ class GUI(tk.Tk, MainWinMixin, PlaybackMixin, PlaylistMixin, LyricMixin, Lifecyc
             self.imm.ImmSetOpenStatus(himc, False)
             self.imm.ImmReleaseContext(hwnd, himc)
 
-    def hotkey(self, widgets, sequence, func):
+    def hotkey(self, widgets: tk.Misc, sequence: str, func: Callable):
         if not isinstance(widgets, (list, tuple)):
             widgets = (widgets,)
         for widget in widgets:
             self._bind_hotkey(widget, sequence, func)
 
-    def copy_hotkey(self, target_widget, source_widget): 
+    def copy_hotkey(self, target_widget: tk.Misc, source_widget: tk.Misc): 
         # copy all hotkeys of target_widget to widget
         bounds = self.widget_hotkeys.get(source_widget, [])
         for bound in bounds:
             self._bind_hotkey(target_widget, *bound)
             
-    def _bind_hotkey(self, widget, sequence, func):
+    def _bind_hotkey(self, widget: tk.Misc, sequence: str, func: Callable):
         widget.bind(sequence, self._hotkey_func(func))
         bound = self.widget_hotkeys.get(widget, tuple()) + ((sequence, func),)
         self.widget_hotkeys[widget] = bound
 
-    def tag_children(self, widget):
+    def tag_children(self, widget: tk.Misc):
         for child in widget.winfo_children():
             tags = child.bindtags()
             if str(widget) not in tags:
                 child.bindtags(tags+(widget,))
             self.tag_children(child)
 
-    def _hotkey_func(self, func):
+    def _hotkey_func(self, func: Callable) -> Callable:
         def on_hotkey(event):
             if event.widget in self.no_hotkey_widgets:
                 return None
@@ -148,7 +149,7 @@ class GUI(tk.Tk, MainWinMixin, PlaybackMixin, PlaylistMixin, LyricMixin, Lifecyc
                 return func(event)
         return on_hotkey
 
-    def get_icon(self, path, size=None):
+    def get_icon(self, path: str, size: tuple[int, int] | int=None) -> tk.PhotoImage:
         if size is None:
             size = ICON_SIZE
         elif not isinstance(size, (list, tuple)):
@@ -188,7 +189,7 @@ class GUI(tk.Tk, MainWinMixin, PlaybackMixin, PlaylistMixin, LyricMixin, Lifecyc
             self.window_ready = True
         self.balloon.refresh()
 
-    def _send_gui_request(self, action, **kwargs):
+    def _send_gui_request(self, action: str, **kwargs) -> dict:
         silent = kwargs.get('silent', False)
         request = {
             'action':action, 
@@ -208,15 +209,15 @@ class GUI(tk.Tk, MainWinMixin, PlaybackMixin, PlaylistMixin, LyricMixin, Lifecyc
             self._show_notifies(notifies)
         return response
 
-    def _show_notifies(self, notifies):
+    def _show_notifies(self, notifies: list[str]):
         for notify in notifies:
             self.after(0, lambda n=notify: messagebox.showinfo('Notify', message=n))
 
-    def poll_request(self, action, **kwargs):
+    def poll_request(self, action: str, **kwargs) -> dict | None:
         response = self._send_gui_request(action=action, **kwargs)
         return response.get('attachment', None)
 
-    def send_command(self, action, **kwargs):
+    def send_command(self, action: str, **kwargs):
         if self.backend_online:
             if not kwargs.get('silent', False):
                 logger.info(f'Send command: {action}')

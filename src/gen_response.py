@@ -1,5 +1,7 @@
+from collections.abc import KeysView
+
 class Response:
-    def __init__(self, msg=None, code=None, attachment=None, failed=None):
+    def __init__(self, msg: str = None, code: int = None, attachment: dict | list = None, failed: list = None):
         if code is None:
             self.code = 3
         else:
@@ -22,27 +24,27 @@ class Response:
 
         self.notifies = []
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return str(dict(self))
 
-    def keys(self):
+    def keys(self) -> KeysView:
         return vars(self).keys()
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str):
         # this is for dict(). do not access attr with [], use the dot.
         return getattr(self, key)
 
-    def __add__(self, other):
+    def __add__(self, other: Response) -> Response:
         return merge(self, other)
 
-    def __iadd__(self, other):
+    def __iadd__(self, other: Response) -> Response:
         self.append(other)
         return self
     
-    def ok(self):
+    def ok(self) -> bool:
         return self.code == 0
     
-    def append(self, *responses, **kwargs):
+    def append(self, *responses: Response, **kwargs):
         result = merge(self, *responses, **kwargs)
         
         self.code = result.code
@@ -165,7 +167,7 @@ class DatabaseError(Failed):
     def __init__(self, attachment=None, failed=None):
         super().__init__('a database error occurred', attachment, failed)
 
-def merge(*responses: Response, joiner='|', attachment=None, failed=None):
+def merge(*responses: Response, joiner: str = '|', attachment: list | dict | None = None, failed: list | None = None) -> Response:
     messages = []
     codes = []
 

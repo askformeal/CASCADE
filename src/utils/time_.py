@@ -1,8 +1,8 @@
 from typing import Literal
 
-from src.sentinels import SENTINELS
+from src.sentinels import SENTINELS, Sentinel
 
-def format_time(raw_time, unit: Literal['ms', 'sec']='ms'):
+def format_time(raw_time: int | None, unit: Literal['ms', 'sec'] = 'ms') -> str:
     if raw_time is None:
         return '--:--:--'
     else:
@@ -23,9 +23,9 @@ def format_time(raw_time, unit: Literal['ms', 'sec']='ms'):
         seconds = remain // 1000
         return f'{hours:02}:{minutes:02}:{seconds:02}'
         
-def parse_time(time):
+def parse_time(time: str) -> int | Sentinel:
     # Technically it can parse things like 999999:9999999:999999 but I decided to count that as a feature
-    parts = time.split(':')
+    parts: list[str|int] = time.split(':')
 
     length = len(parts)
     if length > 3:

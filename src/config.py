@@ -6,13 +6,13 @@ from src.log import setup_logger
 from src.constants.config import CONFIG_SCHEME
 from src.constants.paths import CONFIG_PATH
 from src.constants.paths.log import CONFIG_LOG
-from src.sentinels import SENTINELS
+from src.sentinels import SENTINELS, Sentinel
 from src.types import get_type_name
 
 logger = setup_logger(__name__, CONFIG_LOG)
 
 class Config:
-    def load_file(self):
+    def load_file(self) -> dict | Sentinel:
         try:
             with open(CONFIG_PATH, 'rb') as f:
                 file_config = tomllib.load(f)
@@ -31,7 +31,7 @@ class Config:
         else:
             return file_config
 
-    def set_file(self, file_config):
+    def set_file(self, file_config: dict) -> Sentinel:
         try:
             with open(CONFIG_PATH, 'wb') as f:
                 tomli_w.dump(file_config, f)
@@ -43,7 +43,7 @@ class Config:
         else:
             return SENTINELS.SUCCESS
 
-    def get_option(self, name):
+    def get_option(self, name: str) -> tuple[Sentinel, Sentinel | None]:
         if name not in CONFIG_SCHEME.keys():
             logger.warning(f'Tried to get an unknown option \"{name}\". A Sentinel object will be returned and will most likely cause an error')
             return SENTINELS.UNKNOWN_OPTION, None
@@ -80,7 +80,7 @@ class Config:
 
             return value, source
 
-    def set_option(self, name, value, overwrite_corrupt=False): 
+    def set_option(self, name: str, value, overwrite_corrupt: bool = False) -> Sentinel: 
         # overwrite_corrupt: overwrite invalid config file
         if name not in CONFIG_SCHEME.keys():
             logger.debug(f'Tried to set an unknown option \"{name}\". Setting will be cancelled')
@@ -116,7 +116,7 @@ class Config:
 
                 return self.set_file(file_config)
 
-    def unset_option(self, name):
+    def unset_option(self, name: str) -> Sentinel:
         if name not in CONFIG_SCHEME.keys():
             logger.debug(f'Tried to unset an unknown option \"{name}\". Unsetting will be cancelled')
             return SENTINELS.UNKNOWN_OPTION
@@ -144,10 +144,10 @@ class Config:
                         del file_config[section][name]
                         return self.set_file(file_config)
 
-    def __getattr__(self, name):
+    def __getattr__(self, name: str):
         return self.get_option(name)[0]
     
-    def __setattr__(self, name, value):
+    def __setattr__(self, name: str, value):
         if name in CONFIG_SCHEME.keys():
             return self.set_option(name, value)
         else:

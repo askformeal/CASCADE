@@ -2,24 +2,26 @@ from src.log import setup_logger
 from src.constants.paths.log import BACKEND_LOG
 from src.sentinels import SENTINELS
 from src import gen_response
+from src.gen_response import Response
+from src.backend.context import Context
 from src.utils.misc import bytes2base64
 from .helpers import get_status, open_song, open_type, play_all_songs, stop_player
 
 logger = setup_logger(__name__, BACKEND_LOG)
 
-def status(ctx, request):
+def status(ctx: Context, request: dict) -> Response:
     return gen_response.Success('status obtained', get_status(ctx))
 
-def open_(ctx, request):
+def open_(ctx: Context, request: dict) -> Response:
     song = request['song']
     type_ = request['type']
     cwd = request.get('cwd', None)
     return open_song(ctx, song, type_, cwd)
 
-def play_all(ctx, request):
+def play_all(ctx: Context, request: dict) -> Response:
     return play_all_songs(ctx)
 
-def load_last(ctx, request):
+def load_last(ctx: Context, request: dict) -> Response:
     is_all = ctx.database.get_setting('last_is_all')
     last_type = ctx.database.get_setting('last_type')
     last_reference = ctx.database.get_setting('last_reference')
@@ -42,10 +44,10 @@ def load_last(ctx, request):
     logger.debug(response.msg)
     return response
 
-def stop(ctx, request):
+def stop(ctx: Context, request: dict) -> Response:
     return stop_player(ctx)
 
-def pause(ctx, request):
+def pause(ctx: Context, request: dict) -> Response:
     result = ctx.playback.pause()
     return {
         SENTINELS.SUCCESS: gen_response.Success('player paused'),
@@ -54,7 +56,7 @@ def pause(ctx, request):
         SENTINELS.PLAYER_TIMEOUT: gen_response.PlayerTimeout()
     }[result]
 
-def resume(ctx, request):
+def resume(ctx: Context, request: dict) -> Response:
     result = ctx.playback.resume()
     return {
         SENTINELS.SUCCESS: gen_response.Success('player resumed'),
@@ -63,7 +65,7 @@ def resume(ctx, request):
         SENTINELS.PLAYER_TIMEOUT: gen_response.PlayerTimeout()
     }[result]
 
-def toggle(ctx, request):
+def toggle(ctx: Context, request: dict) -> Response:
     result = ctx.playback.toggle()
     return {
         SENTINELS.SUCCESS: gen_response.Success('player toggled'),
@@ -72,7 +74,7 @@ def toggle(ctx, request):
         SENTINELS.PLAYER_TIMEOUT: gen_response.PlayerTimeout()
     }[result]
 
-def volume(ctx, request):
+def volume(ctx: Context, request: dict) -> Response:
     volume = request['volume']
     if volume.startswith(('+', '-')):
         try:
@@ -100,19 +102,19 @@ def volume(ctx, request):
                 ctx.playback.set_volume(volume)
                 return gen_response.Success(f'set volume to {volume}%')
 
-def mute(ctx, request):
+def mute(ctx: Context, request: dict) -> Response:
     target_mute = not ctx.playback.get_mute()
     ctx.playback.set_mute(target_mute)
     mode = {True: 'on', False: 'off'}[target_mute]
     return gen_response.Success(f'turned mute mode {mode}')
 
-def lyric(ctx, request):
+def lyric(ctx: Context, request: dict) -> Response:
     ctx.playback.online_lyric = not ctx.playback.online_lyric
     ctx.playback.update_lyric()
     mode = {True: 'on', False: 'off'}[ctx.playback.online_lyric]
     return gen_response.Success(f'online lyric mode turned {mode}')
 
-def set_offset_overlay(ctx, request):
+def set_offset_overlay(ctx: Context, request: dict) -> Response:
     offset = request['offset']
     if request['autoincrement']:
         ctx.playback.offset_overlay += offset
@@ -121,7 +123,7 @@ def set_offset_overlay(ctx, request):
     ctx.playback.update_lyric()
     return gen_response.Success(f'lyric offset overlay set to {ctx.playback.offset_overlay}')
 
-def get_cover(ctx, request):
+def get_cover(ctx: Context, request: dict) -> Response:
     if ctx.playback.cover is None:
         return gen_response.Failed('cover unavailable')
     else:

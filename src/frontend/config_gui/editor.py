@@ -9,9 +9,12 @@ from src.constants.config_gui import (
     OFF_COLOR_FG,
     )
 from src.utils.misc import squeeze, hex_color_gray
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .core import ConfigGUI
 
 class EditorMixin:
-    def build_bool_editor(self, value_frame):
+    def build_bool_editor(self: 'ConfigGUI', value_frame: tk.Frame):
         switch = tk.Button(
             value_frame,
             font=self.font,
@@ -22,7 +25,7 @@ class EditorMixin:
         self._apply_switch(switch)
         self.get_val = self._get_switch
         
-    def build_choice_editor(self, value_frame):
+    def build_choice_editor(self: 'ConfigGUI', value_frame: tk.Frame):
         var = tk.StringVar()
         menu = tk.OptionMenu(
             value_frame,
@@ -33,7 +36,7 @@ class EditorMixin:
         var.set(self.value)
         self.get_val = var.get
         
-    def build_percent_editor(self, value_frame):
+    def build_percent_editor(self: 'ConfigGUI', value_frame: tk.Frame):
         scale_font = self.master.get_font(
             size=FONT_SIZE-3,
             slant='italic',
@@ -59,7 +62,7 @@ class EditorMixin:
         scale.set(self.value)
         self.get_val = lambda: str(scale.get())
 
-    def build_color_editor(self, value_frame):
+    def build_color_editor(self: 'ConfigGUI', value_frame: tk.Frame):
         entry = tk.Entry(
             value_frame, 
             font=self.font,
@@ -79,7 +82,7 @@ class EditorMixin:
         
         self.get_val = entry.get
 
-    def build_entry_editor(self, value_frame):
+    def build_entry_editor(self: 'ConfigGUI', value_frame: tk.Frame):
         entry = tk.Entry(
             value_frame, 
             font=self.font,
@@ -89,11 +92,11 @@ class EditorMixin:
         entry.insert(tk.END, str(self.value))
         self.get_val = entry.get
 
-    def _toggle_switch(self, switch):
+    def _toggle_switch(self: 'ConfigGUI', switch: tk.Button):
         self.switch_on = not self.switch_on
         self._apply_switch(switch)
 
-    def _apply_switch(self, switch):
+    def _apply_switch(self: 'ConfigGUI', switch: tk.Button):
         if self.switch_on:
             switch.config(
                 text='On', 
@@ -107,21 +110,21 @@ class EditorMixin:
                 fg=OFF_COLOR_FG
                 )
 
-    def _get_switch(self):
+    def _get_switch(self: 'ConfigGUI'):
         return str(self.switch_on)
 
-    def _nudge_scale(self, scale, step):
+    def _nudge_scale(self: 'ConfigGUI', scale: tk.Scale, step: int):
         number = scale.get()
         scale.set(squeeze(number + step, 100, 0))
 
-    def _get_color(self, entry, button):
+    def _get_color(self: 'ConfigGUI', entry: tk.Entry, button: tk.Button):
         color = colorchooser.askcolor(parent=self)[1]
         if color is not None:
             entry.delete(0, tk.END)
             entry.insert(0, color)
             self._update_color_button(color, button)
 
-    def _update_color_button(self, color, button):
+    def _update_color_button(self: 'ConfigGUI', color: str, button: tk.Button):
         button.config(bg=color)
         button.config(activebackground=color)
         gray = hex_color_gray(color)

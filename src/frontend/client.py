@@ -1,5 +1,6 @@
 import socket
 from time import sleep
+from typing import Callable
 
 from src.log import setup_logger
 from src.constants.paths.log import SOCKET_LOG
@@ -9,7 +10,7 @@ from src.connection import send_json, recv_json
 
 logger = setup_logger(__name__, SOCKET_LOG)
 
-def send_request(expect_reset=False, **kwargs):
+def send_request(expect_reset: bool = False, **kwargs) -> dict:
     try:
         kwargs['token'] = CONFIG.frontend_token
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -44,22 +45,22 @@ def send_request(expect_reset=False, **kwargs):
             'attachment': {}
         }
 
-def test_alive():
+def test_alive() -> bool:
     response = send_request(action='test_alive', source='client', notify_support=False, expect_reset=True)
     return response['code'] != 2
 
-def test_heartbeat():
+def test_heartbeat() -> int:
     response = send_request(action='heartbeat', source='client') # for good measure
     return response['code']
 
-def confirm_dead():
+def confirm_dead() -> bool:
     for i in range(DEATH_CONFIRM_NUMBER):
         sleep(DEATH_CONFIRM_INTERVAL)
         if test_heartbeat() == 0:
             return False # Brain~~~~~~
     return True
 
-def handle_code(code, callback):
+def handle_code(code, callback: Callable):
     if code == 4:
         logger.info('Backend existing')
         callback()

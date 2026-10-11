@@ -9,9 +9,9 @@ import base64
 import hashlib
 
 from src.constants.misc import WINDOWS_ILLEGAL, WINDOWS_RESERVED, AUDIO_EXTENSIONS
-from src.sentinels import SENTINELS
+from src.sentinels import SENTINELS, Sentinel
 
-def squeeze(number, highest, lowest=0):
+def squeeze(number: int, highest: int, lowest: int = 0):
     if number > highest:
         number = highest
     elif number < lowest:
@@ -19,7 +19,7 @@ def squeeze(number, highest, lowest=0):
 
     return number
 
-def verify_path_format(raw: str):
+def verify_path_format(raw: str) -> bool:
     if len(raw.strip()) == 0 or '\x00' in raw:
         return False
     elif os.name == 'nt':
@@ -39,7 +39,7 @@ def verify_path_format(raw: str):
     else:
         return True
 
-def count_dict(obj):
+def count_dict(obj: dict) -> int:
     if not isinstance(obj, dict):
         return 1
     else:
@@ -48,7 +48,7 @@ def count_dict(obj):
             total += count_dict(value)
         return total
 
-def open_file(path):
+def open_file(path: str) -> Sentinel:
     if Path(path).is_file():
         if sys.platform == 'win32':
             os.startfile(path)
@@ -66,26 +66,26 @@ def open_file(path):
     else:
         return SENTINELS.FILE_IO_FAILED
 
-def hex_color_to_dec(color):
+def hex_color_to_dec(color: str) -> int:
     color = color.replace('#', '0x')
     num = int(color, 16)
     return num
 
-def hex_color2rgb(color):
+def hex_color2rgb(color: str) -> tuple[int, int, int]:
     red = int(color[1:3], 16)
     green = int(color[3:5], 16)
     blue = int(color[5:7], 16)
 
     return red, green, blue
 
-def hex_color_gray(color):
+def hex_color_gray(color: str) -> int:
     red, green, blue = hex_color2rgb(color)
     return round(0.299 * red + 0.587 * green + 0.114 * blue)
 
-def sort_songs(info):
+def sort_songs(info: list[dict]) -> list:
     return sorted(info, key=lambda x: Path(x['path']).name.lower())
 
-def get_song_display_name( info):
+def get_song_display_name(info: dict) -> str | None:
     name = info.get('name', None)
     if name is None:
         name = info.get('path', None)
@@ -93,14 +93,14 @@ def get_song_display_name( info):
             name = Path(name).stem
     return name
 
-def shallow_scan(directory):
+def shallow_scan(directory: str) -> list[str]:
     paths = []
     for path in Path(directory).iterdir():
         if path.suffix.lower() in AUDIO_EXTENSIONS and path.is_file():
             paths.append(str(path.resolve()))
     return paths
 
-def recurse_scan(directory):
+def recurse_scan(directory: str) -> list[str]:
     paths = []
     for root, dirs, files in os.walk(directory):
         for file in files:
@@ -109,11 +109,11 @@ def recurse_scan(directory):
                 paths.append(str(path.resolve()))
     return paths
 
-def bytes2base64(data):
+def bytes2base64(data: bytes) -> str:
     return base64.b64encode(data).decode('ascii')
 
-def base642bytes(data):
+def base642bytes(data: str) -> bytes:
     return base64.b64decode(data)
 
-def hash_bytes(data):
+def hash_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()

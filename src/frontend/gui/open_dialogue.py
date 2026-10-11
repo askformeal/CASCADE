@@ -2,9 +2,12 @@ import tkinter as tk
 
 from src.constants.gui import CANCEL_COLOR, OPEN_COLOR
 from .pop_up import PopUp
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .core import GUI
 
 class OpenDialogue(PopUp):
-    def __init__(self, master):
+    def __init__(self, master: 'GUI'):
         super().__init__(master, title='Open')
         
         self.bind('<Return>', self._on_open)

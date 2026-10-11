@@ -4,13 +4,12 @@ from src.utils.time_ import format_time
 
 class SongOutput:
     # generate outputs of from song info
-    def __init__(self, info=None, prettify_none=True):
+    def __init__(self, info: dict = None, prettify_none: bool = True):
         if info is None:
             info = {}
         self.extract_from_dict(info, prettify_none=prettify_none)
 
-    def extract_from_dict(self, info, prettify_none=True):
-
+    def extract_from_dict(self, info: dict, prettify_none: bool = True):
         self.name = info.get('name', '?')
 
         self.artist = info.get('artist', '?')

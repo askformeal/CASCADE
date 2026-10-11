@@ -7,12 +7,15 @@ from src.frontend.client import test_heartbeat
 from src.constants.frontend import HEARTBEAT_POLL_INTERVAL
 from src.sentinels import SENTINELS
 from src.process import ProcessManager
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .core import GUI
 
 class LifecycleMixin:
-    def __init__(self):
+    def __init__(self: 'GUI'):
         self.process = ProcessManager(logger)
 
-    def check_backend(self):
+    def check_backend(self: 'GUI'):
         def check():
             response = self._send_gui_request(action='test_alive')
             code = response['code']
@@ -24,7 +27,7 @@ class LifecycleMixin:
                 self.after(0, lambda: messagebox.showerror(title='Connection failed', message=msg, detail=detail))
         Thread(target=check).start()
 
-    def start_backend(self, continue_=False, dev=False):
+    def start_backend(self: 'GUI', continue_: bool = False, dev: bool = False):
         def start(continue_, dev):
             continue_ = str(int(continue_))
             dev = str(int(dev))
@@ -47,7 +50,7 @@ class LifecycleMixin:
                         ))
         Thread(target=start, args=(continue_, dev)).start()
 
-    def reboot_backend(self, continue_=False, dev=False):
+    def reboot_backend(self: 'GUI', continue_: bool = False, dev: bool = False):
         def reboot(continue_, dev):
             continue_ = str(int(continue_))
             dev = str(int(dev))
@@ -75,7 +78,7 @@ class LifecycleMixin:
                         ))
         Thread(target=reboot, args=(continue_, dev)).start()
 
-    def monitor_heartbeat(self):
+    def monitor_heartbeat(self: 'GUI'):
         while self.running:
             time.sleep(HEARTBEAT_POLL_INTERVAL)
 

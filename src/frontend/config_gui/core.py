@@ -50,7 +50,7 @@ from .pop_up import Popup
 from .handler import HandlerMixin
 
 class ConfigGUI(tk.Tk, HandlerMixin):
-    def __init__(self, direct=None):
+    def __init__(self, direct: bool | None = None):
         super().__init__()
         self.withdraw()
 
@@ -95,7 +95,7 @@ class ConfigGUI(tk.Tk, HandlerMixin):
         self._build_window()
         logger.debug(f'{__name__} initialized')
 
-    def get_font(self, *args, family=None, **kwargs):
+    def get_font(self, *args, family: str | None = None, **kwargs) -> tkfont.Font:
         if family is None:
             family = self.font_family
         return tkfont.Font(*args, family=family, **kwargs)
@@ -167,7 +167,7 @@ class ConfigGUI(tk.Tk, HandlerMixin):
 
         self._update_options()
 
-    def _get_icon(self, path):
+    def _get_icon(self, path: str) -> ImageTk.PhotoImage:
         image = Image.open(path)
         image = image.resize(ICON_SIZE, Image.Resampling.LANCZOS)
         image = ImageTk.PhotoImage(image)
@@ -238,7 +238,7 @@ class ConfigGUI(tk.Tk, HandlerMixin):
 
         logger.info(f'Updated option(s)')
 
-    def _build_option(self, option):
+    def _build_option(self, option: dict) -> tk.Frame:
         font = self.get_font(
             size=FONT_SIZE
         )
@@ -322,11 +322,11 @@ class ConfigGUI(tk.Tk, HandlerMixin):
 
         return frame        
 
-    def _on_edit(self, name):
+    def _on_edit(self, name: str):
         info = self.options[name]
         Popup(self, info)
 
-    def _send_config_request(self, action, **kwargs):
+    def _send_config_request(self, action: str, **kwargs) -> dict:
         request = {'action': action, 'source': 'config_gui', 'notify_support': False, **kwargs}
         response = send_request(**request)
         logger.info(f'Sent request: {request}')

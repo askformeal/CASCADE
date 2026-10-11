@@ -2,9 +2,12 @@ from tkinter import messagebox
 
 from .logger import logger
 from src.config_manager import CONFIG_MANAGER
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .core import ConfigGUI
 
 class HandlerMixin:
-    def set_value(self, name, value, overwrite_corrupt=False):
+    def set_value(self: 'ConfigGUI', name: str, value, overwrite_corrupt: bool = False):
         logger.info(f'Set \"{name}\" to \"{value}\", overwrite corrupted: {overwrite_corrupt}')
         if self.remote:
             response = self._send_config_request(
@@ -22,7 +25,7 @@ class HandlerMixin:
     
         self._handle_response(response)
     
-    def unset(self, name):
+    def unset(self: 'ConfigGUI', name: str):
         logger.info(f'Unset: {name}')
         if self.remote:
             response = self._send_config_request('config.unset', option=name)
@@ -30,7 +33,7 @@ class HandlerMixin:
             response = CONFIG_MANAGER.unset_option(name)
         self._handle_response(response)
 
-    def open_file(self):
+    def open_file(self: 'ConfigGUI'):
         logger.info(f'Open config file')
         if self.remote:
             response = self._send_config_request('config.open')
@@ -39,7 +42,7 @@ class HandlerMixin:
 
         self._handle_response(response, update=False)
 
-    def copy_path(self, *_):
+    def copy_path(self: 'ConfigGUI', *_):
         logger.info(f'Copy config file path')
         if self.remote:
             response = self._send_config_request('config.path')
@@ -57,7 +60,7 @@ class HandlerMixin:
                 detail=path
                 ))
 
-    def _handle_response(self, response, update=True):
+    def _handle_response(self: 'ConfigGUI', response: dict, update: bool = True) -> bool:
         logger.info(f'Handle response: {response}')
         if response['code'] == 0:
             if update:

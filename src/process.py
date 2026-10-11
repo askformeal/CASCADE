@@ -3,6 +3,7 @@ import sys
 import os
 from time import sleep
 from pathlib import Path
+from logging import Logger
 
 import psutil
 
@@ -15,14 +16,14 @@ from src.constants.process import (
     RESTART_POLL_INTERVAL
     )
 from src.config import CONFIG
-from src.sentinels import SENTINELS
+from src.sentinels import SENTINELS, Sentinel
 from src.pid import get_pid, remove_pid
 
 class ProcessManager:
-    def __init__(self, logger):
+    def __init__(self, logger: Logger):
         self.logger = logger
 
-    def start(self, **kwargs):
+    def start(self, **kwargs) -> Sentinel:
         self.logger.info(f'Starting backend, environment variables: {kwargs}...')
         if test_alive():
             self.logger.warning('Backend already running')
@@ -45,7 +46,7 @@ class ProcessManager:
             self.logger.info('Timed out waiting backend to be alive')
             return SENTINELS.FAILED_START_BACKEND
 
-    def reboot(self, **kwargs):
+    def reboot(self, **kwargs) -> Sentinel:
         self.logger.info('Rebooting backend...')
         if not test_alive():
             self.logger.warning('Backend not running')
@@ -66,7 +67,7 @@ class ProcessManager:
                     
                 return self.start(**kwargs)
 
-    def spawn(self, module, **env_args):
+    def spawn(self, module: str, **env_args):
         self.logger.info(f'Spawn module {module} with environment arguments {env_args}')
         for key, value in env_args.items():
             env_args[key] = str(value)
@@ -95,7 +96,7 @@ class ProcessManager:
                                 stderr=subprocess.DEVNULL,
                                 )
 
-    def kill(self):
+    def kill(self) -> list[tuple[str, Sentinel]]:
         pids = get_pid()
         result = []
 

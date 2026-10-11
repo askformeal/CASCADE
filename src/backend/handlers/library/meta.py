@@ -4,12 +4,14 @@ from src.constants.paths.log import BACKEND_LOG
 from src.constants.backend import METADATA
 from src.sentinels import SENTINELS
 from src import gen_response
+from src.gen_response import Response
+from src.backend.context import Context
 from src.utils.file_extract import extract_file_meta
 from .helpers import get_song
 
 logger = setup_logger(__name__, BACKEND_LOG)
 
-def set_(ctx, request):
+def set_(ctx: Context, request: dict) -> Response:
     cwd = request.get('cwd', None)
     song_id = get_song(ctx, request['song'], cwd)
     if song_id is SENTINELS.MISSING_CWD:
@@ -33,7 +35,7 @@ def set_(ctx, request):
         else:
             return gen_response.Failed(f'no metadata was provided')
 
-def read_file(ctx, request):
+def read_file(ctx: Context, request: dict) -> Response:
     song = request['song']
     cwd = request.get('cwd', None)
 

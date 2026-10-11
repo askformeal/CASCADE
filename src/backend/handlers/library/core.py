@@ -4,7 +4,9 @@ from src.log import setup_logger
 from src.constants.paths.log import BACKEND_LOG
 from src.constants.backend import SEARCH_META
 from src import gen_response
+from src.gen_response import Response
 from src.sentinels import SENTINELS
+from src.backend.context import Context
 from src.utils.misc import sort_songs, shallow_scan, recurse_scan
 from .helpers import (
     get_song, 
@@ -16,7 +18,7 @@ from .helpers import (
 
 logger = setup_logger(__name__, BACKEND_LOG)
 
-def info(ctx, request):
+def info(ctx: Context, request: dict) -> Response:
     songs = request['songs']
     show_aliases = request['show_aliases']
     show_playlists = request['show_playlists']
@@ -59,7 +61,7 @@ def info(ctx, request):
     else:
         return gen_response.Failed(msg, failed=failed)
 
-def list_(ctx, request):
+def list_(ctx: Context, request: dict) -> Response:
     info = ctx.database.get_all_song_info()
     if request['show_aliases']:
         info = insert_songs_aliases(ctx, info)
@@ -69,7 +71,7 @@ def list_(ctx, request):
     
     return gen_response.Success('obtained information of all songs in library', sort_songs(info))
 
-def search(ctx, request):
+def search(ctx: Context, request: dict) -> Response:
     keywords = request['keyword']
     keywords = list(map(lambda k:k.lower(), keywords))
     is_or = request['or']
@@ -109,7 +111,7 @@ def search(ctx, request):
 
     return gen_response.Success(f'{len(results)} result(s) found in library', results)
 
-def add(ctx, request):
+def add(ctx: Context, request: dict) -> Response:
     paths = request['paths']
     aliases = request['aliases']
     loose_path = request['loose_path']
@@ -136,7 +138,7 @@ def add(ctx, request):
     
         return gen_response.BatchAuto('songs added to library', len(failed), len(paths), attachment=succeed, failed=failed)
 
-def del_(ctx, request):
+def del_(ctx: Context, request: dict) -> Response:
     songs = request['songs']
     cwd = request.get('cwd', None)
 
@@ -161,7 +163,7 @@ def del_(ctx, request):
 
         return gen_response.BatchAuto('songs removed from library', len(failed), len(songs), failed=failed)
 
-def prune(ctx, request):
+def prune(ctx: Context, request: dict) -> Response:
     from ..playback.helpers import remove_from_current
     dry_run = request['dry_run']
     info = ctx.database.get_all_song_info()
@@ -182,7 +184,7 @@ def prune(ctx, request):
 
         return gen_response.Success(f'{len(found)} song(s) with unavailable path(s) found and was removed from library', attachment=found, failed=failed)
 
-def scan(ctx, request):
+def scan(ctx: Context, request: dict) -> Response:
     missing_cwd = False
     cwd = request.get('cwd', None)
     directory = request['dir']
@@ -247,7 +249,7 @@ def scan(ctx, request):
         else:
             return gen_response.Failed(f'\"{directory}\" is not a valid directory')
 
-def reset(ctx, request):
+def reset(ctx: Context, request: dict) -> Response:
     ctx.database.reset()
     if ctx.playback.current_song_in_lib:
         path = ctx.playback.get_playing_info()['path']

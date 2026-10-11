@@ -1,4 +1,4 @@
-def process_request(args):
+def process_request(args: dict) -> dict:
     if args['action'] == 'reload':
         args['action'] = 'load_last'
 

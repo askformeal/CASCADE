@@ -1,10 +1,12 @@
 import random
+from typing import Callable
+from logging import Logger
 
 from src.utils.misc import base642bytes, hash_bytes
 from src.constants.frontend import MAX_COVER_CACHE
 
 class Cover:
-    def __init__(self, requester, placeholder, logger):
+    def __init__(self, requester: Callable, placeholder, logger: Logger):
         self.request = requester
         self.placeholder = placeholder
         self.logger = logger
@@ -12,7 +14,7 @@ class Cover:
         self.old_cover_hash = None
         self.cover_cache = {}
 
-    def get_cover(self, cover_hash):
+    def get_cover(self, cover_hash: str) -> bytes:
         if cover_hash != self.old_cover_hash:
             self.old_cover_hash = cover_hash
             if cover_hash in self.cover_cache.keys():

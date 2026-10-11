@@ -181,7 +181,7 @@ class Lyric(tk.Tk):
                 logger.exception('An error occurred during updating lyric board')
                 self.exit()
 
-    def _update_text(self, text):
+    def _update_text(self, text: str):
         self.lyric_label.config(text=text)
         self.update_idletasks()
         self._update_geo()
@@ -192,11 +192,11 @@ class Lyric(tk.Tk):
         y_pos = min(self.height, self.winfo_screenheight())
         self.geometry(f'+{x_pos}-{y_pos}')
 
-    def _start_move(self, event):
+    def _start_move(self, event: tk.Event):
         self.x = event.x
         self.y = event.y
 
-    def _move(self, event):
+    def _move(self, event: tk.Event):
         x = event.x_root-self.x
         y = event.y_root-self.y
         self.geometry(f'+{x}+{y}')
@@ -208,7 +208,7 @@ class Lyric(tk.Tk):
         self.x_offset = CONFIG.lyric_x_offset
         self._update_geo()
         
-    def _send_lyric_request(self, action, silent=False, **kwargs):
+    def _send_lyric_request(self, action: str, silent: bool = False, **kwargs) -> dict | None:
         request = {'action': action, 'source': 'lyric', 'notify_support': False, 'silent': silent, **kwargs}
         response = send_request(**request)
         if not silent:

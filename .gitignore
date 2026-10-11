@@ -24,6 +24,7 @@ wheels/
 env/
 venv/
 ENV/
+pyrightconfig.json
 tmp
 test_*.txt
 test_*.json

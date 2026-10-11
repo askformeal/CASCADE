@@ -3,11 +3,13 @@ from src.log import setup_logger
 from src.constants.paths.log import BACKEND_LOG
 from src.sentinels import SENTINELS
 from src import gen_response
+from src.gen_response import Response
+from src.backend.context import Context
 from .helpers import get_song
 
 logger = setup_logger(__name__, BACKEND_LOG)
 
-def list_(ctx, request):
+def list_(ctx: Context, request: dict) -> Response:
     song = request['song']
     cwd = request.get('cwd', None)
     
@@ -20,7 +22,7 @@ def list_(ctx, request):
     else:
         return gen_response.SongNotExist(song)
 
-def bind(ctx, request):
+def bind(ctx: Context, request: dict) -> Response:
     song = request['song']
     aliases = request['aliases']
     cwd = request.get('cwd', None)
@@ -47,7 +49,7 @@ def bind(ctx, request):
     
             return gen_response.BatchAuto('aliases bound to song', len(failed), len(aliases), failed=failed)
 
-def unbind(ctx, request):
+def unbind(ctx: Context, request: dict) -> Response:
     aliases = request['aliases']
     
     if len(aliases) == 0:

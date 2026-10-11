@@ -61,7 +61,7 @@ class EscapeCode:
         for name, value in vars(self).items():
             setattr(self, name, f'\033[{value}m')
 
-    def __getattribute__(self, name):
+    def __getattribute__(self, name: str) -> str:
         if CONFIG.escape_char or name.startswith('_'):
             return object.__getattribute__(self, name)
         else:

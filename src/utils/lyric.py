@@ -3,7 +3,7 @@ import re
 from src.constants.misc import ENCODING_CHAIN
 from src.sentinels import SENTINELS
 
-def parse_lyric(path='', content=None):
+def parse_lyric(path: str = '', content: str = None) -> list[list[int | str]]:
     timestamp = re.compile(r'\[(\d+):(\d+)(?:\.(\d+))?\]')
     if content is None:
         for encoding in ENCODING_CHAIN:
@@ -33,7 +33,7 @@ def parse_lyric(path='', content=None):
                     
     return result
 
-def get_lyric_line(lyric, pos, offset=0):
+def get_lyric_line(lyric: list[list[int, str]], pos: int, offset: int = 0):
     pos -= offset
     if len(lyric) == 0:
         return SENTINELS.EMPTY_LYRIC

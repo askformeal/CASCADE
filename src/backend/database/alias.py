@@ -1,8 +1,11 @@
 from .logger import logger
-from src.sentinels import SENTINELS
+from src.sentinels import SENTINELS, Sentinel
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .core import Database
 
 class AliasMixin:
-    def alias_exists(self, name):
+    def alias_exists(self: 'Database', name: str) -> bool:
         # is an alias exists
         row = self.execute('SELECT 1 FROM aliases WHERE name = ?', name).fetchone()
         if row is not None:
@@ -12,7 +15,7 @@ class AliasMixin:
         logger.debug(f'Check the existence of alias \"{name}\", result: {result}')
         return result
     
-    def bind_alias(self, id, alias):
+    def bind_alias(self: 'Database', id: int, alias: str) -> Sentinel:
         # bind an alias to a song
         if self.song_exists(id):
             if not self.alias_exists(alias):
@@ -26,7 +29,7 @@ class AliasMixin:
             logger.debug(f'Failed to bind alias \"{alias}\" to song with id {id} because the song does not exists')
             return SENTINELS.SONG_NOT_FOUND
     
-    def unbind_alias(self, alias):
+    def unbind_alias(self: 'Database', alias: str) -> Sentinel:
         # delete an alias
         if self.alias_exists(alias):
             self.execute('DELETE FROM aliases WHERE name = ?', alias)

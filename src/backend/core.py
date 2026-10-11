@@ -138,10 +138,10 @@ class Backend:
                 self.request_rate = 0
             time.sleep(LOOP_INTERVAL)
 
-    def get_request_rate(self):
+    def get_request_rate(self) -> int:
         return self.request_rate
 
-    def buffer_request(self, request, connection=None, address=None):
+    def buffer_request(self, request: dict, connection: socket.socket | None = None, address: tuple[str | int] | None = None):
         time_ = int(time.time())
         self.request_count[time_] = self.request_count.get(time_, 0) + 1
         if self.dying:
@@ -209,7 +209,7 @@ class Backend:
                     logger.setLevel(old_level)
                     self.database.silence_off()
 
-    def dispatch(self, request):
+    def dispatch(self, request: dict) -> gen_response.Response:
         response = gen_response.Undefined()
         request = self._process_request(request)
         if isinstance(request, gen_response.Response) and not request.ok():
@@ -226,7 +226,7 @@ class Backend:
 
         return response
 
-    def _process_request(self, request) -> dict | gen_response.Response:
+    def _process_request(self, request: dict) -> dict | gen_response.Response:
         if not isinstance(request, dict):
             return gen_response.Failed('request is not a dictionary')
         else:
@@ -299,7 +299,7 @@ class Backend:
 
                 Thread(target=self._handle_connection, args=(connection,address), daemon=True).start()
 
-    def _handle_connection(self, connection, address):
+    def _handle_connection(self, connection: socket.socket, address: tuple[str | int]):
         request = recv_json(connection)
         if request is None:
             connection.close()
@@ -312,7 +312,7 @@ class Backend:
         time.sleep(PLAY_DEAD_TIME)
         self.running = False
 
-    def exit_(self, error=False, msg=None):
+    def exit_(self, error: bool = False, msg: str | None = None):
         Thread(target=self.playback.stop, daemon=True).start()
         if msg is not None:
             if error:

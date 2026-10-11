@@ -13,9 +13,12 @@ from src.constants.config_gui import (
     UNSET_COLOR
     )
 from .editor import EditorMixin
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .core import ConfigGUI
 
 class Popup(tk.Toplevel, EditorMixin):
-    def __init__(self, master, info):
+    def __init__(self, master: 'ConfigGUI', info: dict):
         super().__init__(master=master)
         self.withdraw()
 
@@ -200,7 +203,7 @@ class Popup(tk.Toplevel, EditorMixin):
         unset_button.pack(side='left', padx=(10, 30))
         self.balloon.bind_widget(unset_button, 'Unset option (Del)')
 
-    def _on_confirm(self, *_, force=True):
+    def _on_confirm(self, *_, force: bool = True):
         value = self.get_val()
         if value != str(self.value) or force:
             self.set_value(self.name, value)
