@@ -12,7 +12,7 @@ def show_notifies(notifies: list[str] | None = None):
 
     if len(notifies) > 0:
         lines = [
-            f'Notifies from CASCADE backend ({len(notifies)}):'
+            f'{EC.white}Notifies from CASCADE backend ({len(notifies)}):{EC.reset}'
         ]
         lines += list(map(lambda x: f'  {x}', notifies))
         print(cli_box('\n'.join(lines)))
@@ -26,12 +26,12 @@ def show_option_info(info: dict):
     description = info.get('description', 'No Description')
     
     lines = [
-        f'Name: {name}',
-        f'Type: {type_}',
-        f'Value: {value}',
-        f'Source: {source}',
-        f'Default Value: {default}',
-        f'\n\"{description}\"'
+        f'{EC.blue}Name:{EC.reset} {name}',
+        f'{EC.blue}Type:{EC.reset} {type_}',
+        f'{EC.blue}Value:{EC.reset} {value}',
+        f'{EC.blue}Source:{EC.reset} {source}',
+        f'{EC.blue}Default Value:{EC.reset} {default}',
+        f'\n{EC.white}\"{EC.italics}{description}\"{EC.reset}'
         ]
     print(cli_box('\n'.join(lines)))
 
@@ -58,37 +58,37 @@ def show_song_info(
                 print(line)
             else:
                 if show_num:
-                    lines = [f'{i+1}. {output.display_name}']
+                    lines = [f'{EC.bold}{i+1}. {EC.white}{output.display_name}{EC.reset}']
                 else:
-                    lines = [f'{output.display_name}']
+                    lines = [f'{EC.bold}{EC.white}{output.display_name}{EC.reset}']
 
                 lines += [
-                    f'\nName: {output.name}',
-                    f'Artist: {output.artist}',
-                    f'Album: {output.album}',
-                    f'\nDuration: {output.duration}',
+                    f'\n{EC.blue}Name:{EC.reset} {output.name}',
+                    f'{EC.blue}Artist:{EC.reset} {output.artist}',
+                    f'{EC.blue}Album:{EC.reset} {output.album}',
+                    f'\n{EC.blue}Duration:{EC.reset} {output.duration}',
                 ]
 
                 if show_tech:
                     lines += [
-                        f'\nBitrate: {output.bitrate} kbps',
-                        f'Sample Rate: {output.sample_rate}',
-                        f'Channels: {output.channels}',
+                        f'\n{EC.yellow}Bitrate:{EC.reset} {output.bitrate} kbps',
+                        f'{EC.yellow}Sample Rate:{EC.reset} {output.sample_rate}',
+                        f'{EC.yellow}Channels:{EC.reset} {output.channels}',
                     ]
 
                 lines += [
-                    f'\nPath: {output.path}',
-                    f'Lyric Path: {output.lyric}',
-                    f'Lyric Offset: {output.lyric_offset}',
-                    f'\nLibrary ID: {output.lib_id}'
+                    f'\n{EC.blue}Path:{EC.reset} {output.path}',
+                    f'{EC.blue}Lyric Path:{EC.reset} {output.lyric}',
+                    f'{EC.blue}Lyric Offset:{EC.reset} {output.lyric_offset}',
+                    f'\n{EC.blue}Library ID:{EC.reset} {output.lib_id}'
                 ]
 
                 if show_aliases:
-                    lines += [f"\nAliases ({output.aliases_num}): {output.aliases}"]
+                    lines += [f"\n{EC.yellow}Aliases ({output.aliases_num}):{EC.reset} {output.aliases}"]
 
                 if show_playlists:
-                    lines += [f"\nPlaylists ({output.playlists_num}): {output.playlists}"]
+                    lines += [f"\n{EC.yellow}Playlists ({output.playlists_num}):{EC.reset} {output.playlists}"]
 
                 print(cli_box('\n'.join(lines)))
     else:
-        print(empty_msg)
+        print(f'{EC.red}{empty_msg}{EC.reset}')

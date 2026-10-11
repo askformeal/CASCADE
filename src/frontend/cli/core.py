@@ -134,10 +134,10 @@ def main() -> int:
         show_notifies(notifies)
 
         if code is None or msg is None:
-            print(f'{FAIL_TAG} Invalid response received from CASCADE backend')
+            print(cli_box(f'\n{FAIL_TAG} Invalid response received from CASCADE backend\n\n'))
 
         elif code == 0:
-            print(cli_box(f'{OK_TAG} {response['msg']}'))
+            print(cli_box(f'\n{OK_TAG} {response['msg']}\n\n'))
             if action == 'lib.add' and isinstance(attachment, list):
                 for add_response in attachment:
                     print(add_response['msg'])
@@ -152,49 +152,52 @@ def main() -> int:
                         output = SongOutput(attachment)
 
                         if output.playing_all:
-                            playlist = '[ Playing all songs in library ]'
+                            playlist = f'{EC.yellow}[ Playing all songs in library ]{EC.reset}'
                         else:
-                            playlist = f'Playlist: {output.playlist_name}'
+                            playlist = f'{EC.blue}Playlist:{EC.reset} {output.playlist_name}'
 
                         text = (
-                            f'\n{output.display_name} - {output.artist} [{output.current_num} / {output.playlist_len}]',
-                            f'[{output.time} / {output.length}] {output.percentage}%\n',
-                            f'In library: {output.in_lib}',
-                            f'Album: {output.album}',
+                            f'{EC.bold}{EC.white}{output.display_name} - {output.artist}{EC.reset} [{output.current_num} / {output.playlist_len}]',
+                            '',
+                            f'[{EC.yellow}{output.time}{EC.reset} / {EC.yellow}{output.length}{EC.reset}] {output.percentage}%',
+                            '',
+                            f'{EC.blue}In library:{EC.reset} {output.in_lib}',
+                            f'{EC.blue}Album:{EC.reset} {output.album}',
                             '',
                             playlist,
                             '',
-                            f'Path: {output.path}',
-                            f'Lyric File Path: {output.lyric}',
+                            f'{EC.blue}Path:{EC.reset} {output.path}',
+                            f'{EC.blue}Lyric File Path:{EC.reset} {output.lyric}',
                             '',
-                            f'Player status: {output.player_status}',
-                            f'Volume: {output.volume}%',
-                            f'Mute: {output.mute}',
+                            f'{EC.blue}Player status:{EC.reset} {output.player_status}',
+                            f'{EC.blue}Volume:{EC.reset} {output.volume}%',
+                            f'{EC.blue}Mute:{EC.reset} {output.mute}',
                             '',
-                            f'Shuffle: {output.shuffle}',
-                            f'Loop: {output.loop}',
-                            f'Reverse: {output.reverse}',
-                            f'Online Lyric: {output.online_lyric}',
+                            f'{EC.blue}Shuffle:{EC.reset} {output.shuffle}',
+                            f'{EC.blue}Loop:{EC.reset} {output.loop}',
+                            f'{EC.blue}Reverse:{EC.reset} {output.reverse}',
+                            f'{EC.blue}Online Lyric:{EC.reset} {output.online_lyric}',
                             '',
-                            f'Audio Engine: {output.engine}',
+                            f'{EC.blue}Audio Engine:{EC.reset} {output.engine}',
                             
                         )
 
                         if dev_status:
                             text += (
                                 '',
-                                f'{EC.bold}Development information{EC.reset}',
                                 '',
-                                f'Backend run time: {output.run_time}',
+                                f'{EC.bold}{EC.white}Development information{EC.reset}',
                                 '',
-                                f'Request rate: {output.request_rate}'
+                                f'{EC.blue}Backend run time:{EC.reset} {output.run_time}',
+                                '',
+                                f'{EC.blue}Request rate:{EC.reset} {output.request_rate}'
                             )
 
                         if output.dev:
                             text += (
                                 '',
                                 '',
-                                'DEVELOPMENT MODE ON'
+                                f'{EC.cyan}DEVELOPMENT MODE ON{EC.reset}'
                                 )
                         text = '\n'.join(text)
 
@@ -229,21 +232,20 @@ def main() -> int:
 
                     elif action == 'lib.scan' and args['dry_run']:
                         if len(attachment) > 0:
-                            print('-'*50)
                             for path in attachment:
                                 print(path)
                         else:
-                            print('No files to be shown')
+                            print(f'{EC.red}No files to be shown{EC.reset}')
 
                     elif action == 'lib.alias.list':
                         if len(attachment) > 0:
-                            print('Alias(es):')
+                            print(f'{EC.blue}Alias(es):{EC.reset}')
                             print(f'  {"\n  ".join(attachment)}')
                         else:
-                            print('No aliases are bound to this song')
+                            print(f'{EC.red}No aliases are bound to this song{EC.reset}')
 
                     elif action == 'lib.lyric.show':
-                        lines = [f"Path: {attachment.get('path', '?')}", '']
+                        lines = [f"{EC.blue}Path:{EC.reset} {attachment.get('path', '?')}", '']
                         for timestamp, text in attachment.get('lyric', []):
                             lines.append(f"[{format_time(timestamp)}] {text.strip().replace('\n', ' \\ ')}")
 
@@ -259,11 +261,11 @@ def main() -> int:
                                             show_playlists=args['show_playlists'])
                         else:
                             if len(attachment) > 0:
-                                print(f'Found {len(attachment)} playlist(s) in library:')
+                                print(f'{EC.white}Found {len(attachment)} playlist(s) in library:{EC.reset}')
                                 for playlist in attachment:
                                     print(f'  {playlist['name']}')
                             else:
-                                print('No playlists in library')
+                                print(f'{EC.red}No playlists in library{EC.reset}')
                     elif action == 'config.list':
                         for option_info in attachment:
                             show_option_info(option_info)
@@ -275,22 +277,22 @@ def main() -> int:
                         print(cli_box(attachment))
 
         elif code == 1:
-            print(cli_box(f'{FAIL_TAG} {response['msg']}'))
+            print(cli_box(f'\n{FAIL_TAG} {response['msg']}\n\n'))
 
         elif code == 2:
-            print(cli_box(f'{FAIL_TAG} failed to connect to CASCADE backend. You can try to use the start subcommand to start it'))
+            print(cli_box(f'\n{FAIL_TAG} failed to connect to CASCADE backend. You can try to use the start subcommand to start it\n\n'))
 
         elif code == 3:
-            print(cli_box(f'{FAIL_TAG} received an unexpected default response code from CASCADE backend which is not to be used under any circumstances. Please report this error'))
+            print(cli_box(f'\n{FAIL_TAG} received an unexpected default response code from CASCADE backend which is not to be used under any circumstances. Please report this error\n\n'))
 
         elif code == 4:
-            print(cli_box(f'{FAIL_TAG} CASCADE backend is exiting'))
+            print(cli_box(f'\n{FAIL_TAG} CASCADE backend is exiting\n\n'))
 
         elif code == 5:
-            print(cli_box(f'{FAIL_TAG} Token rejected, authorization failed'))
+            print(cli_box(f'\n{FAIL_TAG} Token rejected, authorization failed\n\n'))
 
         else:
-            print(cli_box(f'{FAIL_TAG} Unknown response code \"{code}\"'))
+            print(cli_box(f'\n{FAIL_TAG} Unknown response code \"{code}\"\n\n'))
 
         if len(failed) > 0:
             lines = [f'{EC.red}There are failed actions ({len(failed)}):{EC.rs}\n']
