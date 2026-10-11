@@ -78,6 +78,7 @@ def main() -> int:
 
     else:
         print_short = args.get('short', False)
+        print_full = args.get('full', False)
 
         if args['action'] == 'status' and args['dev']:
             dev_status = True
@@ -204,12 +205,19 @@ def main() -> int:
                         print(cli_box(text))
 
                     elif action == 'list':
-                        show_song_info(attachment, 'No songs are being played', short=print_short, show_num=True)
+                        show_song_info(
+                            attachment,
+                            'No songs are being played',
+                            short=print_short,
+                            full=print_full,
+                            show_num=True
+                            )
 
                     elif action == 'lib.info':
                         show_song_info(
                             attachment,
                             short=print_short,
+                            full=print_full,
                             show_tech=True, 
                             show_aliases=args['show_aliases'],
                             show_playlists=args['show_playlists']
@@ -220,15 +228,26 @@ def main() -> int:
                             attachment, 
                             'No songs in library',
                             short=print_short,
+                            full=print_full,
                             show_tech=args['show_tech'],
                             show_aliases=args['show_aliases'], 
                             show_playlists=args['show_playlists'])
 
                     elif action == 'lib.search':
-                        show_song_info(attachment, 'No results to be shown', short=print_short)
+                        show_song_info(
+                            attachment,
+                            'No results to be shown',
+                            short=print_short,
+                            full=print_full
+                            )
 
                     elif action == 'lib.prune':
-                        show_song_info(attachment, 'No songs to be shown', short=print_short)
+                        show_song_info(
+                            attachment,
+                            'No songs to be shown',
+                            short=print_short,
+                            full=print_full
+                            )
 
                     elif action == 'lib.scan' and args['dry_run']:
                         if len(attachment) > 0:
@@ -256,6 +275,7 @@ def main() -> int:
                             show_song_info(attachment, 
                                             'Playlist empty',
                                             short=print_short,
+                                            full=print_full,
                                             show_tech=args['show_tech'],
                                             show_aliases=args['show_aliases'],
                                             show_playlists=args['show_playlists'])

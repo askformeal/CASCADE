@@ -67,7 +67,7 @@
 - [X] GUI frontend
 - [X] Manually managing playlist sorting
 - [X] CLI: add -s/--short to only show the name and ID of each song in a list
-- [ ] CLI: gradually print list - enter to print the next page, q to quit. Similar to git. Use --all to print all at once
+- [X] CLI: gradually print list - enter to print the next page, q to quit. Similar to git. Use --all to print all at once
 - [ ] GUI library manager
 - [ ] HTTP frontend
 - [ ] Audio visualization

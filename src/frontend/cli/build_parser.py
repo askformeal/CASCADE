@@ -12,6 +12,7 @@ class Builder:
 
         self.list_song = argparse.ArgumentParser(add_help=False)
         self.list_song.add_argument('-s', '--short', action='store_true', help='Show song information concisely')
+        self.list_song.add_argument('-f', '--full', action='store_true', help='Print the whole output at once')
 
     def _path(self, val) -> str:
         return str(Path(val).absolute())

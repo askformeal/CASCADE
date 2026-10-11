@@ -1,3 +1,7 @@
+import sys
+
+import readchar
+
 from src.config import CONFIG
 from .song_output import SongOutput
 from src.utils.tui import box
@@ -39,6 +43,7 @@ def show_song_info(
         info: list[dict] | dict,
         empty_msg: str = 'No information to be shown',
         short: bool = False,
+        full: bool = False,
         show_aliases: bool = False,
         show_playlists: bool = False,
         show_num: bool = False,
@@ -90,5 +95,28 @@ def show_song_info(
                     lines += [f"\n{EC.yellow}Playlists ({output.playlists_num}):{EC.reset} {output.playlists}"]
 
                 print(cli_box('\n'.join(lines)))
+
+                if not full and sys.stdin.isatty():
+                    key = None
+                    print(
+                        f'\n  {EC.white}{len(info)-i-1} left{EC.reset}      {EC.green}Enter - Next{EC.reset}        {EC.red}q - Quit{EC.reset}',
+                        end='',
+                        flush=True
+                        )
+                    while key != readchar.key.ENTER:
+                        try:
+                            key = readchar.readkey()
+                            if key == 'q':
+                                break
+                        except KeyboardInterrupt:
+                            break
+                    else:
+                        print('\033[1A\r\033[J')
+                        continue
+
+                    print('\033[1A\r\033[J')
+                    return
+                    
+
     else:
         print(f'{EC.red}{empty_msg}{EC.reset}')
