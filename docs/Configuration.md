@@ -24,6 +24,9 @@
 | `player_timeout`                    | `playback`   | `1`                         | Timeout of backend waiting for a player action to take effect (seconds)                     |
 | `dash_volume_step`                  | `dash`       | `5`                         | Volume increase/decrease step on the dashboard                                              |
 | `dash_pos_step`                     | `dash`       | `5`                         | Position forward/backward step on the dashboard                                             |
+| `gui_font`                          | `appearance` | *(empty)*                   | Font family of the GUI                                                                      |
+| `gui_lyric_wrap`                    | `appearance` | `50`                        | The maximum length of a lyric line on the GUI (characters)                                     |
+| `config_gui_font`                   | `appearance` | *(empty)*                   | Font family of the Config GUI                                                               |
 | `escape_char`                       | `appearance` | `true`                      | Use ANSI escape codes in the CLI and dashboard output                                       |
 | `cli_box_style`                     | `appearance` | `rounded`                   | Box style of the CLI                                                                        |
 | `dash_box_style`                    | `appearance` | `rounded`                   | Box style of the dashboard                                                                  |
@@ -43,3 +46,7 @@
 | `lyric_bg_color`                    | `appearance` | `#111111`                   | Background color of the lyric board (hex)                                                   |
 | `lyric_opacity`                     | `appearance` | `40`                        | Lyric board opacity when not hovered (0~100, 100 = fully opaque)                            |
 | `config_default_remote`             | `config_gui` | `true`                      | Start the configure GUI in remote mode                                                      |
+| `gui_volume_step`                   | `gui`        | `5`                         | Volume increase/decrease step on the GUI                                                    |
+| `gui_pos_step`                      | `gui`        | `5`                         | Position forward/backward step on the GUI (seconds)                                                  |
+| `gui_pos_step_long`                 | `gui`        | `15`                        | Long position forward/backward step on the GUI (seconds)                                             |
+| `gui_offset_step`                   | `gui`        | `100`                       | Lyric offset increase/decrease step on the GUI (ms)                                         |

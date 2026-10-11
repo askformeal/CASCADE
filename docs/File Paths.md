@@ -24,6 +24,7 @@
 | ---------------- | -------------------------- |
 | Backend          | `cascade.log`            |
 | IPC              | `cascade-socket.log`     |
+| CLI              | `cascade-cli.log`        |
 | Media Key Daemon | `cascade-hotkey.log`     |
 | System Tray      | `cascade-tray.log`       |
 | Lyric Board      | `cascade-lyric.log`      |

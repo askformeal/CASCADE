@@ -7,7 +7,7 @@
 
 ## Playback
 
-- Control it via terminal command / TUI / tray icon / media key
+- Control it via terminal command / GUI / TUI / tray icon / media key
 - Memorized progress - continue where you left
 - Resume last session on startup - continue to continue where you left
 - Loop / Shuffle / Reverse mode

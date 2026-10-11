@@ -1,5 +1,31 @@
 # CLI Commands
 
+## General
+
+`-v`/`--verbose` print log to console.
+
+`-V`/`--version` show version information.
+
+`-h`/`--help` show help message.
+
+## Show list of songs
+
+This kind of command includes:
+
+- `list`
+- `lib info`
+- `lib list`
+- `lib search`
+- `lib prune`
+- `lib playlist list`
+
+All of them have these options available:
+
+`-s`/`--short` show list of songs in the short format.
+
+`-f`/`--full` print full list of songs at once without paging.
+
+
 ## Lifecycle
 
 #### `cascade start` / `cascade reboot`
@@ -10,7 +36,7 @@ Start or restart backend.
 
 `--dev`: Boot with an alternative development database.
 
-#### `cascade exit`
+#### `cascade exit (alias: quit)`
 
 Exit the backend
 
@@ -20,7 +46,7 @@ Terminate the backend process. May cause unpredictable consequences.
 
 ## Playback
 
-#### `cascade status`
+#### `cascade status (alias: st)`
 
 Show information about the current playback session.
 
@@ -50,9 +76,19 @@ Show information about the current playback session.
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
 
-#### `cascade open <song>`
+#### `cascade open <song> [-t/--type <type>]`
 
 Open a song / playlist.
+
+`-t`/`--type` can be:
+
+- `auto`: (default) try each type automatically in the order of `song` -> `playlist` -> `file`.
+
+- `song`: open a song in library.
+
+- `playlist`: open a whole playlist.
+
+- `file`: open a file on disk by path.
 
 #### `cascade play-all`
 
@@ -70,7 +106,7 @@ Control play / pause.
 
 Stop playback.
 
-#### `cascade prev` / `cascade next`
+#### `cascade prev (alias: previous)` / `cascade next`
 
 Switch to the previous / next song.
 
@@ -129,6 +165,10 @@ Toggle mute mode.
 > Note: if negative time is parsed as an option, wrap it in quotes like `cascade seek "-1:30"`
 
 ## Library
+
+The alias of `lib` is `library`
+
+---
 
 #### `cascade lib list`
 
@@ -206,6 +246,10 @@ Scan the library for songs whose file no longer exists and remove them.
 
 ### Metadata
 
+The alias of `meta` is `metadata`
+
+---
+
 #### `cascade lib meta set <song>`
 
 Set the metadata of a song.
@@ -272,6 +316,10 @@ Unbind aliases from their songs.
 
 ### Playlist
 
+The alias of `playlist` is `pl`
+
+---
+
 #### `cascade lib playlist list <playlist>`
 
 List all songs in a playlist. If `<playlist>` argument is not provided, list all playlists in library.
@@ -298,7 +346,23 @@ Remove songs from a playlist
 
 Delete a playlist from library. Will not delete the songs in it.
 
+#### `cascade lib playlist swap <playlist> <song1> <song2>`
+
+Swap the position of two songs in a playlist.
+
+#### `cascade lib playlist move <playlist> <song> <position>`
+
+Move the position of a song in a playlist.
+
+Use negative position to count backward.
+
+#### `cascade lib playlist sort <playlist>`
+
+Sort a playlist by filename.
+
 ## Configure
+
+The alias of `config` is `configure`
 
 `-d` / `--direct` / `--no-direct`: Access configuration directly without going through backend. Can only access options on the local machine. Available for all configure command.
 
@@ -345,11 +409,15 @@ Open configure GUI.
 
 > For this command, `--direct` disable remote mode on startup and `--no-direct` will enable it. Both will override the `config_default_remote` option.
 
-## Dashboard
+## Frontend
 
 #### `cascade dash`
 
 Open dashboard.
+
+#### `cascade gui`
+
+Open GUI
 
 ## Reference a song
 
