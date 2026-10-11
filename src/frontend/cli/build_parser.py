@@ -6,6 +6,13 @@ from src.constants.cli import HELP_DESCRIPTION
 from src.utils.text import strlen
 
 class Builder:
+    def __init__(self):
+        self.base = argparse.ArgumentParser(add_help=False)
+        self.base.add_argument('-v', '--verbose', action='store_true', help='Print log to console')
+
+        self.list_song = argparse.ArgumentParser(add_help=False)
+        self.list_song.add_argument('-s', '--short', action='store_true', help='Show song information concisely')
+
     def _path(self, val) -> str:
         return str(Path(val).absolute())
 
@@ -42,9 +49,6 @@ class Builder:
         return description
 
     def build_parser(self) -> argparse.ArgumentParser:
-        self.base = argparse.ArgumentParser(add_help=False)
-        self.base.add_argument('-v', '--verbose', action='store_true', help='Print log to console')
-
         parser = argparse.ArgumentParser(
             prog='cascade',
             description=self._get_description(),
@@ -87,7 +91,7 @@ class Builder:
 
         stop_parser = self._add_parser(command_sub, 'stop', help='Stop playing')
 
-        list_parser = self._add_parser(command_sub, 'list', help='Show current playlist')
+        list_parser = self._add_parser(command_sub, 'list', parents=[self.list_song], help='Show current playlist')
 
         loop_parser = self._add_parser(command_sub, 'loop', help='Toggle loop mode')
 
@@ -123,17 +127,17 @@ class Builder:
 
         lib_sub = lib_parser.add_subparsers(dest='lib_action', required=True)
 
-        lib_info_parser = self._add_parser(lib_sub, 'info', help='Show information of a song')
+        lib_info_parser = self._add_parser(lib_sub, 'info', parents=[self.list_song], help='Show information of a song')
         lib_info_parser.add_argument('songs', type=str, nargs='+', help='Song to show')
         lib_info_parser.add_argument('-a', '--show-aliases', action='store_true', help='Show aliases of the song')
         lib_info_parser.add_argument('-p', '--show-playlists', action='store_true', help='Show playlists the song is in')
 
-        lib_list_parser = self._add_parser(lib_sub, 'list', help='Show all songs in library')
+        lib_list_parser = self._add_parser(lib_sub, 'list', parents=[self.list_song], help='Show all songs in library')
         lib_list_parser.add_argument('-a', '--show-aliases', action='store_true', help='Show aliases of songs')
         lib_list_parser.add_argument('-p', '--show-playlists', action='store_true', help='Show playlists each song is in')
         lib_list_parser.add_argument('-t', '--show-tech', action='store_true', help='Show technical information')
 
-        lib_search_parser = self._add_parser(lib_sub, 'search', help='Search for songs in library')
+        lib_search_parser = self._add_parser(lib_sub, 'search', parents=[self.list_song], help='Search for songs in library')
         lib_search_parser.add_argument('keyword', type=str, nargs='+', help='Keyword to search')
         lib_search_parser.add_argument('-o', '--or', action='store_true', help='Get all results that match any one the keywords')
 
@@ -148,7 +152,7 @@ class Builder:
         lib_del_parser = self._add_parser(lib_sub, 'del', help='Delete songs from library')
         lib_del_parser.add_argument('songs', type=str, nargs='+', help='Songs to delete')
 
-        lib_prune_parser = self._add_parser(lib_sub, 'prune', help='Delete all songs which file no longer exists')
+        lib_prune_parser = self._add_parser(lib_sub, 'prune', parents=[self.list_song], help='Delete all songs which file no longer exists')
         lib_prune_parser.add_argument('-d', '--dry-run', action='store_true', help='Show found files without deleting')
 
         lib_scan_parser = self._add_parser(lib_sub, 'scan', help='Scan a directory for all supported audio files and add them to library')
@@ -217,7 +221,7 @@ class Builder:
         playlist_parser = self._add_parser(lib_sub, 'playlist', aliases=['pl'], help='Manage playlists')
         playlist_sub = playlist_parser.add_subparsers(dest='playlist_action', required=True)
 
-        playlist_list_parser = self._add_parser(playlist_sub, 'list', help='Show all songs in a playlist. Show names of all playlists in library if no playlists are provided')
+        playlist_list_parser = self._add_parser(playlist_sub, 'list', parents=[self.list_song], help='Show all songs in a playlist. Show names of all playlists in library if no playlists are provided')
         playlist_list_parser.add_argument('playlist', type=str, nargs='?', default=None, help='Name of playlist to list')
         playlist_list_parser.add_argument('-a', '--show-aliases', action='store_true', help='Show aliases of songs')
         playlist_list_parser.add_argument('-p', '--show-playlists', action='store_true', help='Show playlists each song is in')

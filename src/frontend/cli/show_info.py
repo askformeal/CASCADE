@@ -1,6 +1,7 @@
 from src.config import CONFIG
 from .song_output import SongOutput
 from src.utils.tui import box
+from src.utils.escape_code import ESCAPE_CODE as EC
 
 def cli_box(*args, **kwargs) -> str:
     return box(*args, style=CONFIG.cli_box_style, **kwargs)
@@ -37,49 +38,57 @@ def show_option_info(info: dict):
 def show_song_info(
         info: list[dict] | dict,
         empty_msg: str = 'No information to be shown',
+        short: bool = False,
         show_aliases: bool = False,
         show_playlists: bool = False,
         show_num: bool = False,
-        show_tech: bool = False
+        show_tech: bool = False,
         ):
     if not isinstance(info, (list, tuple)):
         info = (info,)
     if len(info) > 0:
+        print()
         for i, song in enumerate(info):
             output = SongOutput(song)
 
-            if show_num:
-                lines = [f'{i+1}. {output.display_name}']
+            if short:
+                line = f'{EC.cyan}ID {output.lib_id}{EC.reset} {EC.dim}-{EC.reset} {EC.blue}{output.display_name}{EC.reset}'
+                if show_num:
+                    line = f'{EC.italics}{EC.blue}{i+1:02g}.{EC.reset} {line}'
+                print(line)
             else:
-                lines = [f'{output.display_name}']
+                if show_num:
+                    lines = [f'{i+1}. {output.display_name}']
+                else:
+                    lines = [f'{output.display_name}']
 
-            lines += [
-                f'\nName: {output.name}',
-                f'Artist: {output.artist}',
-                f'Album: {output.album}',
-                f'\nDuration: {output.duration}',
-            ]
-
-            if show_tech:
                 lines += [
-                    f'\nBitrate: {output.bitrate} kbps',
-                    f'Sample Rate: {output.sample_rate}',
-                    f'Channels: {output.channels}',
+                    f'\nName: {output.name}',
+                    f'Artist: {output.artist}',
+                    f'Album: {output.album}',
+                    f'\nDuration: {output.duration}',
                 ]
 
-            lines += [
-                f'\nPath: {output.path}',
-                f'Lyric Path: {output.lyric}',
-                f'Lyric Offset: {output.lyric_offset}',
-                f'\nLibrary ID: {output.lib_id}'
-            ]
+                if show_tech:
+                    lines += [
+                        f'\nBitrate: {output.bitrate} kbps',
+                        f'Sample Rate: {output.sample_rate}',
+                        f'Channels: {output.channels}',
+                    ]
 
-            if show_aliases:
-                lines += [f"\nAliases ({output.aliases_num}): {output.aliases}"]
+                lines += [
+                    f'\nPath: {output.path}',
+                    f'Lyric Path: {output.lyric}',
+                    f'Lyric Offset: {output.lyric_offset}',
+                    f'\nLibrary ID: {output.lib_id}'
+                ]
 
-            if show_playlists:
-                lines += [f"\nPlaylists ({output.playlists_num}): {output.playlists}"]
+                if show_aliases:
+                    lines += [f"\nAliases ({output.aliases_num}): {output.aliases}"]
 
-            print(cli_box('\n'.join(lines)))
+                if show_playlists:
+                    lines += [f"\nPlaylists ({output.playlists_num}): {output.playlists}"]
+
+                print(cli_box('\n'.join(lines)))
     else:
         print(empty_msg)

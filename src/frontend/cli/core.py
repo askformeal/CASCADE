@@ -28,7 +28,6 @@ def main() -> int:
     args = vars(parser.parse_args())
     args = process_request(args)
 
-
     logger = setup_logger(
         __name__, 
         CLI_LOG, 
@@ -78,6 +77,8 @@ def main() -> int:
         ConfigGUI(args['direct']).run()
 
     else:
+        print_short = args.get('short', False)
+
         if args['action'] == 'status' and args['dev']:
             dev_status = True
         else:
@@ -200,26 +201,31 @@ def main() -> int:
                         print(cli_box(text))
 
                     elif action == 'list':
-                        show_song_info(attachment, 'No songs are being played', show_num=True)
+                        show_song_info(attachment, 'No songs are being played', short=print_short, show_num=True)
 
                     elif action == 'lib.info':
-                        show_song_info(attachment, 
-                                        show_tech=True, 
-                                        show_aliases=args['show_aliases'],
-                                        show_playlists=args['show_playlists'])
+                        show_song_info(
+                            attachment,
+                            short=print_short,
+                            show_tech=True, 
+                            show_aliases=args['show_aliases'],
+                            show_playlists=args['show_playlists']
+                            )
 
                     elif action == 'lib.list':
-                        show_song_info(attachment, 
-                                        'No songs in library', 
-                                        show_tech=args['show_tech'],
-                                        show_aliases=args['show_aliases'], 
-                                        show_playlists=args['show_playlists'])
+                        show_song_info(
+                            attachment, 
+                            'No songs in library',
+                            short=print_short,
+                            show_tech=args['show_tech'],
+                            show_aliases=args['show_aliases'], 
+                            show_playlists=args['show_playlists'])
 
                     elif action == 'lib.search':
-                        show_song_info(attachment, 'No results to be shown')
+                        show_song_info(attachment, 'No results to be shown', short=print_short)
 
                     elif action == 'lib.prune':
-                        show_song_info(attachment, 'No songs to be shown')
+                        show_song_info(attachment, 'No songs to be shown', short=print_short)
 
                     elif action == 'lib.scan' and args['dry_run']:
                         if len(attachment) > 0:
@@ -247,6 +253,7 @@ def main() -> int:
                         if args['playlist'] is not None:
                             show_song_info(attachment, 
                                             'Playlist empty',
+                                            short=print_short,
                                             show_tech=args['show_tech'],
                                             show_aliases=args['show_aliases'],
                                             show_playlists=args['show_playlists'])
