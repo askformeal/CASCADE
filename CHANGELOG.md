@@ -4,6 +4,10 @@
 
 ### Added
 
+#### Backend
+
+- Timestamp to notifies.
+
 #### CLI
 
 - `--by-name` option for `lib playlist sort` command to sort by name in metadata.

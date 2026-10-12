@@ -1,4 +1,5 @@
 import sys
+import time
 from datetime import datetime
 
 import readchar
@@ -7,6 +8,7 @@ from src.config import CONFIG
 from .song_output import SongOutput
 from src.utils.tui import box
 from src.utils.escape_code import ESCAPE_CODE as EC
+from src.utils.time_ import format_time
 
 def cli_box(*args, **kwargs) -> str:
     return box(*args, style=CONFIG.cli_box_style, **kwargs)
@@ -22,7 +24,8 @@ def show_notifies(notifies: list[list[float, str]] | None = None):
         ]
         for notify in notifies:
             time_ = datetime.fromtimestamp(round(notify[0]))
-            lines.append(f'{EC.cyan}{EC.bold}{time_}{EC.reset}    {notify[1]}')
+            lag = format_time(time.time() - notify[0], 'sec', format_='text')
+            lines.append(f'{EC.cyan}{EC.bold}{time_}{EC.reset}    {notify[1]} {EC.italics}{EC.yellow}({lag} ago){EC.reset}')
         print(cli_box('\n'.join(lines)))
 
 def show_option_info(info: dict):

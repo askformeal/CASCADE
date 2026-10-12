@@ -29,6 +29,7 @@ from src.config import CONFIG
 from src.frontend.client import send_request
 from src.frontend.snapshot import Snapshot
 from src.frontend.tkinter_tools.balloon import Balloon
+from src.utils.time_ import format_time
 from .empty import GUI_EMPTY as EMPTY
 from .main_window import MainWinMixin
 from .playback import PlaybackMixin
@@ -210,11 +211,12 @@ class GUI(tk.Tk, MainWinMixin, PlaybackMixin, PlaylistMixin, LyricMixin, Lifecyc
             self._show_notifies(notifies)
         return response
 
-    def _show_notifies(self, notifies: list[str]):
+    def _show_notifies(self, notifies: list[list[float, str]]):
         for notify in notifies:
             time_ = datetime.fromtimestamp(round(notify[0]))
+            lag = format_time(time.time() - notify[0], 'sec', format_='text')
 
-            self.after(0, lambda t=f'From: {time_}', n=notify[1]: messagebox.showinfo(
+            self.after(0, lambda t=f'From: {time_} ({lag} ago)', n=notify[1]: messagebox.showinfo(
                 'Notify',
                 message=n,
                 detail=t

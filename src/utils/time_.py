@@ -2,16 +2,29 @@ from typing import Literal
 
 from src.sentinels import SENTINELS, Sentinel
 
-def format_time(raw_time: int | None, unit: Literal['ms', 'sec'] = 'ms') -> str:
+def format_time(
+        raw_time: int | None,
+        unit: Literal['ms', 'sec'] = 'ms',
+        format_: Literal['colon', 'text'] = 'colon'
+        ) -> str:
+
+    if format_ == 'colon':
+        empty = '--:--:--'
+        zero = '00:00:00'
+    
+    elif format_ == 'text':
+        empty = '-- seconds'
+        zero = '0 seconds'
+
     if raw_time is None:
-        return '--:--:--'
+        return empty
     else:
-        raw_time = int(raw_time)
+        raw_time = round(float(raw_time))
 
         if raw_time == -1:
-            return '--:--:--'
+            return empty
         elif raw_time == 0:
-            return '00:00:00'
+            return zero
 
         if unit == 'sec':
             ms = raw_time * 1000
@@ -21,7 +34,16 @@ def format_time(raw_time: int | None, unit: Literal['ms', 'sec'] = 'ms') -> str:
         hours, remain = divmod(ms, 3600000) # 3600000 = 1000 * 60 * 60
         minutes, remain = divmod(remain, 60000) # 60000 = 1000 * 60
         seconds = remain // 1000
-        return f'{hours:02}:{minutes:02}:{seconds:02}'
+
+        if format_ == 'colon':
+            return f'{hours:02}:{minutes:02}:{seconds:02}'
+        elif format_ == 'text':
+            text = f'{seconds} seconds'
+            if minutes > 0:
+                text = f'{minutes} minutes ' + text
+            if hours > 0:
+                text = f'{hours} hours ' + text
+            return text
         
 def parse_time(time: str) -> int | Sentinel:
     # Technically it can parse things like 999999:9999999:999999 but I decided to count that as a feature

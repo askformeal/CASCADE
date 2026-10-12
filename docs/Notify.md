@@ -10,6 +10,16 @@ Currently, there are **TWO** notify-supported frontends.
 
 If notifies are received in the response of a CLI command, they will be shown in the terminal output.
 
+```
+╭───────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│  Notifies from CASCADE backend (1):                                                                               │
+│                                                                                                                   │
+│  2026-10-12 21:51:24    J. Doe, welcome to Command-Line Audio Stream Capture And Decoding Engine (0 seconds ago)  │
+╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+```
+
 ## GUI
 
 Unlike the CLI, the GUI polls the backend continuously and will receive notifies in near real-time, and will show them in a pop-up window.
+
+![Notify on GUI](images/gui_notify.png)
