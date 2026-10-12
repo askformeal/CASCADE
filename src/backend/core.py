@@ -56,7 +56,7 @@ class Backend:
         self.dying = False
         
         self.dispatch_buffer = queue.Queue() # single way
-        self.notifies = []
+        self.notifies = queue.Queue()
         
         self.request_count = {} # request number of the last n active seconds
         self.request_rate = 0 # average request per second
@@ -74,10 +74,11 @@ class Backend:
                 exit_=self.exit_,
                 start_time=time.time(),
                 dev=self.dev,
+                notify=self.notify,
                 get_request_rate=self.get_request_rate
             )
 
-            self.notifies.append(f'{CONFIG.username}, welcome to Command-Line Audio Stream Capture And Decoding Engine') # just for fun
+            self.notify(f'{CONFIG.username}, welcome to Command-Line Audio Stream Capture And Decoding Engine') # just for fun
 
             if CONFIG.proxy != '':
                 os.environ['HTTP_PROXY'] = CONFIG.proxy
@@ -92,6 +93,9 @@ class Backend:
             logger.debug(f'Proxy whitelist: {os.environ.get('NO_PROXY', '(empty)')}')
 
             logger.debug(f'{__name__} initiated')
+
+    def notify(self, text: str):
+        self.notifies.put(text)
 
     def run(self):
         if self.running:
@@ -188,8 +192,13 @@ class Backend:
                     response = gen_response.Failed(f'an internal backend error occurred during dispatching of request: \"{e}\"')
 
                 if connection is not None and request.get('notify_support', False):
-                    response.notifies = self.notifies.copy()
-                    self.notifies = []
+                    response.notifies = []
+                    while True:
+                        try:
+                            response.notifies.append(self.notifies.get(block=False))
+                        except queue.Empty:
+                            break
+                        
                     logger.info(f'Notifies cleared: {response.notifies}')
 
                 if self.dev:

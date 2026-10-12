@@ -11,4 +11,5 @@ class Context:
     exit_: Callable
     start_time: int
     dev: bool
+    notify: Callable
     get_request_rate: Callable

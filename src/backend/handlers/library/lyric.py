@@ -1,17 +1,15 @@
-from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+from threading import Thread
 
 from src.log import setup_logger
 from src.constants.paths.log import BACKEND_LOG
-from src.constants.misc import ENCODING
-from src.constants.backend import LYRIC_FETCH_MAX_WORKERS
 from src.sentinels import SENTINELS
 from src import gen_response
 from src.gen_response import Response
 from src.backend.context import Context
 from src.utils.misc import get_song_display_name
 from src.utils.lyric import parse_lyric
-from .helpers import get_song, fetch_lyric
+from .helpers import get_song, batch_fetch
 
 logger = setup_logger(__name__, BACKEND_LOG)
 
@@ -73,9 +71,7 @@ def fetch(ctx: Context, request: dict) -> Response:
     cwd = request.get('cwd', None)
 
     failed = []
-    paths = {}
-    names = {}
-    search_terms = []
+    args = []
 
     if len(songs) == 0:
         return gen_response.EmptyList('songs')
@@ -87,33 +83,19 @@ def fetch(ctx: Context, request: dict) -> Response:
             elif song_id is SENTINELS.NOT_IN_LIB:
                 failed.append(gen_response.SongNotExist(song))
             else:
-                names[song_id] = song
                 info = ctx.database.get_song_info(song_id)[0]
 
                 path = str(Path(info['path']).with_suffix('.lrc'))
-                paths[song_id] = path
 
                 name = get_song_display_name(info)
                 artist = info.get('artist', None)
                 if artist is None:
                     artist = ''
 
-                search_terms.append((song_id, f'{name} {artist}'.strip()))
+                search_term = f'{name} {artist}'.strip()
+                args.append((song_id, song, path, search_term))
 
-        with ThreadPoolExecutor(max_workers=LYRIC_FETCH_MAX_WORKERS) as pool:
-            results = list(pool.map(fetch_lyric, search_terms))
+        if len(songs) - len(failed) > 0:
+            Thread(target=lambda: batch_fetch(ctx, args), daemon=True).start()
 
-        for song_id, lrc in results:
-            if lrc is None:
-                failed.append(gen_response.Failed(f'can not find lyric of {names[song_id]}'))
-            else:
-                path = paths[song_id]
-                try:
-                    with open(path, 'w', encoding=ENCODING) as f:
-                        f.write(lrc)
-                except OSError as e:
-                    failed.append(gen_response.FileIOFailed(path, e))
-                else:
-                    ctx.database.set_song_meta(song_id, 'lyric', path)
-
-        return gen_response.BatchAuto('Lyric fetched', len(failed), len(songs), failed=failed)
+        return gen_response.BatchAuto('Started fetching', len(failed), len(songs), failed=failed)

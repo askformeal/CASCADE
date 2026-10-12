@@ -1,9 +1,12 @@
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import syncedlyrics
 
 from src.log import setup_logger
 from src.constants.paths.log import BACKEND_LOG
+from src.constants.backend import LYRIC_FETCH_MAX_WORKERS
+from src.constants.misc import ENCODING
 from src import gen_response
 from src.backend.context import Context
 from src.sentinels import SENTINELS, Sentinel
@@ -146,10 +149,40 @@ def add_song(
     else:
         return response
 
-def fetch_lyric(song: tuple[int, str]) -> tuple[int, str | None]:
-    song_id, search_term = song
-    lrc = syncedlyrics.search(
-        search_term,
-        synced_only=True,
-    )
-    return song_id, lrc
+def batch_fetch(ctx: Context, args: list[tuple]):
+    logger.info(f'Start fetching lyric for {len(args)} song(s)...')
+
+    with ThreadPoolExecutor(max_workers=LYRIC_FETCH_MAX_WORKERS) as pool:
+        results = list(pool.map(lambda arg: fetch_lyric(*arg), args))
+
+    ok = 0
+    for result in results:
+        song_id, song_name, path, lrc = result
+        if lrc is None:
+            logger.info(f'Failed to fetch lyric for \"{song_name}\": can not find lyric')
+        else:
+            try:
+                with open(path, 'w', encoding=ENCODING) as f:
+                    f.write(lrc)
+            except OSError as e:
+                logger.warning(f'Failed to fetch lyric for \"{song_name}\": failed to write into {path}: \"{e}\"')
+            else:
+                ctx.database.set_song_meta(song_id, 'lyric', path)
+                logger.info(f'Fetched lyric for \"{song_name}\": saved to {path}')
+                ok += 1
+    ctx.notify(f'[{ok}/{len(results)}] lyric(s) fetched successfully')
+
+def fetch_lyric(song_id: int, song_name: str, path: str, search_term: str) -> tuple[int, str, str, str | None]:
+    logger.info(f'Started fetching lyric with: {search_term}')
+    try:
+        lrc = syncedlyrics.search(
+            search_term,
+            synced_only=True,
+        )
+    except Exception as e:
+        logger.warning(f'Failed to fetch lyric with {search_term}: {e}')
+        lrc = None
+    else:
+        logger.info(f'Lyric fetched with: {search_term}')
+
+    return song_id, song_name, path, lrc
