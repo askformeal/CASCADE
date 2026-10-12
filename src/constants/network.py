@@ -184,7 +184,8 @@ ACTION_KEYS = {
         'song_ids': (IterType(int), True)
     },
     'lib.playlist.sort': {
-        'playlist': (str, True)
+        'playlist': (str, True),
+        'by_name': (CONVERTER.boolean, False, False)
     },
     'config.show': {
         'option': (str, True)

@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## [Unreleased]
+
+### Added
+
+### CLI
+
+- `--by-name` option for `lib playlist sort` command to sort by name in metadata.
+
 ## [0.57.0] - 2026-10-11
 
 ### Added

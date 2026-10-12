@@ -82,8 +82,16 @@ def hex_color_gray(color: str) -> int:
     red, green, blue = hex_color2rgb(color)
     return round(0.299 * red + 0.587 * green + 0.114 * blue)
 
-def sort_songs(info: list[dict]) -> list:
-    return sorted(info, key=lambda x: Path(x['path']).name.lower())
+def sort_songs(info: list[dict], by_name=False) -> list:
+    def key_func(song):
+        name = song['name']
+        filename = Path(song['path']).name.lower()
+        if by_name and name is not None:
+            return name.lower()
+        else:
+            return filename
+
+    return sorted(info, key=key_func)
 
 def get_song_display_name(info: dict) -> str | None:
     name = info.get('name', None)

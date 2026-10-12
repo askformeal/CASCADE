@@ -254,6 +254,7 @@ class Builder:
 
         playlist_sort_parser = self._add_parser(playlist_sub, 'sort', help='Sort a playlist by each song\'s filename')
         playlist_sort_parser.add_argument('playlist', type=str, help='Playlist to sort')
+        playlist_sort_parser.add_argument('--by-name', action='store_true', help='Sort by names in metadata instead of by filenames')
         
         config_parser = self._add_parser(command_sub, 'config', aliases=['configure'], help='Manage configuration')
         config_sub = config_parser.add_subparsers(dest='config_action', required=True)

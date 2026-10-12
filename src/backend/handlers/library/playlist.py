@@ -198,12 +198,13 @@ def reorder(ctx: Context, request: dict) -> Response:
 
 def sort(ctx: Context, request: dict) -> Response:
     playlist = request['playlist']
+    by_name = request['by_name']
     playlist_id = ctx.database.get_playlist_via_name(playlist)
     if playlist_id is SENTINELS.PLAYLIST_NOT_FOUND:
         return gen_response.PlaylistNotExist(playlist)
     else:
         info = ctx.database.get_playlist_songs(playlist_id)
-        info = sort_songs(info)
+        info = sort_songs(info, by_name=by_name)
         sorted_ids = list(map(lambda x: x['id'], info))
         result = ctx.database.reorder_playlist(playlist_id, sorted_ids)
         return {

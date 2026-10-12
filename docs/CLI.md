@@ -356,9 +356,11 @@ Move the position of a song in a playlist.
 
 Use negative position to count backward.
 
-#### `cascade lib playlist sort <playlist>`
+#### `cascade lib playlist sort <playlist> [--by-name]`
 
 Sort a playlist by filename.
+
+`--by-name`: sort by name in metadata instead of filename. Fallback to filename if name unavailable.
 
 ## Configure
 
