@@ -286,7 +286,7 @@ Set the local lyric file of a song.
 
 Download lyrics of songs from online sources.
 
-> This command times out easily, and in that case, backend will continue to download and write files in background. I recommend you not to fetch for more than four songs at a time, as four is the maximum parallel downloading allowed.
+> This command starts fetching tasks that run in background. Results will be reported via notifies.
 
 > **For China Mainland users:** when fetching lyrics online, it is recommended to enable `netease_skip_proxy`. If you are there you'll know why.
 
