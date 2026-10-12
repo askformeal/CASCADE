@@ -1,4 +1,5 @@
 import sys
+from datetime import datetime
 
 import readchar
 
@@ -10,15 +11,18 @@ from src.utils.escape_code import ESCAPE_CODE as EC
 def cli_box(*args, **kwargs) -> str:
     return box(*args, style=CONFIG.cli_box_style, **kwargs)
 
-def show_notifies(notifies: list[str] | None = None):
+def show_notifies(notifies: list[list[float, str]] | None = None):
     if notifies is None:
         notifies = []
 
     if len(notifies) > 0:
         lines = [
-            f'{EC.white}Notifies from CASCADE backend ({len(notifies)}):{EC.reset}'
+            f'{EC.white}Notifies from CASCADE backend ({len(notifies)}):{EC.reset}',
+            ''
         ]
-        lines += list(map(lambda x: f'  {x}', notifies))
+        for notify in notifies:
+            time_ = datetime.fromtimestamp(round(notify[0]))
+            lines.append(f'{EC.cyan}{EC.bold}{time_}{EC.reset}    {notify[1]}')
         print(cli_box('\n'.join(lines)))
 
 def show_option_info(info: dict):

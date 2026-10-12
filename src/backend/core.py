@@ -95,7 +95,7 @@ class Backend:
             logger.debug(f'{__name__} initiated')
 
     def notify(self, text: str):
-        self.notifies.put(text)
+        self.notifies.put([time.time(), text])
 
     def run(self):
         if self.running:

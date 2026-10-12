@@ -1,5 +1,6 @@
 import sys
 import time
+from datetime import datetime
 from threading import Thread
 import tkinter as tk
 import tkinter.font as tkfont
@@ -211,7 +212,13 @@ class GUI(tk.Tk, MainWinMixin, PlaybackMixin, PlaylistMixin, LyricMixin, Lifecyc
 
     def _show_notifies(self, notifies: list[str]):
         for notify in notifies:
-            self.after(0, lambda n=notify: messagebox.showinfo('Notify', message=n))
+            time_ = datetime.fromtimestamp(round(notify[0]))
+
+            self.after(0, lambda t=f'From: {time_}', n=notify[1]: messagebox.showinfo(
+                'Notify',
+                message=n,
+                detail=t
+                ))
 
     def poll_request(self, action: str, **kwargs) -> dict | None:
         response = self._send_gui_request(action=action, **kwargs)
