@@ -329,7 +329,7 @@ def _wrap_request(args: dict) -> dict:
     args['notify_support'] = True
     return args
 
-def get_notifies() -> list[list[float, str]]:
+def get_notifies() -> list[list[float | str]]:
     return send_request(**_wrap_request({'action':'get_notifies'})).get('notifies', [])
 
 def _start_backend(process: ProcessManager, **kwargs) -> Sentinel:

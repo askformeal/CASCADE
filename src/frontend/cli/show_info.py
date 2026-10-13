@@ -13,7 +13,7 @@ from src.utils.time_ import format_time
 def cli_box(*args, **kwargs) -> str:
     return box(*args, style=CONFIG.cli_box_style, **kwargs)
 
-def show_notifies(notifies: list[list[float, str]] | None = None):
+def show_notifies(notifies: list[list[float | str]] | None = None):
     if notifies is None:
         notifies = []
 

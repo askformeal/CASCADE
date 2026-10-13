@@ -211,7 +211,7 @@ class GUI(tk.Tk, MainWinMixin, PlaybackMixin, PlaylistMixin, LyricMixin, Lifecyc
             self._show_notifies(notifies)
         return response
 
-    def _show_notifies(self, notifies: list[list[float, str]]):
+    def _show_notifies(self, notifies: list[list[float | str]]):
         for notify in notifies:
             time_ = datetime.fromtimestamp(round(notify[0]))
             lag = format_time(time.time() - notify[0], 'sec', format_='text')
