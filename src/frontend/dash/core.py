@@ -6,8 +6,6 @@ import os
 
 from threading import Thread
 
-from src import __version__
-
 from .logger import logger
 from src.constants.paths.res import NO_COVER
 from src.constants.misc import ENCODING, BOX_STYLES
