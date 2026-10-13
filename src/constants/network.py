@@ -1,4 +1,4 @@
-from src.types import IterType, StrChoiceList, CONVERTER
+from src.converters import IterType, StrChoiceList, CONVERTER
 from src.sentinels import SENTINELS
 
 SERVER_TIMEOUT = 0.5

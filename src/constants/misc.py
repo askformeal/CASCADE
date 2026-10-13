@@ -1,4 +1,4 @@
-from src.types import CONVERTER
+from src.converters import CONVERTER
 
 REPO_LINK = 'https://github.com/askformeal/CASCADE'
 

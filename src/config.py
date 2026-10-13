@@ -7,7 +7,7 @@ from src.constants.config import CONFIG_SCHEME
 from src.constants.paths import CONFIG_PATH
 from src.constants.paths.log import CONFIG_LOG
 from src.sentinels import SENTINELS, Sentinel
-from src.types import get_type_name
+from src.converters import get_type_name
 
 logger = setup_logger(__name__, CONFIG_LOG)
 

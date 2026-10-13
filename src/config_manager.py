@@ -4,7 +4,7 @@ from src.constants.paths import CONFIG_PATH
 from src.sentinels import SENTINELS
 from src import gen_response
 from src.gen_response import Response
-from src.types import get_type_name, get_type_codename
+from src.converters import get_type_name, get_type_codename
 from src.utils.misc import open_file
 
 class ConfigManager:

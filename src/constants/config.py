@@ -1,5 +1,5 @@
 from src.sentinels import SENTINELS
-from src.types import CONVERTER, StrChoiceList
+from src.converters import CONVERTER, StrChoiceList
 from .misc import BOX_STYLES
 
 # dunno if scheme is the right name
