@@ -18,6 +18,10 @@
 
 - `lib lyric fetch`: now starts fetching task in background and sends notify on completion.
 
+### Fixed
+
+- `requests` / `urllib3` / `six` / `pycparser` missed out by build.sh
+
 ## [0.57.0] - 2026-10-11
 
 ### Added
