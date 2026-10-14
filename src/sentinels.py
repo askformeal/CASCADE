@@ -2,7 +2,7 @@ from types import NotImplementedType
 
 class Sentinel:
     def __init__(self, msg: str):
-        self.msg = msg
+        self.msg = f'[SENTINEL]: {msg}'
 
     def __repr__(self) -> str:
         return self.msg
