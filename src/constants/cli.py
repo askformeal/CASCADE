@@ -7,6 +7,8 @@ OK_TAG = f'{EC.bold}{EC.green}[Succeeded]{EC.rs}:'
 
 NON_REQUEST_KEYS = ('verbose', 'dev', 'yes', 'direct', 'short', 'full')
 
+TERMINAL_WIDTH_REDUNDANCY = 4
+
 HELP_DESCRIPTION = f'''
 Command-line Audio Stream Capture And Decoding Engine
 

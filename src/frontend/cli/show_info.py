@@ -1,17 +1,25 @@
 import sys
+import shutil
 import time
 from datetime import datetime
 
 import readchar
 
+from src.constants.cli import TERMINAL_WIDTH_REDUNDANCY
 from src.config import CONFIG
 from .song_output import SongOutput
 from src.utils.tui import box
 from src.utils.escape_code import ESCAPE_CODE as EC
 from src.utils.time_ import format_time
 
-def cli_box(*args, **kwargs) -> str:
-    return box(*args, style=CONFIG.cli_box_style, **kwargs)
+def cli_box(*texts, **kwargs) -> str:
+    columns = shutil.get_terminal_size().columns
+    return box(
+        *texts,
+        style=CONFIG.cli_box_style,
+        wrap_len=columns - TERMINAL_WIDTH_REDUNDANCY,
+        **kwargs
+        )
 
 def show_notifies(notifies: list[list[float | str]] | None = None):
     if notifies is None:

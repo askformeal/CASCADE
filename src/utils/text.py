@@ -13,6 +13,8 @@ def strlen(text: str) -> int:
     return wcswidth(visible_text)
 
 def wrap_text(text: str, max_len: int) -> str:
+    max_len = max(max_len, 1)
+    pad = text.removesuffix(text.lstrip())
     lines = []
     line = ''
     words = text.split(' ')
@@ -35,5 +37,6 @@ def wrap_text(text: str, max_len: int) -> str:
     
     while '' in lines:
         lines.remove('')
+    lines = list(map(lambda l: f'{pad}{l}', lines))
     
     return '\n'.join(lines)

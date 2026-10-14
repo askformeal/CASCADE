@@ -4,9 +4,9 @@ import math
 from PIL import Image, ImageOps
 
 from src.constants.misc import BOX_STYLES
-from .text import strlen
+from .text import strlen, wrap_text
 
-def box(*texts: str, l_pad: int = 2, r_pad: int = 2, style: str = 'ascii') -> str:
+def box(*texts: str, l_pad: int = 2, r_pad: int = 2, style: str = 'ascii', wrap_len=None) -> str:
     style = str(style)
 
     upper_left, upper_right, lower_left, lower_right, vertical, horizontal, t_down, t_up = BOX_STYLES[style]
@@ -16,12 +16,32 @@ def box(*texts: str, l_pad: int = 2, r_pad: int = 2, style: str = 'ascii') -> st
 
     lines = list(map(lambda x:x.splitlines(), texts))
 
-    max_lines = max(map(len, lines))
 
     max_width = []
     for text_lines in lines:
         max_width.append(max(map(strlen, text_lines)))
 
+    if wrap_len is not None:
+        wrap_len -= (l_pad + r_pad + 1) * len(lines) + 1
+        if wrap_len > 0:
+            max_width_sum = sum(max_width)
+            for i, text_max_width in enumerate(max_width):
+                text_wrap_len = wrap_len * (text_max_width / max_width_sum)
+                text_wrap_len = max(int(text_wrap_len), 1)
+                text_lines = []
+                for text_line in lines[i]:
+                    if text_line.strip() == '':
+                        text_lines.append(text_line)
+                    else:
+                        text_lines += wrap_text(text_line, text_wrap_len).splitlines()
+                lines[i] = text_lines
+
+            max_width = []
+            for text_lines in lines:
+                max_width.append(max(map(strlen, text_lines)))
+
+    max_lines = max(map(len, lines))
+    
     top_line = ''
     for length in max_width:
         top_line += f'{horizontal * (length + l_pad + r_pad)}{t_down}'
