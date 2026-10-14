@@ -89,6 +89,12 @@ class Sentinels:
         self.PROCESS_NOT_FOUND = Sentinel('Process Not Found')
         self.GRACE_KILL = Sentinel('Process is Gracefully Terminated')
         self.FORCE_KILL = Sentinel('Process is Forcefully Killed')
+
+        # Task
+
+        self.TASK_RUNNING = Sentinel('Task Running')
+        self.TASK_SUCCEED = Sentinel('Task Succeed')
+        self.TASK_FAILED = Sentinel('Task Failed')
         
         # Misc
         self.INVALID_TIME = Sentinel('Invalid Time, Can Not be Parsed')

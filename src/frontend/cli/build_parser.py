@@ -75,6 +75,8 @@ class Builder:
         status_parser = self._add_parser(command_sub, 'status', aliases=['st'], help='Show CASCADE status')
         status_parser.add_argument('-d', '--dev', action='store_true', help='Show dev info')
 
+        task_parser = self._add_parser(command_sub, 'task', help='Show task status')
+
         open_epilog = 'You can open a song in library, a playlist or a file on disk, and you can specify it with the --type option.'
         open_parser = self._add_parser(command_sub, 'open', help='Open a song or playlist. Supports alias, file path and playlist name', epilog=open_epilog)
         open_parser.add_argument('song', type=str, help='Song to open')

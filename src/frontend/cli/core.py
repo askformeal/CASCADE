@@ -204,6 +204,35 @@ def main() -> int:
 
                         print(cli_box(text))
 
+                    elif action == 'task':
+                        lines = []
+                        if len(attachment) > 0:
+                            lines += [
+                                f'{EC.white}{len(attachment)} tasks{EC.reset}',
+                                ''
+                                ]
+                            
+                            for i, task in enumerate(attachment):
+                                if task['status'] == 'running':
+                                    status = f'{EC.yellow}RUNNING{EC.reset}'
+                                elif task['status'] == 'succeed':
+                                    status = f'{EC.green}SUCCEED{EC.reset}'
+                                elif task['status'] == 'failed':
+                                    status = f'{EC.red}FAILED{EC.reset}'
+                                else:
+                                    status = f'{EC.white}{task['status']}{EC.reset}'
+
+
+                                if task['max_progress'] > 0:
+                                    progress = f"[{task['progress']}/{task['max_progress']}] "
+                                else:
+                                    progress = ''
+                                lines.append(f'{EC.cyan}{i+1}.{EC.reset} {EC.white}{task['msg']}{EC.cyan} {progress}{status}')
+                        else:
+                            lines = [f'{EC.red}No tasks{EC.reset}']
+
+                        print(cli_box('\n'.join(lines)))
+
                     elif action == 'list':
                         show_song_info(
                             attachment,

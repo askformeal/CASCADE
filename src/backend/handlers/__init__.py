@@ -1,4 +1,4 @@
-from . import misc, config, poll
+from . import misc, config, poll, task
 from .library import meta, alias, lyric, playlist
 from .library import core as lib_core
 from .playback import sequence, navigation
@@ -9,6 +9,7 @@ ROUTER = {
     'get_notifies': misc.get_notifies,
 
     'status': play_core.status,
+    'task': task.get_tasks,
     'open': play_core.open_,
     'play-all': play_core.play_all,
     'load_last': play_core.load_last,

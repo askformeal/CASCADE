@@ -6,6 +6,7 @@ DEATH_CONFIRM_NUMBER = 10
 
 ATTACHMENT_REQUIRED_ACTIONS = [
     'status',
+    'task',
     'list',
     'lib.info',
     'lib.list',

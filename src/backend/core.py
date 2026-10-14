@@ -29,10 +29,11 @@ from src.sentinels import SENTINELS
 from src.error import InitializationError
 from src.connection import recv_json, send_json
 from src import gen_response
-from src.backend.database.core import Database
-from src.backend.playback.core import Playback
-from src.backend.context import Context
-from src.backend.handlers import ROUTER
+from .database.core import Database
+from .playback.core import Playback
+from .context import Context
+from .task import TaskManager
+from .handlers import ROUTER
 from src.pid import add_pid, remove_pid
 
 logger = setup_logger(__name__, BACKEND_LOG)
@@ -64,6 +65,7 @@ class Backend:
         try:
             self.database = Database(database_path)
             self.playback = Playback(self.buffer_request, self.database)
+            self.task = TaskManager()
         except InitializationError as e:
             logger.exception('Failed to initialize one of backend\'s modules')
             self.running = False
@@ -71,6 +73,7 @@ class Backend:
             self.ctx = Context(
                 database=self.database,
                 playback=self.playback,
+                task=self.task,
                 exit_=self.exit_,
                 start_time=time.time(),
                 dev=self.dev,
