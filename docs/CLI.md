@@ -362,6 +362,8 @@ Sort a playlist by filename.
 
 `--by-name`: sort by name in metadata instead of filename. Fallback to filename if name unavailable.
 
+`-r` / `--reverse`: reverse sorting.
+
 ## Configure
 
 The alias of `config` is `configure`

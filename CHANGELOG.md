@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## [Unreleased]
+
+### Added
+
+#### CLI
+
+- `-r` / `--reverse` option for `lib playlist sort` to sort in reverse.
+
 ## [0.58.0] - 2026-10-13
 
 ### Added

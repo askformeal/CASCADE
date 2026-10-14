@@ -185,7 +185,8 @@ ACTION_KEYS = {
     },
     'lib.playlist.sort': {
         'playlist': (str, True),
-        'by_name': (CONVERTER.boolean, False, False)
+        'by_name': (CONVERTER.boolean, False, False),
+        'reverse': (CONVERTER.boolean, False, False)
     },
     'config.show': {
         'option': (str, True)

@@ -1076,6 +1076,112 @@ def test_lib_playlist_reorder_database_error(backend, tmp_path, monkeypatch):
     assert 'database error' in response['msg']
 
 
+def _make_scrambled_playlist(backend, tmp_path, playlist_name='workout'):
+    """Seed a playlist in c / a / b order so sorting has something to do.
+
+    Returns (paths, song_ids, playlist_id) all in the seeded order.
+    """
+    database = backend.database
+    paths = []
+    song_ids = []
+    for name in ('c.wav', 'a.wav', 'b.wav'):
+        path = tmp_path / name
+        _make_wav(path)
+        paths.append(str(path))
+        song_id, _ = database.add_song(str(path))
+        song_ids.append(song_id)
+    playlist_id = database.create_playlist(playlist_name)[0]
+    for song_id in song_ids:
+        database.add_song_to_playlist(playlist_id, song_id)
+    return paths, song_ids, playlist_id
+
+
+def test_lib_playlist_sort_by_filename(backend, tmp_path):
+    """No optional key given: by_name and reverse must default to False."""
+    paths, song_ids, playlist_id = _make_scrambled_playlist(backend, tmp_path)
+    response = _request(backend, 'lib.playlist.sort', playlist='workout')
+    assert response['code'] == 0
+    assert 'sorted' in response['msg']
+    assert _playlist_song_ids(backend.database, playlist_id) == [song_ids[1], song_ids[2], song_ids[0]]
+    assert _playlist_song_numbers(backend.database, playlist_id) == [0, 1, 2]
+
+
+def test_lib_playlist_sort_reverse(backend, tmp_path):
+    paths, song_ids, playlist_id = _make_scrambled_playlist(backend, tmp_path)
+    response = _request(backend, 'lib.playlist.sort', playlist='workout', reverse=True)
+    assert response['code'] == 0
+    assert _playlist_song_ids(backend.database, playlist_id) == [song_ids[0], song_ids[2], song_ids[1]]
+    assert _playlist_song_numbers(backend.database, playlist_id) == [0, 1, 2]
+
+
+def test_lib_playlist_sort_by_name(backend, tmp_path):
+    paths, song_ids, playlist_id = _make_scrambled_playlist(backend, tmp_path)
+    # names are the reverse of the filenames on purpose
+    backend.database.set_song_meta(song_ids[0], 'name', 'Zulu')
+    backend.database.set_song_meta(song_ids[1], 'name', 'Mike')
+    backend.database.set_song_meta(song_ids[2], 'name', 'Alpha')
+    response = _request(backend, 'lib.playlist.sort', playlist='workout', by_name=True)
+    assert response['code'] == 0
+    assert _playlist_song_ids(backend.database, playlist_id) == [song_ids[2], song_ids[1], song_ids[0]]
+
+
+def test_lib_playlist_sort_by_name_reverse(backend, tmp_path):
+    _, song_ids, playlist_id = _make_scrambled_playlist(backend, tmp_path)
+    backend.database.set_song_meta(song_ids[0], 'name', 'Zulu')
+    backend.database.set_song_meta(song_ids[1], 'name', 'Mike')
+    backend.database.set_song_meta(song_ids[2], 'name', 'Alpha')
+    response = _request(backend, 'lib.playlist.sort', playlist='workout', by_name=True, reverse=True)
+    assert response['code'] == 0
+    assert _playlist_song_ids(backend.database, playlist_id) == [song_ids[0], song_ids[1], song_ids[2]]
+
+
+def test_lib_playlist_sort_by_name_fallback_to_filename(backend, tmp_path):
+    """A song without a name in metadata falls back to its filename."""
+    paths, song_ids, playlist_id = _make_scrambled_playlist(backend, tmp_path)
+    backend.database.set_song_meta(song_ids[0], 'name', 'Zulu')
+    response = _request(backend, 'lib.playlist.sort', playlist='workout', by_name=True)
+    assert response['code'] == 0
+    assert _playlist_song_ids(backend.database, playlist_id) == [song_ids[1], song_ids[2], song_ids[0]]
+
+
+def test_lib_playlist_sort_invalid_reverse(backend, tmp_path):
+    paths, song_ids, playlist_id = _make_scrambled_playlist(backend, tmp_path)
+    response = _request(backend, 'lib.playlist.sort', playlist='workout', reverse='maybe')
+    assert response['code'] == 1
+    assert 'reverse' in response['msg']
+    assert _playlist_song_ids(backend.database, playlist_id) == song_ids
+
+
+def test_lib_playlist_sort_empty_playlist(backend, tmp_path):
+    paths, song_ids, playlist_id = _make_scrambled_playlist(backend, tmp_path)
+    _request(backend, 'lib.playlist.kick', songs=paths, playlist='workout')
+    response = _request(backend, 'lib.playlist.sort', playlist='workout')
+    assert response['code'] == 0
+    assert _playlist_song_ids(backend.database, playlist_id) == []
+
+
+def test_lib_playlist_sort_playlist_not_exist(backend, tmp_path):
+    _make_scrambled_playlist(backend, tmp_path)
+    response = _request(backend, 'lib.playlist.sort', playlist='ghost')
+    assert response['code'] == 1
+    assert 'no such playlist in library' in response['msg']
+
+
+def test_lib_playlist_sort_missing_key(backend, tmp_path):
+    _make_scrambled_playlist(backend, tmp_path)
+    response = _request(backend, 'lib.playlist.sort')
+    assert response['code'] == 1
+    assert 'playlist' in response['msg']
+
+
+def test_lib_playlist_sort_database_error(backend, tmp_path, monkeypatch):
+    paths, song_ids, playlist_id = _make_scrambled_playlist(backend, tmp_path)
+    monkeypatch.setattr(backend.database, 'reorder_playlist', lambda playlist_id, song_ids: SENTINELS.DATABASE_ERROR)
+    response = _request(backend, 'lib.playlist.sort', playlist='workout')
+    assert response['code'] == 1
+    assert 'database error' in response['msg']
+
+
 def test_lib_playlist_add(backend, audio_file):
     song_id, playlist_id = _create_playlist_with_song(backend, audio_file, 'workout')
     # seed another song that is NOT in the playlist yet
