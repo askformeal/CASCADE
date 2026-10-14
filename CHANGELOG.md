@@ -4,9 +4,19 @@
 
 ### Added
 
+#### Overall
+
+- A **task system** - access tasks via `task` command on CLI.
+
 #### CLI
 
 - `-r` / `--reverse` option for `lib playlist sort` to sort in reverse.
+
+### Changed
+
+#### Overall
+
+- Lyric fetching wired to task system.
 
 ## [0.58.0] - 2026-10-13
 

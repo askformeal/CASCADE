@@ -151,29 +151,58 @@ def add_song(
 
 def batch_fetch(ctx: Context, args: list[tuple]):
     logger.info(f'Start fetching lyric for {len(args)} song(s)...')
+    batch_task_index = ctx.task.add_task(max_progress=len(args), name=f'Fetch lyrics for {len(args)} songs')
 
     with ThreadPoolExecutor(max_workers=LYRIC_FETCH_MAX_WORKERS) as pool:
-        results = list(pool.map(lambda arg: fetch_lyric(*arg), args))
+        results = list(pool.map(lambda arg: fetch_lyric(ctx, batch_task_index, *arg), args))
 
     ok = 0
     for result in results:
-        song_id, song_name, path, lrc = result
+        song_id, song_name, path, lrc, task_index, error = result
+        
         if lrc is None:
             logger.info(f'Failed to fetch lyric for \"{song_name}\": can not find lyric')
+            ctx.task.task_failed(task_index, 'Can not find lyric')
+        
+        elif lrc is SENTINELS.LYRIC_FETCH_ERROR:
+            ctx.task.task_failed(task_index, f'Error while fetching: {error}')
+
         else:
+            ctx.task.log_task(task_index, 'Lyric obtained')
             try:
                 with open(path, 'w', encoding=ENCODING) as f:
                     f.write(lrc)
+                    
             except OSError as e:
                 logger.warning(f'Failed to fetch lyric for \"{song_name}\": failed to write into {path}: \"{e}\"')
+                ctx.task.task_failed(task_index, f'Failed to write into {path}: {e}')
+
             else:
                 ctx.database.set_song_meta(song_id, 'lyric', path)
                 logger.info(f'Fetched lyric for \"{song_name}\": saved to {path}')
+                ctx.task.task_succeed(task_index, f'Wrote into {path}, fetching completed')
                 ok += 1
-    ctx.notify(f'[{ok}/{len(results)}] lyric(s) fetched successfully')
 
-def fetch_lyric(song_id: int, song_name: str, path: str, search_term: str) -> tuple[int, str, str, str | None]:
+    ctx.notify(f'[{ok}/{len(results)}] lyric(s) fetched successfully')
+    ctx.task.log_task(batch_task_index, f'[{ok}/{len(results)}] fetched successfully')
+    if ok > 0:
+        ctx.task.task_succeed(batch_task_index)
+    else:
+        ctx.task.task_failed(batch_task_index)
+
+def fetch_lyric(
+        ctx: Context,
+        batch_task_index: int,
+        song_id: int,
+        song_name: str,
+        path: str,
+        search_term: str
+        ) -> tuple[int, str, str, str | None | Sentinel, int, Exception | None]:
+
+    error = None
+
     logger.info(f'Started fetching lyric with: {search_term}')
+    task_index = ctx.task.add_task(name=f'Fetch lyric: {search_term}')
     try:
         lrc = syncedlyrics.search(
             search_term,
@@ -181,8 +210,10 @@ def fetch_lyric(song_id: int, song_name: str, path: str, search_term: str) -> tu
         )
     except Exception as e:
         logger.warning(f'Failed to fetch lyric with {search_term}: {e}')
-        lrc = None
+        lrc = SENTINELS.LYRIC_FETCH_ERROR
+        error = e
     else:
         logger.info(f'Lyric fetched with: {search_term}')
 
-    return song_id, song_name, path, lrc
+    ctx.task.nudge_task_progress(batch_task_index)
+    return song_id, song_name, path, lrc, task_index, error

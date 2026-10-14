@@ -15,6 +15,12 @@ class Sentinel:
 
     def __hash__(self) -> int:
         return id(self)
+
+    def __copy__(self):
+        return self
+    
+    def __deepcopy__(self, memo):
+        return self
     
 class Sentinels:
     def __init__(self):
@@ -106,5 +112,6 @@ class Sentinels:
         self.LYRIC_NOT_FOUND = Sentinel('Lyric Not Found')
         self.LYRIC_LOADING = Sentinel('Lyric is loading')
         self.NO_COVER = Sentinel('No Cover')
+        self.LYRIC_FETCH_ERROR = Sentinel('An Error Occurred when Fetching Lyric')
 
 SENTINELS = Sentinels()

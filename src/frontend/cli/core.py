@@ -1,3 +1,4 @@
+from datetime import datetime
 import sys
 from pathlib import Path
 import readchar
@@ -222,12 +223,15 @@ def main() -> int:
                                 else:
                                     status = f'{EC.white}{task['status']}{EC.reset}'
 
-
                                 if task['max_progress'] > 0:
                                     progress = f"[{task['progress']}/{task['max_progress']}] "
                                 else:
                                     progress = ''
-                                lines.append(f'{EC.cyan}{i+1}.{EC.reset} {EC.white}{task['msg']}{EC.cyan} {progress}{status}')
+                                lines.append(f'{EC.cyan}{i+1}.{EC.reset} {EC.white}{task['name']}{EC.cyan} {progress}{status}')
+                                for record in task['logs']:
+                                    time_ = datetime.fromtimestamp(round(record[0]))
+                                    lines.append(f'  {EC.cyan}{time_}{EC.reset}    {record[1]}')
+                                lines.append('')
                         else:
                             lines = [f'{EC.red}No tasks{EC.reset}']
 
