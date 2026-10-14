@@ -76,6 +76,10 @@ Show information about the current playback session.
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
 
+#### `cascade task`
+
+View tasks.
+
 #### `cascade open <song> [-t/--type <type>]`
 
 Open a song / playlist.

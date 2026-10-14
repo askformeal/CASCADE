@@ -10,6 +10,7 @@
 
 #### CLI
 
+- `task` command to view tasks.
 - `-r` / `--reverse` option for `lib playlist sort` to sort in reverse.
 
 ### Changed
@@ -17,6 +18,10 @@
 #### Overall
 
 - Lyric fetching wired to task system.
+
+#### CLI
+
+- Auto-wrap lines in boxes based on terminal width.
 
 ## [0.58.0] - 2026-10-13
 
