@@ -5,12 +5,9 @@ from src import gen_response
 from src.gen_response import Response
 from src.backend.context import Context
 from src.utils.misc import bytes2base64
-from .helpers import get_status, open_song, open_type, play_all_songs, stop_player
+from .helpers import open_song, open_type, play_all_songs, stop_player
 
 logger = setup_logger(__name__, BACKEND_LOG)
-
-def status(ctx: Context, request: dict) -> Response:
-    return gen_response.Success('status obtained', get_status(ctx))
 
 def open_(ctx: Context, request: dict) -> Response:
     song = request['song']

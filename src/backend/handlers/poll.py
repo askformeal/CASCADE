@@ -1,7 +1,8 @@
 from src import gen_response
 from src.gen_response import Response
 from src.backend.context import Context
-from .playback.helpers import get_status, get_current_songs, get_current_lyric
+from .status import get_status
+from .playback.helpers import get_current_songs, get_current_lyric
 from .library.helpers import get_song_playlist_names
 
 def poll(ctx: Context, request: dict) -> Response:

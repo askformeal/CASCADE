@@ -8,6 +8,42 @@
 
 `-h`/`--help` show help message.
 
+#### `cascade status (alias: st)`
+
+Show information about the current playback session.
+
+```
+╭──────────────────────────────────────────────────────────────────────────────────────────────────╮
+│                                                                                                  │
+│  To Hell and Back - Sabaton [5 / 13]   <- [song name] - [artist] [number in current playlist]    │
+│  [00:01:07 / 00:03:26] 33%     <- progress                                                       │
+│                                                                                                  │
+│  In library: Yes     <- if the song is added to the library                                      │
+│  Album: Heroes                                                                                   │
+│  Path: E:\Files\Musics\Sabaton\[2014] Sabaton - Heroes [16-44][qobuz]\05. To Hell and Back.flac  │
+│                                                                                                  │
+│  Lyric File Path: N/A     <- Local lyric file                                                    │
+│  Player status: playing                                                                          │
+│  Volume: 100%                                                                                    │
+│  Mute: Off                                                                                       │
+│                                                                                                  │
+│  Shuffle: Off                                                                                    │
+│  Loop: Off                                                                                       │
+│  Reverse: Off                                                                                    │
+│  Online Lyric: On                                                                                │
+│                                                                                                  │
+│  Audio Engine: Miniaudio                                                                         │
+│                                                                                                  │
+│  CASCADE backend has been running for 00:00:19                                                   │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
+```
+
+#### `cascade task [-f/--filter <status>]`
+
+View tasks.
+
+`-f`/`--filter` (default: all, choices: all | running | succeeded | failed): filter tasks by status.
+
 ## Show list of songs
 
 This kind of command includes:
@@ -45,42 +81,6 @@ Exit the backend
 Terminate the backend process. May cause unpredictable consequences.
 
 ## Playback
-
-#### `cascade status (alias: st)`
-
-Show information about the current playback session.
-
-```
-╭──────────────────────────────────────────────────────────────────────────────────────────────────╮
-│                                                                                                  │
-│  To Hell and Back - Sabaton [5 / 13]   <- [song name] - [artist] [number in current playlist]    │
-│  [00:01:07 / 00:03:26] 33%     <- progress                                                       │
-│                                                                                                  │
-│  In library: Yes     <- if the song is added to the library                                      │
-│  Album: Heroes                                                                                   │
-│  Path: E:\Files\Musics\Sabaton\[2014] Sabaton - Heroes [16-44][qobuz]\05. To Hell and Back.flac  │
-│                                                                                                  │
-│  Lyric File Path: N/A     <- Local lyric file                                                    │
-│  Player status: playing                                                                          │
-│  Volume: 100%                                                                                    │
-│  Mute: Off                                                                                       │
-│                                                                                                  │
-│  Shuffle: Off                                                                                    │
-│  Loop: Off                                                                                       │
-│  Reverse: Off                                                                                    │
-│  Online Lyric: On                                                                                │
-│                                                                                                  │
-│  Audio Engine: Miniaudio                                                                         │
-│                                                                                                  │
-│  CASCADE backend has been running for 00:00:19                                                   │
-╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
-```
-
-#### `cascade task [-f/--filter <status>]`
-
-View tasks.
-
-`-f`/`--filter` (default: all, choices: all | running | succeeded | failed): filter tasks by status.
 
 #### `cascade open <song> [-t/--type <type>]`
 
