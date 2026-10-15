@@ -105,7 +105,11 @@ def mute(ctx: Context, request: dict) -> Response:
     mode = {True: 'on', False: 'off'}[target_mute]
     return gen_response.Success(f'turned mute mode {mode}')
 
-def lyric(ctx: Context, request: dict) -> Response:
+def reload_lyric(ctx: Context, request: dict) -> Response:
+    ctx.playback.update_lyric(force=True)
+    return gen_response.Success('lyric reloaded')
+
+def switch_lyric_mode(ctx: Context, request: dict) -> Response:
     ctx.playback.online_lyric = not ctx.playback.online_lyric
     ctx.playback.update_lyric()
     mode = {True: 'on', False: 'off'}[ctx.playback.online_lyric]

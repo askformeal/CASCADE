@@ -188,7 +188,7 @@ def test_reload_keeps_play_all_playlist(backend, audio_file, tmp_path):
         target.write(audio)
 
     assert _request(backend, 'lib.add', paths=[audio_file, second])['code'] == 0
-    assert _request(backend, 'play-all')['code'] == 0
+    assert _request(backend, 'play_all')['code'] == 0
     assert _poll(backend)['playlist_len'] == 2
 
     assert _request(backend, 'load_last')['code'] == 0

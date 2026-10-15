@@ -48,7 +48,7 @@ class Tray(Icon):
                 
                 title = 'CASCADE'
                 
-                playlists_sub_menu = [MenuItem('[Play All]', lambda *_: self._send_tray_request('play-all'))]
+                playlists_sub_menu = [MenuItem('[Play All]', lambda *_: self._send_tray_request('play_all'))]
 
 
                 if self.snapshot.display_name is not None:

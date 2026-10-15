@@ -2073,7 +2073,7 @@ def test_lib_meta_set_missing_song_key(backend):
 
 
 def test_play_all_empty_library(backend):
-    response = _request(backend, 'play-all')
+    response = _request(backend, 'play_all')
     assert response['code'] == 1
     assert 'no song in library' in response['msg']
 
@@ -2084,7 +2084,7 @@ def test_play_all_two_songs(backend, audio_file, tmp_path):
     backend.database.add_song(audio_file)
     backend.database.add_song(second)
 
-    response = _request(backend, 'play-all')
+    response = _request(backend, 'play_all')
     assert response['code'] == 0
     assert backend.playback.current_playlist is SENTINELS.PLAY_ALL
     assert backend.playback.current_song_num == 0
@@ -2099,11 +2099,11 @@ def test_play_all_restores_last_num(backend, audio_file, tmp_path):
     backend.database.add_song(first)
     backend.database.add_song(second)
 
-    _request(backend, 'play-all')
+    _request(backend, 'play_all')
     _request(backend, 'switch', number=2)
     assert backend.playback.current_song_num == 1
 
-    response = _request(backend, 'play-all')
+    response = _request(backend, 'play_all')
     assert response['code'] == 0
     assert 'last played number detected' in response['msg']
     assert backend.playback.current_song_num == 1
@@ -2117,7 +2117,7 @@ def test_play_all_restores_zero_when_never_played(backend, audio_file, tmp_path)
     backend.database.add_song(audio_file)
     backend.database.add_song(second)
 
-    response = _request(backend, 'play-all')
+    response = _request(backend, 'play_all')
     assert response['code'] == 0
     # 从未播过 → 从 0 开始,不应有 'last played number detected'
     assert 'last played number detected' not in response['msg']

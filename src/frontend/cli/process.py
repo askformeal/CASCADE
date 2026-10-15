@@ -1,6 +1,11 @@
 def process_request(args: dict) -> dict:
-    if args['action'] == 'reload':
-        args['action'] = 'load_last'
+    action_translate = {
+        'reload': 'load_last',
+        'play-all': 'play_all',
+        'reload-lyric': 'reload_lyric',
+        'lyric': 'switch_lyric_mode'
+    }
+    args['action'] = action_translate.get(args['action'], args['action'])
 
     if args.get('meta_action', None) is not None:
         args['lib_action'] = f"{args['lib_action']}.{args['meta_action']}"

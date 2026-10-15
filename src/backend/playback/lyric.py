@@ -20,7 +20,12 @@ class LyricMixin:
             offset = info.get('offset', None)
             if offset is None:
                 offset = 0
-            if force or self.lyric.get('path', None) != song_path or self.lyric.get('online', None) != self.online_lyric:
+            if (
+                force
+                or self.lyric.get('path', None) != song_path
+                or self.lyric.get('online', None) != self.online_lyric
+                ):
+                
                 self.lyric = {'path': song_path, 'offset': offset, 'lyric': None}
 
                 if self.online_lyric:

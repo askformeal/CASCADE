@@ -104,7 +104,7 @@ class LyricMixin:
             self.lyric_box.select_clear(0, tk.END)
 
     def _toggle_online_lyric(self: 'GUI', *_):
-        self.send_command('lyric')
+        self.send_command('switch_lyric_mode')
 
     def _reset_offset(self: 'GUI', *_):
         self.send_command('set_offset_overlay', offset=0)

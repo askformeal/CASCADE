@@ -132,6 +132,8 @@ class Builder:
 
         lyric_parser = self._add_parser(command_sub, 'lyric', help='Switch between lyric sources [local/online]')
 
+        reload_lyric_parser = self._add_parser(command_sub, 'reload-lyric', help='Reload lyric')
+
         lib_parser = self._add_parser(command_sub, 'lib', aliases=['library'], help='Manage library')
 
         lib_sub = lib_parser.add_subparsers(dest='lib_action', required=True)

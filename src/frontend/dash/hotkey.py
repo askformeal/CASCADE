@@ -31,7 +31,7 @@ class HotkeyMixin:
 
                 elif key in KEY_MAP.play_all:
                     self._toast('Play all')
-                    self._send_dash_request('play-all')
+                    self._send_dash_request('play_all')
 
                 elif key in KEY_MAP.toggle:
                     self._toast('Play/Pause')
@@ -67,7 +67,7 @@ class HotkeyMixin:
                     self._send_dash_request('reverse')
                 elif key in KEY_MAP.lyric:
                     self._toast('Toggle online lyric')
-                    self._send_dash_request('lyric')
+                    self._send_dash_request('switch_lyric_mode')
 
                 elif key in KEY_MAP.offset_increase:
                     self._toast(f'Lyric offset +{OFFSET_OVERLAY_STEP}ms')

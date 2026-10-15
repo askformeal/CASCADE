@@ -201,7 +201,7 @@ class MainWinMixin(MenubarMixin):
         OpenDialogue(self)
 
     def _open_all(self: 'GUI', *_):
-        self.send_command('play-all')
+        self.send_command('play_all')
 
     def _open_start(self: 'GUI', *_):
         StartPopUp(self)
