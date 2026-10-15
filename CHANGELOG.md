@@ -10,7 +10,7 @@
 
 #### CLI
 
-- `task` command to view tasks.
+- `task` command to view tasks, with filtered-by-status option (`-f`/`--filter`).
 - `-r` / `--reverse` option for `lib playlist sort` to sort in reverse.
 
 ### Changed

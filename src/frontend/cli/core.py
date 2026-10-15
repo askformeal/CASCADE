@@ -80,6 +80,7 @@ def main() -> int:
     else:
         print_short = args.get('short', False)
         print_full = args.get('full', False)
+        task_filter = args.get('filter', None)
 
         if args['action'] == 'status' and args['dev']:
             dev_status = True
@@ -207,13 +208,18 @@ def main() -> int:
 
                     elif action == 'task':
                         lines = []
-                        if len(attachment) > 0:
+                        tasks = []
+                        for task in attachment:
+                            if task['status'] == task_filter or task_filter == 'all':
+                                tasks.append(task)
+
+                        if len(tasks) > 0:
                             lines += [
-                                f'{EC.white}{len(attachment)} tasks{EC.reset}',
+                                f'{EC.white}{len(tasks)} tasks{EC.reset}',
                                 ''
                                 ]
                             
-                            for i, task in enumerate(attachment):
+                            for i, task in enumerate(tasks):
                                 if task['status'] == 'running':
                                     status = f'{EC.yellow}RUNNING{EC.reset}'
                                 elif task['status'] == 'succeeded':
@@ -232,6 +238,8 @@ def main() -> int:
                                     time_ = datetime.fromtimestamp(round(record[0]))
                                     lines.append(f'  {EC.cyan}{time_}{EC.reset}    {record[1]}')
                                 lines.append('')
+                        elif len(attachment) > 0:
+                            lines = [f'{EC.red}No \"{task_filter}\" tasks{EC.reset}']
                         else:
                             lines = [f'{EC.red}No tasks{EC.reset}']
 

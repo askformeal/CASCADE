@@ -76,9 +76,11 @@ Show information about the current playback session.
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
 
-#### `cascade task`
+#### `cascade task [-f/--filter <status>]`
 
 View tasks.
+
+`-f`/`--filter` (default: all, choices: all | running | succeeded | failed): filter tasks by status.
 
 #### `cascade open <song> [-t/--type <type>]`
 
