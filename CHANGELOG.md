@@ -17,6 +17,7 @@
 
 #### Overall
 
+- Refactored request system, now verify + router are put together in a `request.py`.
 - Lyric fetching wired to task system.
 
 #### CLI

@@ -17,8 +17,6 @@ from src.constants.paths import (
 from src.constants.paths.log import BACKEND_LOG
 from src.constants.network import (
     BACKLOG,
-    ACTION_KEYS,
-    NON_ACTION_KEYS,
     SERVER_TIMEOUT,
     SOURCES,
     ACK
@@ -33,7 +31,7 @@ from .database.core import Database
 from .playback.core import Playback
 from .context import Context
 from .task import TaskManager
-from .handlers import ROUTER
+from .request import RequestManager
 from src.pid import add_pid, remove_pid
 
 logger = setup_logger(__name__, BACKEND_LOG)
@@ -65,6 +63,7 @@ class Backend:
         try:
             self.database = Database(database_path)
             self.playback = Playback(self.buffer_request, self.database)
+            self.request_manager = RequestManager()
             self.task = TaskManager()
         except InitializationError as e:
             logger.exception('Failed to initialize one of backend\'s modules')
@@ -223,65 +222,15 @@ class Backend:
 
     def dispatch(self, request: dict) -> gen_response.Response:
         response = gen_response.Undefined()
-        request = self._process_request(request)
-        if isinstance(request, gen_response.Response) and not request.ok():
-            response = request
+        ok, result = self.request_manager.process_request(request)
+        if ok:
+            request, handler = result
+            response = handler(self.ctx, request)
+
+            return response
         else:
-            action = request['action']
+            return result
 
-            handler = ROUTER.get(action, None)
-            if handler is None:
-                logger.error(f'Invalid \"action\" value received: {action}')
-                response = gen_response.UnknownAction(action)
-            else:
-                response = handler(self.ctx, request)
-
-        return response
-
-    def _process_request(self, request: dict) -> dict | gen_response.Response:
-        if not isinstance(request, dict):
-            return gen_response.Failed('request is not a dictionary')
-        else:
-            token = request.get('token', '')
-            backend_token = CONFIG.backend_token
-            if backend_token != '' and token != backend_token:
-                return gen_response.AuthFailed()
-            else:
-                action = request.get('action', None)
-                if action is None:
-                    logger.error('Not \"action\" key found in request')
-                    return gen_response.MissingKey('action')
-                
-                else:
-                    keys = ACTION_KEYS.get(action, {})
-
-                    expected_keys = set(keys.keys()) | NON_ACTION_KEYS
-                    unexpected_keys = set(request.keys()) - expected_keys
-                    if len(unexpected_keys) > 0:
-                        logger.warning(f'Unexpected key(s) received: {unexpected_keys}')
-
-                    for key, info in keys.items():
-                        key_type, is_required = info[:2]
-                        value = request.get(key, SENTINELS.KEY_NOT_PROVIDED)
-                        if value in (SENTINELS.KEY_NOT_PROVIDED, None):
-                            if is_required:
-                                return gen_response.MissingKey(key)
-                            else:
-                                try:
-                                    default_value = info[2]
-                                except IndexError:
-                                    return gen_response.Failed(f'Value of key \"{key}\" was not provided and not default value is available. Please report this error')
-                                else:
-                                    request[key] = default_value
-                        else:
-                            try:
-                                value = key_type(value)
-                            except ValueError as e: 
-                                return gen_response.InvalidKeyType(key, value, str(e))
-                            else:
-                                request[key] = value
-                                
-                    return request
 
     def _memorize_pos(self):
         while self.running:
@@ -340,4 +289,5 @@ class Backend:
             Thread(target=self._play_dead, daemon=True).start()
 
 if __name__ == '__main__':
+
     Backend().run()
