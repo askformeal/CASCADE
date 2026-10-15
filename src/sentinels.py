@@ -99,7 +99,7 @@ class Sentinels:
         # Task
 
         self.TASK_RUNNING = Sentinel('Task Running')
-        self.TASK_SUCCEED = Sentinel('Task Succeed')
+        self.TASK_SUCCEEDED = Sentinel('Task Succeeded')
         self.TASK_FAILED = Sentinel('Task Failed')
         
         # Misc

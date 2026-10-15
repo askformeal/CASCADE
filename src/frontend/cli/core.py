@@ -216,8 +216,8 @@ def main() -> int:
                             for i, task in enumerate(attachment):
                                 if task['status'] == 'running':
                                     status = f'{EC.yellow}RUNNING{EC.reset}'
-                                elif task['status'] == 'succeed':
-                                    status = f'{EC.green}SUCCEED{EC.reset}'
+                                elif task['status'] == 'succeeded':
+                                    status = f'{EC.green}SUCCEEDED{EC.reset}'
                                 elif task['status'] == 'failed':
                                     status = f'{EC.red}FAILED{EC.reset}'
                                 else:

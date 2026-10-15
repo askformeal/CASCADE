@@ -6,7 +6,7 @@ from src.backend.context import Context
 def get_tasks(ctx: Context, request: dict) -> Response:
     status = {
         SENTINELS.TASK_RUNNING: 'running',
-        SENTINELS.TASK_SUCCEED: 'succeed',
+        SENTINELS.TASK_SUCCEEDED: 'succeeded',
         SENTINELS.TASK_FAILED: 'failed'
     }
     tasks = ctx.task.list_()

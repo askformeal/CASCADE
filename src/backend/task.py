@@ -34,10 +34,10 @@ class TaskManager:
         self.log_task(index, 'Task start')
         return index
 
-    def task_succeed(self, index: int, record: str | None = None):
+    def task_succeeded(self, index: int, record: str | None = None):
         if record is not None:
             self.log_task(index, record)
-        self.tasks[index].status = SENTINELS.TASK_SUCCEED
+        self.tasks[index].status = SENTINELS.TASK_SUCCEEDED
 
     def task_failed(self, index: int, record: str | None = None):
         if record is not None:

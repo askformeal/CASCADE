@@ -128,15 +128,15 @@ def add(ctx: Context, request: dict) -> Response:
         if len(aliases) == 0:
             aliases = [None] * len(paths)
         failed = []
-        succeed = [] # otherwise all the info about auto meta and alias will be lost
+        succeeded = [] # otherwise all the info about auto meta and alias will be lost
         for path, alias in zip(paths, aliases):
             add_response = add_song(ctx, path, set_meta, bind_alias, set_lyric, alias=alias, cwd=cwd, loose_path=loose_path)
             if add_response.ok():
-                succeed.append(add_response)
+                succeeded.append(add_response)
             else:
                 failed.append(add_response)
     
-        return gen_response.BatchAuto('songs added to library', len(failed), len(paths), attachment=succeed, failed=failed)
+        return gen_response.BatchAuto('songs added to library', len(failed), len(paths), attachment=succeeded, failed=failed)
 
 def del_(ctx: Context, request: dict) -> Response:
     songs = request['songs']

@@ -180,13 +180,13 @@ def batch_fetch(ctx: Context, args: list[tuple]):
             else:
                 ctx.database.set_song_meta(song_id, 'lyric', path)
                 logger.info(f'Fetched lyric for \"{song_name}\": saved to {path}')
-                ctx.task.task_succeed(task_index, f'Wrote into {path}, fetching completed')
+                ctx.task.task_succeeded(task_index, f'Wrote into {path}, fetching completed')
                 ok += 1
 
     ctx.notify(f'[{ok}/{len(results)}] lyric(s) fetched successfully')
     ctx.task.log_task(batch_task_index, f'[{ok}/{len(results)}] fetched successfully')
     if ok > 0:
-        ctx.task.task_succeed(batch_task_index)
+        ctx.task.task_succeeded(batch_task_index)
     else:
         ctx.task.task_failed(batch_task_index)
 
