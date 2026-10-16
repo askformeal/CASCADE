@@ -19,6 +19,10 @@
 
 - A reload lyric button (thanks Monica for the icon).
 
+#### Dashboard
+
+- A `Ctrl+y` hotkey to reload lyric.
+
 ### Changed
 
 #### Overall
