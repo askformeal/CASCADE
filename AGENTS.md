@@ -11,7 +11,7 @@ Always run from the repo root with the project venv. Never use the global Python
 - Run the CLI: `./venv/Scripts/python.exe -m src <command>`
 - Run all tests: `./venv/Scripts/python.exe -m pytest`
 - Run one file / one test: `./venv/Scripts/python.exe -m pytest tests/test_backend.py -xvs` / `... tests/test_backend.py::test_name`
-- Start / stop the daemon: `./venv/Scripts/python.exe -m src start` / `... exit`
+- Start / stop the daemon: `./venv/Scripts/python.exe -m src start [module]` / `... exit`. `<module>` is `backend` (default), `hotkey`, `tray` or `lyric`, so a single background service can be started on its own
 - Install deps: `./venv/Scripts/python.exe -m pip install -r requirements-dev.txt`
 - Portable build: `bash build.sh` (bundles a standalone interpreter and VLC into `dist/`)
 - Release: `./venv/Scripts/bump-my-version.exe bump patch|minor`, commit the two version files, then `git tag vX.Y.Z`
@@ -42,6 +42,7 @@ Always run from the repo root with the project venv. Never use the global Python
 - SQLite is one connection per thread (`threading.local` in `src/backend/database/core.py`). Never hand a connection or cursor to another thread.
 - The TUI and GUI frontends share one bare-letter hotkey cluster. Check `DashKeyMap` in `src/constants/dash.py` before claiming a new key.
 - Long work belongs in a thread (lyric fetching, library scanning), never in the dispatch loop.
+- Background services are spawned by `ProcessManager.spawn()` with a dotted module path (`python -m src.frontend.tray`), so a short name gets a child that dies silently - `spawn()` sends its output to `DEVNULL`. `NAME_TO_MODULE` in `src/constants/cli.py` holds those paths.
 - User state (database, logs, `PID.json`, `config.toml`) lives outside the repo, under the platformdirs paths in `src/constants/paths/`.
 
 ## Conventions
@@ -54,8 +55,8 @@ Always run from the repo root with the project venv. Never use the global Python
 
 ## Git
 
-- Commit messages: conventional prefix (`feat:` / `fix:` / `refactor:` / `docs:` / `chore:`), verb phrase, lowercase, no trailing period. No body unless one was asked for.
-- `CHANGELOG.md` records every version. New work goes under `[Unreleased]` in the subsections already used there (`#### Overall`, `#### Backend`, `#### CLI`, `#### GUI`), and lists only what the commit actually contains.
+- Commit messages: conventional prefix, verb phrase, lowercase, no trailing period. No body unless one was asked for. General prefixes are `feat:` / `fix:` / `refactor:` / `docs:` / `chore:`, and a change confined to one frontend takes that frontend's name instead (`dash:`, `gui:`, `cli:`).
+- `CHANGELOG.md` records every version. New work goes under `[Unreleased]`, in the subsection for the area or frontend it touches (`#### Overall`, `#### Backend`, `#### CLI`, `#### GUI`, `#### Dashboard`, `#### Tray icon`, `#### Config GUI`). List only what the commit actually contains.
 - Commit, tag and push only when explicitly asked. Never commit secrets or `.env`.
 
 ## Documentation
