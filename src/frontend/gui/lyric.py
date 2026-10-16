@@ -2,6 +2,7 @@ import tkinter as tk
 
 from .logger import logger
 from src.constants.paths.res.gui import (
+    RELOAD_LYRIC_ICON,
     ONLINE_LYRIC_ICON,
     LOCAL_LYRIC_ICON,
     RESET_OFFSET_ICON
@@ -35,6 +36,7 @@ class LyricMixin:
 
         self.offset_dragging = False
 
+        self.reload_lyric_icon = self.get_icon(RELOAD_LYRIC_ICON)
         self.online_lyric_icon = self.get_icon(ONLINE_LYRIC_ICON)
         self.local_lyric_icon = self.get_icon(LOCAL_LYRIC_ICON)
         self.reset_offset_icon = self.get_icon(RESET_OFFSET_ICON)
@@ -44,6 +46,17 @@ class LyricMixin:
         self.hotkey(self, '<[>', lambda *_: self._move_offset(False))
         self.hotkey(self, '<]>', lambda *_: self._move_offset(True))
         self.hotkey(self, '<z>', self._toggle_online_lyric)
+
+        top_bar = tk.Frame(lyric_frame)
+        top_bar.pack(fill='x', pady=(0, 10))
+
+        reload_lyric_button = tk.Button(
+            top_bar,
+            image=self.reload_lyric_icon,
+            command=self._reload_lyric
+            )
+        reload_lyric_button.pack(side='right')
+        self.balloon.bind_widget(reload_lyric_button, 'Reload Lyric')
 
         self.lyric_box = tk.Listbox(lyric_frame, 
                                     bg=LYRIC_BG,
@@ -102,6 +115,9 @@ class LyricMixin:
         if time_ is not None:
             self.send_command('seek', time=str(time_), ms=True)
             self.lyric_box.select_clear(0, tk.END)
+
+    def _reload_lyric(self: 'GUI', *_):
+        self.send_command('reload_lyric')
 
     def _toggle_online_lyric(self: 'GUI', *_):
         self.send_command('switch_lyric_mode')

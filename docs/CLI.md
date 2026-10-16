@@ -136,9 +136,13 @@ Toggle loop mode.
 
 Toggle reverse sequence mode. Overridden by shuffle mode.
 
+#### `cascade reload-lyric`
+
+Reload lyric. Useful when online lyric turns up empty.
+
 #### `cascade lyric`
 
-Switch lyric source: local / online
+Switch lyric source: local / online.
 
 #### `cascade switch <num>`
 

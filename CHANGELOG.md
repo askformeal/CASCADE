@@ -7,11 +7,17 @@
 #### Overall
 
 - A **task system** - access tasks via `task` command on CLI.
+- Reloading lyric.
 
 #### CLI
 
 - `task` command to view tasks, with filtered-by-status option (`-f`/`--filter`).
 - `-r` / `--reverse` option for `lib playlist sort` to sort in reverse.
+- `reload-lyric` command to reload lyric.
+
+#### GUI
+
+- A reload lyric button (thanks Monica for the icon).
 
 ### Changed
 

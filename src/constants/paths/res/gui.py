@@ -28,6 +28,7 @@ FILTER_ICON = get_res('gui/filter.png')
 SELECT_CURRENT_ICON = get_res('gui/select_current.png')
 SWITCH_SELECTED_ICON = get_res('gui/switch_selected.png')
 
+RELOAD_LYRIC_ICON = get_res('gui/reload_lyric.png')
 ONLINE_LYRIC_ICON = get_res('gui/online_lyric.png')
 LOCAL_LYRIC_ICON = get_res('gui/local_lyric.png')
 
