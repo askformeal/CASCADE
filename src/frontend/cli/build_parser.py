@@ -61,6 +61,13 @@ class Builder:
         parser.add_argument('-V', '--version', action='version', version=f'CASCADE version {__version__}')
 
         start_parser = self._add_parser(command_sub, 'start', help='Start CASCADE backend')
+        start_parser.add_argument(
+            'module',
+            type=str,
+            nargs='?',
+            choices=['backend', 'hotkey', 'tray', 'lyric'],
+            default='backend',
+        )
         start_parser.add_argument('-c', '--continue', action='store_true', help='Continue playing last song')
         start_parser.add_argument('--dev', action='store_true', help='Start in development mode')
 

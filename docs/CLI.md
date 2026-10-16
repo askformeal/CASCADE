@@ -64,9 +64,22 @@ All of them have these options available:
 
 ## Lifecycle
 
-#### `cascade start` / `cascade reboot`
+#### `cascade start [module]`
 
-Start or restart backend.
+Start a module.
+
+- `backend` (default): CASCADE backend.
+- `hotkey`: Hotkey service.
+- `tray`: System tray icon.
+- `lyric`: Floating lyric board.
+
+`-c`/`--continue`: Resume last session.
+
+`--dev`: Boot with an alternative development database.
+
+#### `cascade reboot`
+
+Restart backend.
 
 `-c`/`--continue`: Resume last session.
 

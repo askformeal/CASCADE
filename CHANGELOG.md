@@ -11,6 +11,7 @@
 
 #### CLI
 
+- `start` now can also be used to start services.
 - `task` command to view tasks, with filtered-by-status option (`-f`/`--filter`).
 - `-r` / `--reverse` option for `lib playlist sort` to sort in reverse.
 - `reload-lyric` command to reload lyric.

@@ -9,6 +9,12 @@ NON_REQUEST_KEYS = ('verbose', 'dev', 'yes', 'direct', 'short', 'full', 'filter'
 
 TERMINAL_WIDTH_REDUNDANCY = 4
 
+NAME_TO_MODULE = {
+    'hotkey': 'src.frontend.hotkey',
+    'tray': 'src.frontend.tray',
+    'lyric': 'src.frontend.lyric',
+}
+
 HELP_DESCRIPTION = f'''
 Command-line Audio Stream Capture And Decoding Engine
 

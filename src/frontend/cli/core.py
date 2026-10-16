@@ -10,7 +10,12 @@ from src.frontend.client import send_request
 from src.process import ProcessManager
 from src.constants.paths.log import CLI_LOG
 from src.constants.frontend import ATTACHMENT_REQUIRED_ACTIONS
-from src.constants.cli import FAIL_TAG, OK_TAG, NON_REQUEST_KEYS
+from src.constants.cli import (
+    FAIL_TAG,
+    OK_TAG,
+    NON_REQUEST_KEYS,
+    NAME_TO_MODULE
+    )
 from src.config_manager import CONFIG_MANAGER
 from .song_output import SongOutput
 from src.utils.escape_code import ESCAPE_CODE as EC
@@ -44,8 +49,14 @@ def main() -> int:
     }
 
     if args['action'] == 'start':
-        _start_backend(process, **environ)
-        show_notifies(get_notifies())
+        module = args['module']
+        if module == 'backend':
+            _start_backend(process, **environ)
+            show_notifies(get_notifies())
+        else:
+            module_path = NAME_TO_MODULE[module]
+            process.spawn(module_path, **environ)
+            print(cli_box(f'Module \"{module}\" started {EC.dim}({module_path}){EC.reset}'))
 
     elif args['action'] == 'reboot':
         _reboot_backend(process, **environ)
