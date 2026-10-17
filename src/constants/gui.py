@@ -43,3 +43,15 @@ SCROLL_EVENTS = (
 )
 
 MAX_OFFSET = 5000
+
+TASK_REFRESH_INTERVAL = 300 # ms
+
+TASK_SCROLL_WIDTH = 560
+TASK_SCROLL_HEIGHT = 700
+TASK_RECORD_WRAP = 400
+
+TASK_STATUS_FG = {
+    'running': '#c28f03',
+    'succeeded': 'green',
+    'failed': 'red'
+}

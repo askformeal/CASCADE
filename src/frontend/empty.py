@@ -15,3 +15,9 @@ class Empty:
 
     def __hash__(self) -> int:
         return id(self)
+
+    def __copy__(self):
+        return self
+
+    def __deepcopy__(self, memo):
+        return self

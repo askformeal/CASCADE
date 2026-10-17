@@ -35,6 +35,8 @@ class MenubarMixin:
         file_menu.add_command(label='Ping backend', command=self.check_backend)
         file_menu.add_command(label='Exit backend', command=lambda: self.send_command('exit'))
         file_menu.add_separator()
+        file_menu.add_command(label='Tasks...', command=self._open_task)
+        file_menu.add_separator()
         file_menu.add_command(
             label='Exit GUI',
             command=lambda *_: self._exit(), 

@@ -55,6 +55,8 @@ class Snapshot:
 
         self.cover_hash = self.empty
 
+        self.tasks = self.empty
+
         self.run_time = self.empty
         self.dev = self.empty
 
@@ -114,6 +116,8 @@ class Snapshot:
 
         self.playlist_name = self.get('playlist_name')
         self.playing_all = self.get('playing_all')
+
+        self.tasks = self.get('tasks')
 
         self.run_time = self.get('run_time')
         self.dev = self.get('dev')

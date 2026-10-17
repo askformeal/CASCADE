@@ -19,6 +19,7 @@
 #### GUI
 
 - A reload lyric button (thanks Monica for the icon).
+- A pop-up to view tasks.
 
 #### Dashboard
 

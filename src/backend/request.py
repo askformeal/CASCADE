@@ -42,7 +42,7 @@ class RequestManager:
         self._add_command('test_alive', misc.test_alive)
         self._add_command('get_notifies', misc.get_notifies)
         self._add_command('status', status.status)
-        self._add_command('task', task.get_tasks)
+        self._add_command('task', task.task)
         self._add_command('exit', misc.exit_)
 
         # Playback

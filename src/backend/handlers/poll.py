@@ -2,11 +2,13 @@ from src import gen_response
 from src.gen_response import Response
 from src.backend.context import Context
 from .status import get_status
+from .task import get_tasks
 from .playback.helpers import get_current_songs, get_current_lyric
 from .library.helpers import get_song_playlist_names
 
 def poll(ctx: Context, request: dict) -> Response:
     snapshot = get_status(ctx)
+    snapshot['tasks'] = get_tasks(ctx)
     song_id = snapshot.get('id', None)
     if song_id is not None:
         snapshot['aliases'] = ctx.database.get_song_aliases(song_id)

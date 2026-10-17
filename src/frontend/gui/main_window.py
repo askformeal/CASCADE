@@ -8,6 +8,7 @@ from src.constants.paths.res import LICENSE
 from src.constants.paths.res.gui import (
     ONLINE_ICON,
     OFFLINE_ICON,
+    TASK_ICON,
     START_ICON
     )
 from src.constants.gui import DEV_COLOR, FONT_SIZE
@@ -15,6 +16,7 @@ from src.constants.misc import ENCODING, REPO_LINK
 from src.utils.time_ import format_time
 from .empty import GUI_EMPTY as EMPTY
 from .menubar import MenubarMixin
+from .task_popup import TaskPopUp
 from .open_dialogue import OpenDialogue
 from .start_popup import StartPopUp
 from typing import TYPE_CHECKING
@@ -52,6 +54,7 @@ class MainWinMixin(MenubarMixin):
         self.online_icon = self.get_icon(ONLINE_ICON, (32, 23))
         self.offline_icon = self.get_icon(OFFLINE_ICON, (32, 23))
         self.start_icon = self.get_icon(START_ICON)
+        self.task_icon = self.get_icon(TASK_ICON)
     
         menubar = tk.Menu(self)
         self.config(menu=menubar)
@@ -80,6 +83,14 @@ class MainWinMixin(MenubarMixin):
                                   text='DEV'
                                   )
         self.balloon.bind_widget(self.dev_label, 'Development mode on')
+
+        task_button = tk.Button(
+            bottom_bar,
+            image=self.task_icon,
+            command=self._open_task
+            )
+        task_button.pack(side='left')
+        self.balloon.bind_widget(task_button, 'Tasks')
     
         main_frame = tk.Frame(self)
         main_frame.pack(
@@ -113,8 +124,7 @@ class MainWinMixin(MenubarMixin):
             fill='y',
             expand=True
         )
-    
-    
+
         self.lyric_pack = lambda: lyric_frame.pack(
             before=left_separator,
             side='left',
@@ -226,6 +236,9 @@ class MainWinMixin(MenubarMixin):
             self.lyric_pack()
         else:
             self.lyric_unpack()
+
+    def _open_task(self: 'GUI', *_):
+        TaskPopUp(self)
 
     def _open_config(self: 'GUI', *_):
         self.process.spawn('src.frontend.config_gui')

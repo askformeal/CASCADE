@@ -18,6 +18,7 @@ MUTE_ICON = get_res('gui/mute.png')
 
 ONLINE_ICON = get_res('gui/online.png')
 OFFLINE_ICON = get_res('gui/offline.png')
+TASK_ICON = get_res('gui/task.png')
 
 SHUFFLE_ICON = get_res('gui/shuffle.png')
 LOOP_ICON = get_res('gui/loop.png')

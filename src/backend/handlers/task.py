@@ -3,7 +3,7 @@ from src import gen_response
 from src.gen_response import Response
 from src.backend.context import Context
 
-def get_tasks(ctx: Context, request: dict) -> Response:
+def get_tasks(ctx: Context) -> list:
     status = {
         SENTINELS.TASK_RUNNING: 'running',
         SENTINELS.TASK_SUCCEEDED: 'succeeded',
@@ -13,4 +13,8 @@ def get_tasks(ctx: Context, request: dict) -> Response:
     for i, task in enumerate(tasks):
         tasks[i]['status'] = status[task['status']]
 
-    return gen_response.Success('tasks obtained', attachment=tasks)
+    return tasks
+
+
+def task(ctx: Context, request: dict) -> Response:
+    return gen_response.Success('tasks obtained', attachment=get_tasks(ctx))
